@@ -1,21 +1,27 @@
 {
+  "short_name": "IEEM Admin",
   "name": "Dirección de Administración - IEEM",
-  "short_name": "Direccion de Administracion",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#007bff",
-  "theme_color": "#007bff",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
+      "src": "favicon.png",
+      "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
+      "src": "apple-icon-180.png",
+      "sizes": "180x180",
       "type": "image/png"
+    },
+    {
+      "src": "ieemlogo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": ".",
+  "background_color": "#f3f3f9",
+  "theme-color": "#6f42c1",
+  "display": "standalone",
+  "orientation": "portrait"
 }
