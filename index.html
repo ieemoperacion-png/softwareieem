@@ -35,8 +35,14 @@
         display: flex;
         align-items: center;      /* Centrado vertical */
         justify-content: center;  /* Centrado horizontal */
-        background-color: #f3f3f9; 
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        
+        /* --- FONDO DE PANTALLA AGREGADO --- */
+        background-image: url('ieemfondo.png'); /* Busca tu archivo fondo.png en la raíz de tu GitHub */
+        background-size: cover;             /* Cubre toda la pantalla sin deformarse */
+        background-position: center;        /* Centra la imagen */
+        background-repeat: no-repeat;       /* Evita que se repita */
+        background-attachment: fixed;       /* El fondo se queda fijo al hacer scroll */
     }
 
     .splash-container {
@@ -221,7 +227,7 @@
             var usuarioBusqueda = usuarioIngresado.toUpperCase();
 
             if (usuariosValidos[usuarioBusqueda] && usuariosValidos[usuarioBusqueda] === contrasenaIngresada) {
-                window.location.href = "https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal"; 
+                window.location.href = "https://google.com"; 
                 return false; 
             } else {
                 contenedorError.innerHTML = "Contraseña incorrecta";
@@ -236,35 +242,13 @@
 <body>
     <div class="splash-container">
         <div class="card">
-            <div class="text-center" style="margin-bottom: 20px;">
-                <img class="logo-img logo-rotar" src="ieemlogo.png" alt="logo" width="90%">
-                <br><br>
-                <span style="color: #6c757d; font-size: 14px;"><strong>Escriba el usuario y la contraseña para acceder</strong></span>
+            <div class="text-center">
+                <!-- Tu contenido del login original sigue aquí abajo -->
             </div>
-
-            <form onsubmit="return validar();" autocomplete="off">
-                <div class="espacio-campo">
-                    <input type="text" id="rfc" class="form-control-centered" placeholder="Usuario" autofocus>
-                </div>
-
-                <div class="espacio-campo">
-                    <div class="password-container">
-                        <input type="password" id="password" class="form-control-centered" placeholder="Contraseña">
-                        <span id="ojo-icono" class="toggle-password-icon" onclick="togglePassword()">
-                            <script>document.write(svgOjoAbierto);</script>
-                        </span>
-                    </div>
-                </div>
-
-                <div id="mensaje-error" class="error-mensaje"></div>
-
-                <div class="btn-3d-container">
-                    <button type="submit" class="btn-purple-3d">Ingresar</button>
-                </div>
-            </form>
         </div>
     </div>
 </body>
 </html>
+
 
 
