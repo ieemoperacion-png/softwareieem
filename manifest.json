@@ -1,9 +1,9 @@
 {
-  "short_name": "Dirección de Administración - IEEM",
+  "short_name": "IEEM Admin",
   "name": "Dirección de Administración - IEEM",
   "icons": [
     {
-      "src": "favicon.PNG",
+      "src": "favicon.png",
       "sizes": "32x32",
       "type": "image/png"
     },
@@ -13,14 +13,10 @@
       "type": "image/png"
     },
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
+      "src": "ieemlogo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
