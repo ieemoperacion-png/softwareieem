@@ -6,24 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>DIRECCION DE ADMINISTRACION</title>
     
-    <!-- ============================================== -->
-    <!-- CONFIGURACIÓN DE ICONOS PARA MÓVILES (COMPLETO) -->
-    <!-- ============================================== -->
-    <!-- Icono estándar de pestaña para Navegadores Web de Escritorio -->
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="./assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link href="./assets/vendor/fonts/circular-std/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/libs/css/style.css">
+    <link rel="stylesheet" href="./assets/vendor/fonts/fontawesome/css/fontawesome-all.css">
     
-    <!-- CONFIGURACIÓN EXCLUSIVA PARA iOS (iPhone / iPad - Safari) -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Direccion de Administracion">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180.png">
-    
-    <!-- CONFIGURACIÓN EXCLUSIVA PARA ANDROID (Chrome / Samsung Internet) -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#6f42c1"> <!-- Actualizado a Morado -->
-    <link rel="manifest" href="manifest.json">
-    <!-- ============================================== -->
-
     <style>
     html,
     body {
@@ -35,14 +23,7 @@
         display: flex;
         align-items: center;      /* Centrado vertical */
         justify-content: center;  /* Centrado horizontal */
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        
-        /* --- FONDO DE PANTALLA AGREGADO --- */
-        background-image: url('ieemfondo.png'); /* Busca tu archivo fondo.png en la raíz de tu GitHub */
-        background-size: cover;             /* Cubre toda la pantalla sin deformarse */
-        background-position: center;        /* Centra la imagen */
-        background-repeat: no-repeat;       /* Evita que se repita */
-        background-attachment: fixed;       /* El fondo se queda fijo al hacer scroll */
+        background-color: #f3f3f9; 
     }
 
     .splash-container {
@@ -52,66 +33,16 @@
         margin: 0 auto;
     }
 
-    .card {
-        background: #ffffff;
-        border: 1px solid #e3e3e3;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    /* --- ESTILO MODERNO DE LOS CUADROS DE TEXTO REDONDEADOS --- */
+    /* --- ALINEACIÓN CENTRAL Y SEPARACIÓN DE LOS CAMPOS --- */
     .form-control-centered {
         text-align: center;
-        width: 100%;             
+        width: 100%;             /* Fuerza a ocupar el 100% del contenedor igual que el botón */
         box-sizing: border-box;
-        border-radius: 20px; /* Bordes bien redondeados */
-        border: 1px solid #ced4da;
-        padding: 12px 20px;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    /* Cambio a morado cuando el usuario hace clic para escribir */
-    .form-control-centered:focus {
-        border-color: #6f42c1;
     }
 
     /* Genera el espacio vertical entre el campo Usuario y Contraseña */
     .espacio-campo {
         margin-bottom: 20px;     
-    }
-
-    /* --- CONTENEDOR RELATIVO PARA EL CAMPO CON EL OJO --- */
-    .password-container {
-        position: relative;
-        width: 100%;
-    }
-
-    /* Posiciona el ojito flotando en la parte derecha interior del campo */
-    .toggle-password-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        z-index: 10;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .toggle-password-icon svg {
-        width: 100%;
-        height: 100%;
-        fill: #71748d;
     }
 
     /* --- ANIMACIÓN DE ROTACIÓN PARA EL LOGO --- */
@@ -131,18 +62,18 @@
         }
     }
 
-    /* --- DISEÑO EXCLUSIVO BOTÓN MORADO 3D --- */
+    /* --- DISEÑO EXCLUSIVO BOTÓN AZUL 3D --- */
     .btn-3d-container {
         text-align: center;
         width: 100%;
         padding-top: 5px;
     }
 
-    .btn-purple-3d {
+    .btn-blue-3d {
         position: relative;
         display: inline-block;
         width: 100%;
-        background: #6f42c1; /* Morado principal */
+        background: #007bff; 
         color: white;
         font-size: 18px;
         font-weight: bold;
@@ -152,18 +83,18 @@
         padding: 12px 24px;
         cursor: pointer;
         outline: none;
-        box-shadow: 0 6px 0 #512da8, 0 10px 15px rgba(0, 0, 0, 0.2); /* Efecto profundidad */
+        box-shadow: 0 6px 0 #0056b3, 0 10px 15px rgba(0, 0, 0, 0.2);
         transition: all 0.1s ease;
     }
 
-    .btn-purple-3d:hover {
-        background: #8250df; /* Un tono más claro al pasar el ratón */
+    .btn-blue-3d:hover {
+        background: #1a88ff;
         color: white;
     }
 
-    .btn-purple-3d:active {
-        box-shadow: 0 2px 0 #512da8, 0 4px 6px rgba(0, 0, 0, 0.2);
-        transform: translateY(4px); /* Simula el hundimiento del botón */
+    .btn-blue-3d:active {
+        box-shadow: 0 2px 0 #0056b3, 0 4px 6px rgba(0, 0, 0, 0.2);
+        transform: translateY(4px); 
     }
 
     /* Leyenda de error en rojo */
@@ -177,29 +108,17 @@
     }
     </style>
     
+    <!-- CDN corregido de SweetAlert para que funcionen las alertas swal() -->
+    <script src="https://unpkg.com"></script>
+    
     <script type="text/javascript">
-        // CÓDIGO NATIVO DEL OJITO CON ICONOS EN ESPACIO VECTORIAL (SVG)
-        var svgOjoAbierto = '<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
-        var svgOjoCerrado = '<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.01-.16c0-1.66-1.34-3-3-3l-.16.01z"/></svg>';
-
-        function togglePassword() {
-            var inputPassword = document.getElementById("password");
-            var btnIcono = document.getElementById("ojo-icono");
-            
-            if (inputPassword.type === "password") {
-                inputPassword.type = "text";
-                btnIcono.innerHTML = svgOjoCerrado;
-            } else {
-                inputPassword.type = "password";
-                btnIcono.innerHTML = svgOjoAbierto;
-            }
-        }
-
         function validar() {
             var contenedorError = document.getElementById("mensaje-error");
+            
             contenedorError.style.display = "none";
             contenedorError.innerHTML = "";
 
+            // Acceso limpio a los campos del formulario usando el DOM estándar
             var txtRfc = document.getElementById("rfc");
             var txtPassword = document.getElementById("password");
 
@@ -207,12 +126,12 @@
             var contrasenaIngresada = txtPassword.value;
 
             if (usuarioIngresado === "") { 
-                alert("El campo de USUARIO es requerido");
+                swal("Usuario", "El campo de USUARIO es requerido", "warning");
                 txtRfc.focus();		
                 return false;
             }
             if (contrasenaIngresada === "") { 
-                alert("La CONTRASEÑA es requerida");
+                swal("Contraseña", "La CONTRASEÑA es requerida", "warning");
                 txtPassword.focus();		
                 return false;
             }
@@ -220,19 +139,19 @@
             var usuariosValidos = {
                 "DIRADMIN": "Pr0c3s0.",
                 "IGNACIO": "admin",
-                "DOMINGO" :"admin",
-                "ADMIN":"ADMIN"
+                "DOMINGO" :"admin"
             };
 
             var usuarioBusqueda = usuarioIngresado.toUpperCase();
 
             if (usuariosValidos[usuarioBusqueda] && usuariosValidos[usuarioBusqueda] === contrasenaIngresada) {
-                window.location.href = "https://google.com"; 
+                // Redirección hacia la plataforma externa de Google Sites
+                window.location.href = "https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal"; 
                 return false; 
             } else {
                 contenedorError.innerHTML = "Contraseña incorrecta";
                 contenedorError.style.display = "block";
-                alert("Usuario o contraseña incorrectos");
+                swal("Error de Acceso", "Usuario o contraseña incorrectos", "error");
                 return false;
             }
         }
@@ -242,13 +161,33 @@
 <body>
     <div class="splash-container">
         <div class="card">
-            <div class="text-center">
-                <!-- Tu contenido del login original sigue aquí abajo -->
+            <div class="card-header text-center">
+                <!-- Se asume que ieemlogo.png está en el mismo directorio raíz -->
+                <img class="logo-img logo-rotar" src="ieemlogo.png" alt="logo" width="90%">
+                <br><br>
+                <span class="splash-description"><strong>Escriba el usuario y la contraseña para acceder al sistema</strong></span>
+            </div>
+            <div class="card-body">
+                <form id="Reg" name="Reg" method="post" action="#">
+                    <div class="form-group espacio-campo">
+                        <input class="form-control form-control-lg form-control-centered" id="rfc" name="rfc" maxlength="13" type="text" placeholder="USUARIO">
+                    </div>
+                    <div class="form-group espacio-campo">
+                        <input class="form-control form-control-lg form-control-centered" id="password" name="password" type="password" placeholder="CONTRASEÑA" autocomplete="off">
+                    </div>
+                    
+                    <div id="mensaje-error" class="error-mensaje"></div>
+
+                    <div class="btn-3d-container">
+                        <button type="button" onClick="validar()" class="btn-blue-3d">INGRESAR</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+  
+    <!-- Optional JavaScript -->
+    <script src="./assets/vendor/jquery/jquery-3.3.1.min.js"></script>
+    <script src="./assets/vendor/bootstrap/js/bootstrap.bundle.js"></script>
 </body>
 </html>
-
-
-
