@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IEEM - Carga de Archivos Completo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6e6e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #e6e6e6;
+            text-align: center;
+            width: 480px;
+        }
+
+        /* CONTENEDOR PRINCIPAL DEL LOGO CON ANIMACIÓN DE FLOTACIÓN */
+        .logo-container {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            position: relative;
+            animation: flotar 4s ease-in-out infinite;
+        }
+
+        /* EFECTO DE BRILLO METÁLICO QUE CRUZA TODO EL LOGO */
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.25) 50%, 
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: skewX(-25deg);
+            z-index: 10;
+            pointer-events: none;
+            animation: brillo 6s ease-in-out infinite;
+        }
+
+        /* Bloque Morado Principal */
+        .header-ieem {
+            background-color: #702082; /* Morado institucional */
+            color: white;
+            padding: 35px 20px 20px 20px;
+        }
+
+        /* BLOQUE ROSA INFERIOR INTEGRADO EXACTAMENTE COMO LA IMAGEN */
+        .footer-ieem-pink {
+            background-color: #de177e; /* Rosa institucional */
+            height: 18px;
+            width: 100%;
+        }
+
+        .logo-text {
+            font-size: 46px;
+            font-weight: bold;
+            font-style: italic;
+            margin: 0;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+        }
+
+        .sub-text {
+            font-size: 11px;
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            padding-top: 6px;
+            margin: 6px 0 22px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .title-admin {
+            font-size: 16px;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 0.8px;
+        }
+
+        /* CONFIGURACIÓN DE LAS ANIMACIONES */
+        @keyframes flotar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); } /* Movimiento vertical suave */
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes brillo {
+            0% { left: -150%; }
+            20% { left: 150%; } /* Destello rápido */
+            100% { left: 150%; } /* Pausa elegante */
+        }
+
+        /* Contenedor General de Cargas */
+        .content-container {
+            margin-top: 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* Área de cada archivo */
+        .file-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f2f2f2;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .file-link {
+            color: #337ab7;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .file-link:hover {
+            text-decoration: underline;
+        }
+
+        .actions-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .label-carga {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        /* Botones de acción */
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9);
+        }
+
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-delete {
+            fill: #555555;
+        }
+
+        .icon-upload {
+            fill: #337ab7;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- Contenedor unificado del logotipo con la barra rosa inferior -->
+    <div class="logo-container">
+        <!-- Parte Morada -->
+        <div class="header-ieem">
+            <div class="logo-text">IEEM</div>
+            <div class="sub-text">Instituto Electoral del Estado de México</div>
+            <div class="title-admin">Dirección de Administración</div>
+        </div>
+        <!-- Parte Rosa Sólida Inferior -->
+        <div class="footer-ieem-pink"></div>
+    </div>
+
+    <!-- Contenedor con los dos apartados de carga -->
+    <div class="content-container">
+        
+        <!-- PRIMER ARCHIVO -->
+        <div class="file-block">
+            <a id="file-download-1" class="file-link" href="#" style="display: none;">Archivo 1</a>
+            <span id="no-file-1" style="color: #777; font-size: 14px; margin-bottom: 8px;">Ningún archivo seleccionado (Bloque 1)</span>
+
+            <div class="actions-row">
+                <span class="label-carga">Carga el archivo 1</span>
+                <input type="file" id="file-input-1" class="hidden-input">
+
+                <button class="btn-icon" id="btn-delete-1" title="Eliminar archivo 1">
+                    <svg class="icon-delete" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                </button>
+
+                <button class="btn-icon" id="btn-upload-1" title="Subir archivo 1">
+                    <svg class="icon-upload" viewBox="0 0 24 24">
+                        <path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- SEGUNDO ARCHIVO -->
+        <div class="file-block">
+            <a id="file-download-2" class="file-link" href="#" style="display: none;">Archivo 2</a>
+            <span id="no-file-2" style="color: #777; font-size: 14px; margin-bottom: 8px;">Ningún archivo seleccionado (Bloque 2)</span>
+
+            <div class="actions-row">
+                <span class="label-carga">Carga el archivo 2</span>
+                <input type="file" id="file-input-2" class="hidden-input">
+
+                <button class="btn-icon" id="btn-delete-2" title="Eliminar archivo 2">
+                    <svg class="icon-delete" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                </button>
+
+                <button class="btn-icon" id="btn-upload-2" title="Subir archivo 2">
+                    <svg class="icon-upload" viewBox="0 0 24 24">
+                        <path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Código JavaScript independiente para gestionar ambos archivos
+    const fileInput1 = document.getElementById('file-input-1');
+    const btnUpload1 = document.getElementById('btn-upload-1');
+    const btnDelete1 = document.getElementById('btn-delete-1');
+    const fileDownload1 = document.getElementById('file-download-1');
+    const noFileText1 = document.getElementById('no-file-1');
+
+    btnUpload1.addEventListener('click', () => fileInput1.click());
+    
+    fileInput1.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileDownload1.textContent = file.name;
+            fileDownload1.href = URL.createObjectURL(file);
+            fileDownload1.download = file.name;
+            fileDownload1.style.display = 'block';
+            noFileText1.style.display = 'none';
+        }
+    });
+
+    btnDelete1.addEventListener('click', () => {
+        fileInput1.value = '';
+        if (fileDownload1.href.startsWith('blob:')) URL.revokeObjectURL(fileDownload1.href);
+        fileDownload1.style.display = 'none';
+        noFileText1.style.display = 'block';
+    });
+
+    const fileInput2 = document.getElementById('file-input-2');
+    const btnUpload2 = document.getElementById('btn-upload-2');
+    const btnDelete2 = document.getElementById('btn-delete-2');
+    const fileDownload2 = document.getElementById('file-download-2');
+    const noFileText2 = document.getElementById('no-file-2');
+
+    btnUpload2.addEventListener('click', () => fileInput2.click());
+    
+    fileInput2.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileDownload2.textContent = file.name;
+            fileDownload2.href = URL.createObjectURL(file);
+            fileDownload2.download = file.name;
+            fileDownload2.style.display = 'block';
+            noFileText2.style.display = 'none';
+        }
+    });
+
+    btnDelete2.addEventListener('click', () => {
+        fileInput2.value = '';
+        if (fileDownload2.href.startsWith('blob:')) URL.revokeObjectURL(fileDownload2.href);
+        fileDownload2.style.display = 'none';
+        noFileText2.style.display = 'block';
+    });
+</script>
+
+</body>
+</html>
