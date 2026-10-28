@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IEEM - Descarga de Archivos</title>
+    <title>IEEM - file upload</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -110,34 +110,63 @@
             flex-direction: column;
             align-items: center;
             background-color: #f2f2f2;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .file-link {
-            color: #702082;
+            color: #337ab7;
             text-decoration: none;
-            font-size: 16px;
+            font-size: 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
             font-weight: bold;
-            background-color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 2px solid #702082;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .file-link:hover {
-            background-color: #702082;
-            color: #ffffff;
-            text-decoration: none;
+            text-decoration: underline;
         }
 
-        .no-file-text {
-            color: #777; 
-            font-size: 14px; 
-            font-style: italic;
+        .actions-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .label-carga {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.9);
+        }
+
+        .btn-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-delete {
+            fill: #555555;
+        }
+
+        .icon-upload {
+            fill: #337ab7;
         }
     </style>
 </head>
@@ -148,7 +177,7 @@
         <div class="header-ieem">
             <div class="logo-text">IEEM</div>
             <div class="sub-text">Instituto Electoral del Estado de México</div>
-            <div class="title-admin">Consulta de Documentos</div>
+            <div class="title-admin">Dirección de Administración</div>
         </div>
         <div class="footer-ieem-pink"></div>
     </div>
@@ -157,43 +186,35 @@
         
         <!-- PRIMER ARCHIVO -->
         <div class="file-block">
-            <!-- El enlace se mostrará dinámicamente si existe archivo, si no, se muestra el texto -->
-            <a id="file-download-1" class="file-link" href="#" download style="display: none;">📥 Descargar Archivo 1</a>
-            <span id="no-file-1" class="no-file-text">El Administrador aún no ha subido el Archivo 1</span>
+            <a id="file-download-1" class="file-link" href="CATALOGO DE MOBILIARIO.xlsx" download>CATALOGO DE MOBILIARIO.xlsx</a>
+
+            <div class="actions-row">
+                <span class="label-carga">Administrar Archivo 1</span>
+                <button class="btn-icon" title="Eliminar (Simulado)">
+                    <svg class="icon-delete" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+                <button class="btn-icon" title="Subir nuevo (Ir a GitHub)">
+                    <svg class="icon-upload" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+                </button>
+            </div>
         </div>
 
         <!-- SEGUNDO ARCHIVO -->
         <div class="file-block">
-            <a id="file-download-2" class="file-link" href="#" download style="display: none;">📥 Descargar Archivo 2</a>
-            <span id="no-file-2" class="no-file-text">El Administrador aún no ha subido el Archivo 2</span>
+            <a id="file-download-2" class="file-link" href="DISTRITALES TDV2.xlsx" download>DISTRITALES TDV2.xlsx</a>
+
+            <div class="actions-row">
+                <span class="label-carga">Administrar Archivo 2</span>
+                <button class="btn-icon" title="Eliminar (Simulado)">
+                    <svg class="icon-delete" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+                <button class="btn-icon" title="Subir nuevo (Ir a GitHub)">
+                    <svg class="icon-upload" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+                </button>
+            </div>
         </div>
 
     </div>
 </div>
-
-<script>
-    // NOTA: Para conectar los datos entre tu página de admin y esta, 
-    // se requiere un backend o base de datos. Si estás usando LocalStorage temporalmente:
-    
-    function verificarArchivos() {
-        const archivo1 = localStorage.getItem('archivo1_url'); // O como guardes tu archivo
-        const archivo2 = localStorage.getItem('archivo2_url');
-
-        if(archivo1) {
-            document.getElementById('file-download-1').href = archivo1;
-            document.getElementById('file-download-1').style.display = 'inline-block';
-            document.getElementById('no-file-1').style.display = 'none';
-        }
-        
-        if(archivo2) {
-            document.getElementById('file-download-2').href = archivo2;
-            document.getElementById('file-download-2').style.display = 'inline-block';
-            document.getElementById('no-file-2').style.display = 'none';
-        }
-    }
-
-    // Ejecutar al cargar la vista
-    window.onload = verificarArchivos;
-</script>
 </body>
 </html>
