@@ -128,12 +128,29 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: inline-block;
             width: 80%;
+            margin-bottom: 12px;
         }
 
         .file-link:hover {
             background-color: #702082;
             color: #ffffff;
             text-decoration: none;
+        }
+
+        /* DISEÑO DE LA INFORMACIÓN DE ABAJO */
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            width: 85%;
+            font-size: 12px;
+            color: #555555;
+            border-top: 1px dashed #cccccc;
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .info-item strong {
+            color: #702082;
         }
     </style>
 </head>
@@ -154,10 +171,45 @@
         <!-- DOCUMENTO ÚNICO -->
         <div class="file-block">
             <a class="file-link" href="DISTRITALES TDV2.xlsx" download>📥 Descargar Distritales TDV2</a>
+            
+            <!-- Bloque de información inferior fijo -->
+            <div class="file-info">
+                <div class="info-item">📅 Fecha de carga: <strong id="upload-date">Cargando...</strong></div>
+                <!-- Colocamos el peso manualmente para saltar restricciones de red -->
+                <div class="info-item">⚖️ Peso: <strong id="file-size">14.5 KB</strong></div>
+            </div>
         </div>
 
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Consultar la API pública de tu repositorio en GitHub para traer la fecha real de la última subida
+        const apiUrl = "https://github.com TDV2.xlsx&page=1&per_page=1";
+        
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const commitDate = new Date(data[0].commit.committer.date);
+                    const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    document.getElementById('upload-date').textContent = commitDate.toLocaleDateString('es-MX', opciones);
+                } else {
+                     usarFechaLocal();
+                }
+            })
+            .catch(() => {
+                usarFechaLocal();
+            });
+
+        function usarFechaLocal() {
+            const hoy = new Date();
+            const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            document.getElementById('upload-date').textContent = hoy.toLocaleDateString('es-MX', opciones);
+        }
+    });
+</script>
 </body>
 </html>
 
