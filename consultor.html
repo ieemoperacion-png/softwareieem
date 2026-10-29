@@ -182,13 +182,12 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // CORRECCIÓN: Codificación del espacio (%20) en la URL de la API
         const apiUrl = "https://github.com";
         
         fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
-                // CORRECCIÓN: Acceso correcto a la posición [0] de la respuesta de commits de GitHub
+                // CORRECCIÓN CLAVE: Se agregó data[0] para leer el primer elemento del arreglo
                 if (data && data.length > 0 && data[0].commit) {
                     const commitDate = new Date(data[0].commit.committer.date);
                     const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
@@ -210,4 +209,3 @@
 </script>
 </body>
 </html>
-
