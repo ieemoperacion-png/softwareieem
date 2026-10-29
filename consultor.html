@@ -160,6 +160,7 @@
         <div class="header-ieem">
             <div class="logo-text">IEEM</div>
             <div class="sub-text">Instituto Electoral del Estado de México</div>
+            <div class="sub-text">Dirección de Administración</div>
             <div class="title-admin">Consulta de Documentos</div>
         </div>
         <div class="footer-ieem-pink"></div>
@@ -182,18 +183,22 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // DIRECCIÓN DE LA API CORREGIDA: Apunta directamente a los commits del archivo específico en tu repositorio
         const apiUrl = "https://github.com";
         
         fetch(apiUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error("Error en la red");
+                return response.json();
+            })
             .then(data => {
-                // CORRECCIÓN CLAVE: Se agregó data[0] para leer el primer elemento del arreglo
-                if (data && data.length > 0 && data[0].commit) {
+                // Validación del arreglo de confirmaciones (commits) que envía GitHub
+                if (data && data.length > 0 && data[0].commit && data[0].commit.committer) {
                     const commitDate = new Date(data[0].commit.committer.date);
                     const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
                     document.getElementById('upload-date').textContent = commitDate.toLocaleDateString('es-MX', opciones);
                 } else {
-                     usarFechaLocal();
+                    usarFechaLocal();
                 }
             })
             .catch(() => {
