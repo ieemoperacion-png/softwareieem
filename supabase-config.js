@@ -3,5 +3,5 @@
 // Nunca colocar aquí service_role ni una secret key.
 window.INVENTARIO_SUPABASE_CONFIG = {
   url: "https://iiqjhultnfwswtbufyed.supabase.co",
-  anonKey: "AQUI_TU_CLAVE_PUBLICABLE_ACTUAL"
+  anonKey: "sb_publishable_hAvPtHeS9zQy-bR5uB8KTw_EhK4M9pI"
 };
