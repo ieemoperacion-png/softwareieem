@@ -523,7 +523,7 @@
                 <span class="auth-instruccion"><strong>Escriba el usuario y la contraseña para acceder</strong></span>
             </div>
 
-            <form onsubmit="iniciarSesion(event)" autocomplete="off">
+            <form id="loginForm" onsubmit="iniciarSesion(event)" autocomplete="off">
                 <div class="auth-campo">
                     <input type="email" id="loginEmail" class="form-control-centered"
                            placeholder="Usuario" autocomplete="username"
@@ -554,7 +554,7 @@
                 <p class="auth-nota">Acceso para cuentas autorizadas. Utilice el correo registrado en Supabase. No hay registro público.</p>
             </form>
 
-            <div style="text-align:center;margin-top:14px;">
+            <div id="recoveryLinkWrap" style="text-align:center;margin-top:14px;">
                 <button type="button" onclick="solicitarRestablecimiento()"
                     style="border:0;background:none;color:#6f42c1;text-decoration:underline;cursor:pointer;font-size:13px;">
                     ¿Olvidaste tu contraseña?
@@ -721,7 +721,10 @@ function validarConfiguracionSupabase() {
 
 async function iniciarApp() {
     if (!validarConfiguracionSupabase()) return;
-    sb.auth.onAuthStateChange(async (event, session) => {
+
+    // El evento PASSWORD_RECOVERY es la señal fiable de que Supabase validó
+    // el enlace enviado por correo y creó la sesión temporal de recuperación.
+    sb.auth.onAuthStateChange((event) => {
         if (event === 'PASSWORD_RECOVERY') {
             mostrarPantallaNuevaContrasena();
             return;
@@ -733,38 +736,71 @@ async function iniciarApp() {
             ocultarPantallaNuevaContrasena();
         }
     });
-    const { data, error } = await sb.auth.getSession();
-    if (error) { mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message); return; }
 
-    // El enlace del correo vuelve a esta misma página con ?restablecer=1.
-    // Si existe una sesión de recuperación, mostrar el formulario y no el inventario.
-    const esRutaRecuperacion = new URLSearchParams(window.location.search).get('restablecer') === '1';
-    if (esRutaRecuperacion && data.session) {
-        mostrarPantallaNuevaContrasena();
+    const params = new URLSearchParams(window.location.search);
+    const esRutaRecuperacion = params.get('restablecer') === '1';
+
+    // Supabase procesa el code/token del enlace al inicializar el cliente.
+    // Esperamos a getSession antes de decidir si se abre el inventario.
+    const { data, error } = await sb.auth.getSession();
+    if (error) {
+        if (esRutaRecuperacion) {
+            mostrarPantallaNuevaContrasena();
+            mostrarMensajeRecuperacion('No se pudo validar el enlace. Solicita uno nuevo desde la pantalla de acceso.');
+        } else {
+            mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message);
+        }
         return;
     }
-    if (data.session) await prepararSesion(data.session);
-    else document.getElementById('authOverlay').style.display = 'flex';
+
+    if (esRutaRecuperacion) {
+        // Nunca enviar al inventario desde la ruta de recuperación.
+        mostrarPantallaNuevaContrasena();
+        if (!data.session) {
+            mostrarMensajeRecuperacion('El enlace no se validó o ya venció. Solicita un nuevo correo de recuperación y abre el enlace más reciente.');
+        }
+        return;
+    }
+
+    if (data.session) {
+        await prepararSesion(data.session);
+    } else {
+        document.getElementById('authOverlay').style.display = 'flex';
+    }
 }
 
 function mostrarPantallaNuevaContrasena() {
-    document.getElementById('appShell').style.display = 'none';
-    document.getElementById('authOverlay').style.display = 'flex';
-    document.getElementById('passwordRecoveryPanel').style.display = 'block';
-    const loginForm = document.querySelector('#authOverlay form');
+    const app = document.getElementById('appShell');
+    const overlay = document.getElementById('authOverlay');
+    const panel = document.getElementById('passwordRecoveryPanel');
+    if (app) app.style.display = 'none';
+    if (overlay) overlay.style.display = 'flex';
+    if (panel) panel.style.display = 'block';
+
+    const loginForm = document.getElementById('loginForm');
+    const recoveryLink = document.getElementById('recoveryLinkWrap');
     if (loginForm) loginForm.style.display = 'none';
-    const recoveryLink = document.querySelector('#authOverlay .auth-card > div[style*="text-align:center"]');
     if (recoveryLink) recoveryLink.style.display = 'none';
-    document.getElementById('auth-message').style.display = 'none';
+
+    const authMessage = document.getElementById('auth-message');
+    if (authMessage) authMessage.style.display = 'none';
 }
 
 function ocultarPantallaNuevaContrasena() {
     const panel = document.getElementById('passwordRecoveryPanel');
+    const loginForm = document.getElementById('loginForm');
+    const recoveryLink = document.getElementById('recoveryLinkWrap');
     if (panel) panel.style.display = 'none';
-    const loginForm = document.querySelector('#authOverlay form');
     if (loginForm) loginForm.style.display = '';
-    const recoveryLink = document.querySelector('#authOverlay .auth-card > div[style*="text-align:center"]');
     if (recoveryLink) recoveryLink.style.display = '';
+}
+
+function mostrarMensajeRecuperacion(mensaje, correcto = false) {
+    const el = document.getElementById('recovery-message');
+    if (!el) return;
+    el.textContent = mensaje || '';
+    el.style.color = correcto ? '#198754' : '#dc3545';
+    el.style.display = mensaje ? 'block' : 'none';
 }
 
 async function solicitarRestablecimiento() {
@@ -795,6 +831,7 @@ async function guardarNuevaContrasena(event) {
     const mensaje = document.getElementById('recovery-message');
 
     mensaje.style.display = 'block';
+    mensaje.style.color = '#dc3545';
     if (password.length < 8) {
         mensaje.textContent = 'La contraseña debe tener al menos 8 caracteres.';
         return;
