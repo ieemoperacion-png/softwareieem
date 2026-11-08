@@ -553,6 +553,36 @@
                 </div>
                 <p class="auth-nota">Acceso para cuentas autorizadas. Utilice el correo registrado en Supabase. No hay registro público.</p>
             </form>
+
+            <div style="text-align:center;margin-top:14px;">
+                <button type="button" onclick="solicitarRestablecimiento()"
+                    style="border:0;background:none;color:#6f42c1;text-decoration:underline;cursor:pointer;font-size:13px;">
+                    ¿Olvidaste tu contraseña?
+                </button>
+            </div>
+
+            <section id="passwordRecoveryPanel" style="display:none;margin-top:18px;border-top:1px solid #eee;padding-top:16px;">
+                <h3 style="text-align:center;color:#002060;font-size:17px;margin:0 0 10px;">Restablecer contraseña</h3>
+                <p style="text-align:center;color:#666;font-size:13px;">
+                    Escribe y confirma tu nueva contraseña.
+                </p>
+                <form onsubmit="guardarNuevaContrasena(event)" autocomplete="off">
+                    <div class="auth-campo">
+                        <input id="newPassword" type="password" class="form-control-centered"
+                            placeholder="Nueva contraseña" minlength="8" required autocomplete="new-password">
+                    </div>
+                    <div class="auth-campo">
+                        <input id="confirmNewPassword" type="password" class="form-control-centered"
+                            placeholder="Confirmar contraseña" minlength="8" required autocomplete="new-password">
+                    </div>
+                    <div id="recovery-message" class="error-mensaje" role="alert" aria-live="polite"></div>
+                    <div class="btn-3d-container">
+                        <button id="saveNewPasswordButton" type="submit" class="btn-purple-3d">
+                            Guardar nueva contraseña
+                        </button>
+                    </div>
+                </form>
+            </section>
         </div>
         <div class="auth-footer">
             <span style="display:block;font-weight:500;">IGNACIO EMMANUEL ILAGORRE SALGADO</span>
@@ -691,17 +721,107 @@ function validarConfiguracionSupabase() {
 
 async function iniciarApp() {
     if (!validarConfiguracionSupabase()) return;
-    sb.auth.onAuthStateChange((event) => {
+    sb.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            mostrarPantallaNuevaContrasena();
+            return;
+        }
         if (event === 'SIGNED_OUT') {
             usuarioActual = null; rolActual = 'CONSULTA'; esDirAdmin = false;
             document.getElementById('appShell').style.display = 'none';
             document.getElementById('authOverlay').style.display = 'flex';
+            ocultarPantallaNuevaContrasena();
         }
     });
     const { data, error } = await sb.auth.getSession();
     if (error) { mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message); return; }
+
+    // El enlace del correo vuelve a esta misma página con ?restablecer=1.
+    // Si existe una sesión de recuperación, mostrar el formulario y no el inventario.
+    const esRutaRecuperacion = new URLSearchParams(window.location.search).get('restablecer') === '1';
+    if (esRutaRecuperacion && data.session) {
+        mostrarPantallaNuevaContrasena();
+        return;
+    }
     if (data.session) await prepararSesion(data.session);
     else document.getElementById('authOverlay').style.display = 'flex';
+}
+
+function mostrarPantallaNuevaContrasena() {
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('authOverlay').style.display = 'flex';
+    document.getElementById('passwordRecoveryPanel').style.display = 'block';
+    const loginForm = document.querySelector('#authOverlay form');
+    if (loginForm) loginForm.style.display = 'none';
+    const recoveryLink = document.querySelector('#authOverlay .auth-card > div[style*="text-align:center"]');
+    if (recoveryLink) recoveryLink.style.display = 'none';
+    document.getElementById('auth-message').style.display = 'none';
+}
+
+function ocultarPantallaNuevaContrasena() {
+    const panel = document.getElementById('passwordRecoveryPanel');
+    if (panel) panel.style.display = 'none';
+    const loginForm = document.querySelector('#authOverlay form');
+    if (loginForm) loginForm.style.display = '';
+    const recoveryLink = document.querySelector('#authOverlay .auth-card > div[style*="text-align:center"]');
+    if (recoveryLink) recoveryLink.style.display = '';
+}
+
+async function solicitarRestablecimiento() {
+    if (!sb && !validarConfiguracionSupabase()) return;
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) {
+        mostrarMensajeAcceso('Escribe primero tu correo institucional para enviarte el enlace de recuperación.');
+        document.getElementById('loginEmail').focus();
+        return;
+    }
+    mostrarMensajeAcceso('');
+    try {
+        const redirectTo = window.location.origin + window.location.pathname + '?restablecer=1';
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+        if (error) throw error;
+        mostrarMensajeAcceso('Si el correo está registrado, recibirás un enlace para restablecer tu contraseña. Revisa también tu carpeta de correo no deseado.', false);
+    } catch (error) {
+        mostrarMensajeAcceso('No se pudo enviar el enlace de recuperación: ' + (error.message || 'Intenta nuevamente.'));
+    }
+}
+
+async function guardarNuevaContrasena(event) {
+    event.preventDefault();
+    if (!sb && !validarConfiguracionSupabase()) return;
+    const password = document.getElementById('newPassword').value;
+    const confirmacion = document.getElementById('confirmNewPassword').value;
+    const button = document.getElementById('saveNewPasswordButton');
+    const mensaje = document.getElementById('recovery-message');
+
+    mensaje.style.display = 'block';
+    if (password.length < 8) {
+        mensaje.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+        return;
+    }
+    if (password !== confirmacion) {
+        mensaje.textContent = 'Las contraseñas no coinciden.';
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Guardando...';
+    try {
+        const { error } = await sb.auth.updateUser({ password });
+        if (error) throw error;
+        mensaje.style.color = '#198754';
+        mensaje.textContent = 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.';
+        await sb.auth.signOut();
+        window.history.replaceState({}, document.title, window.location.pathname);
+        ocultarPantallaNuevaContrasena();
+        mostrarMensajeAcceso('Tu contraseña fue actualizada. Ingresa con tu nueva contraseña.', false);
+    } catch (error) {
+        mensaje.style.color = '#dc3545';
+        mensaje.textContent = 'No se pudo actualizar la contraseña: ' + (error.message || '');
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Guardar nueva contraseña';
+    }
 }
 
 async function iniciarSesion(event) {
