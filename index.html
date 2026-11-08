@@ -1,264 +1,1308 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>DIRECCION DE ADMINISTRACION</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dirección de Administración | Inventario IEEM</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="https://ieemoperacion-png.github.io/softwareieem/favicon.png">
     
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Direccion de Administracion">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-icon-180.png">
-    
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#6f42c1"> 
-    <link rel="manifest" href="manifest.json">
-    <!-- ============================================== -->
-
-    <script type="text/javascript" src="https://kaspersky-labs.com" charset="UTF-8"></script>
-    <style>
-    html,
-    body {
-        height: 100%;
-        margin: 0;
-    }
-
-    body {
-        display: flex;
-        align-items: center;      /* Centrado vertical */
-        justify-content: center;  /* Centrado horizontal */
-        background-color: #f3f3f9; 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    .splash-container {
-        width: 100%;
-        max-width: 375px;
-        padding: 15px;
-        margin: 0 auto;
-    }
-
-    .card {
-        background: #ffffff;
-        border: 1px solid #e3e3e3;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .form-control-centered {
-        text-align: center;
-        width: 100%;             
-        box-sizing: border-box;
-        border-radius: 20px; /* Bordes bien redondeados */
-        border: 1px solid #ced4da;
-        padding: 12px 20px;
-        font-size: 16px;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .form-control-centered:focus {
-        border-color: #6f42c1;
-    }
-
-    .espacio-campo {
-        margin-bottom: 20px;     
-    }
-
-    .password-container {
-        position: relative;
-        width: 100%;
-    }
-
-    .toggle-password-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        z-index: 10;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .toggle-password-icon svg {
-        width: 100%;
-        height: 100%;
-        fill: #71748d;
-    }
-
-    .logo-rotar {
-        animation: rotarLogo 1.5s ease-out forwards;
-        transform-origin: center;
-    }
-
-    @keyframes rotarLogo {
-        from {
-            transform: rotate(-360deg) scale(0.3);
-            opacity: 0;
-        }
-        to {
-            transform: rotate(0deg) scale(1);
-            opacity: 1;
-        }
-    }
-
-    .btn-3d-container {
-        text-align: center;
-        width: 100%;
-        padding-top: 5px;
-    }
-
-    .btn-purple-3d {
-        position: relative;
-        display: inline-block;
-        width: 100%;
-        background: #6f42c1; /* Morado principal */
-        color: white;
-        font-size: 18px;
-        font-weight: bold;
-        letter-spacing: 1px;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 24px;
-        cursor: pointer;
-        outline: none;
-        box-shadow: 0 6px 0 #512da8, 0 10px 15px rgba(0, 0, 0, 0.2); 
-        transition: all 0.1s ease;
-    }
-
-    .btn-purple-3d:hover {
-        background: #8250df; 
-        color: white;
-    }
-
-    .btn-purple-3d:active {
-        box-shadow: 0 2px 0 #512da8, 0 4px 6px rgba(0, 0, 0, 0.2);
-        transform: translateY(4px); 
-    }
-
-    .error-mensaje {
-        color: #dc3545;
-        font-size: 14px;
-        font-weight: bold;
-        margin-top: 10px;
-        text-align: center;
-        display: none;
-    }
-    </style>
-    
-    <script type="text/javascript">
-        var svgOjoAbierto = '<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
-        var svgOjoCerrado = '<svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.01-.16c0-1.66-1.34-3-3-3l-.16.01z"/></svg>';
-
-        function togglePassword() {
-            var inputPassword = document.getElementById("password");
-            var btnIcono = document.getElementById("ojo-icono");
-            
-            if (inputPassword.type === "password") {
-                inputPassword.type = "text";
-                btnIcono.innerHTML = svgOjoCerrado;
-            } else {
-                inputPassword.type = "password";
-                btnIcono.innerHTML = svgOjoAbierto;
-            }
-        }
-
-        function validar() {
-            var contenedorError = document.getElementById("mensaje-error");
-            contenedorError.style.display = "none";
-            contenedorError.innerHTML = "";
-
-            var txtRfc = document.getElementById("rfc");
-            var txtPassword = document.getElementById("password");
-
-            var usuarioIngresado = txtRfc.value.trim();
-            var contrasenaIngresada = txtPassword.value;
-
-            if (usuarioIngresado === "") { 
-                alert("El campo de USUARIO es requerido");
-                txtRfc.focus();		
-                return false;
-            }
-            if (contrasenaIngresada === "") { 
-                alert("La CONTRASEÑA es requerida");
-                txtPassword.focus();		
-                return false;
-            }
-        
-            var usuariosValidos = {
-                "DIRADMIN": "Pr0c3s0.",
-                "IGNACIO": "admin",
-                "DOMINGO" :"admin",
-                "ADMIN":"admin",
-            };
-
-            var usuarioBusqueda = usuarioIngresado.toUpperCase();
-
-            if (usuariosValidos[usuarioBusqueda] && usuariosValidos[usuarioBusqueda] === contrasenaIngresada) {
-                window.location.href = "https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal"; 
-                return false; 
-            } else {
-                contenedorError.innerHTML = "Contraseña incorrecta";
-                contenedorError.style.display = "block";
-                alert("Usuario o contraseña incorrectos");
-                return false;
-            }
-        }
-    </script>
+    <!-- Librería oficial de SheetJS (XLSX) cargada correctamente mediante CDNJS -->
+   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
 </head>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f8f9fa; margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 1140px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { border-bottom: 2px solid #002060; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .header h2 { color: #002060; margin: 0; font-size: 22px; }
+        .btn-excel { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-excel:hover { background-color: #157347; }
+        .kpi-row { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .kpi-card { flex: 1; min-width: 200px; background: #fff; padding: 15px; border-radius: 6px; border-left: 5px solid #002060; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .kpi-card.si { border-left-color: #28a745; }
+        .kpi-card.no { border-left-color: #ffc107; }
+        .kpi-card h6 { margin: 0 0 5px 0; color: #666; font-size: 11px; text-transform: uppercase; }
+        .kpi-card h3 { margin: 0; font-size: 26px; }
+        .main-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px; }
+        .panel-left { flex: 1.3; min-width: 320px; }
+        .panel-right { flex: 0.7; min-width: 280px; }
+        .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 13px; min-width: 600px; }
+        th, td { padding: 8px; border: 1px solid #dee2e6; vertical-align: middle; }
+        th { background: #002060; color: white; }
+        .total-row td { background: #002060; color: white; font-weight: bold; }
+        select { width: 100%; padding: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; }
+        .chart-box { border: 1px solid #dee2e6; padding: 15px; border-radius: 6px; background: #fff; }
+        .bar-group { margin-bottom: 12px; }
+        .bar-label { font-size: 12px; margin-bottom: 4px; font-weight: bold; color: #555; }
+        .bar-bg { background: #e9ecef; border-radius: 4px; height: 14px; width: 100%; overflow: hidden; }
+        .bar-fill { background: #002060; height: 100%; width: 0%; transition: width 0.3s; }
+        
+        /* Buscador integrado con botón de limpiar */
+        .search-container { position: relative; display: inline-block; width: 320px; }
+        .search-container input { width: 100%; padding: 6px 35px 6px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; box-sizing: border-box; }
+        .search-container .clear-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); border: none; background: none; color: #999; font-size: 14px; cursor: pointer; display: none; padding: 0; }
+        .search-container .clear-btn:hover { color: #333; }
 
+        /* Contenedor e imágenes de la celda de fotos */
+        .foto-celda { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .img-miniatura { width: 45px; height: 45px; object-fit: cover; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; transition: transform 0.2s; }
+        .img-miniatura:hover { transform: scale(1.08); border-color: #002060; }
+        .sin-foto-box { width: 45px; height: 45px; background: #eee; color: #aaa; font-size: 9px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid #ddd; user-select: none; }
+
+        /* Ventana Emergente Modal para Ampliar la Imagen */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-content { max-width: 85%; max-height: 85%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; padding: 6px; }
+        .modal-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; font-weight: bold; cursor: pointer; background: none; border: none; }
+        .modal-close:hover { color: #ccc; }
+        /* Tabla de consulta: todos los campos son de solo lectura */
+#raw-body td {
+    background: #fff;
+    color: #333;
+}
+
+.btn-editar {
+    background: #079bb8;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    font-size: 19px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn-editar:hover {
+    background: #007c96;
+    transform: scale(1.08);
+}
+
+.celda-responsiva {
+    font-weight: bold;
+    color: white !important;
+    min-width: 100px;
+}
+
+.responsiva-si {
+    background: #078b13 !important;
+}
+
+.responsiva-no {
+    background: #dc3545 !important;
+}
+
+
+/* Estado y acciones de Carta Responsiva dentro de una sola celda */
+.celda-responsiva {
+    min-width: 150px;
+    padding: 6px !important;
+    color: #fff;
+    font-weight: bold;
+}
+.responsiva-si { background: #078b13 !important; }
+.responsiva-no { background: #dc3545 !important; }
+.responsiva-acciones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.btn-documento {
+    border: 0;
+    border-radius: 5px;
+    min-width: 34px;
+    min-height: 32px;
+    padding: 5px 8px;
+    color: #fff;
+    background: rgba(0,0,0,.22);
+    cursor: pointer;
+    font-size: 17px;
+}
+.btn-documento:hover { background: rgba(0,0,0,.38); }
+.nombre-documento {
+    display: block;
+    width: 100%;
+    max-width: 145px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 3px auto 0;
+    font-size: 10px;
+    font-weight: normal;
+}
+
+/* Ventana emergente de edición */
+.modal-edicion {
+    display: none;
+    position: fixed;
+    z-index: 3000;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.modal-edicion-contenido {
+    background: white;
+    width: 100%;
+    max-width: 650px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 5px 25px rgba(0,0,0,.3);
+}
+
+.modal-edicion-header {
+    background: #858585;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-edicion-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.modal-edicion-header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 27px;
+    cursor: pointer;
+}
+
+.modal-edicion-body {
+    padding: 20px;
+}
+
+.modal-edicion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.campo-edicion {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campo-edicion label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+}
+
+.campo-edicion input,
+.campo-edicion select,
+.campo-edicion textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.campo-edicion textarea {
+    min-height: 85px;
+    resize: vertical;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.archivo-responsiva {
+    border: 2px dashed #aaa;
+    padding: 18px;
+    text-align: center;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.modal-edicion-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-cancelar {
+    background: #ffc107;
+    color: #333;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-guardar {
+    background: #0879dc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Ficha emergente de edición con fotografía y carta responsiva */
+.modal-edicion-contenido { max-width: 850px; }
+.ficha-edicion-superior {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+}
+.ficha-foto {
+    border: 1px solid #bbb;
+    padding: 10px;
+    text-align: center;
+    background: #fafafa;
+}
+.ficha-foto img {
+    display: block;
+    width: 100%;
+    height: 155px;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.ficha-serie {
+    font-size: 11px;
+    font-weight: bold;
+    color: #555;
+    margin: 7px 0 10px;
+    overflow-wrap: anywhere;
+}
+.btn-subir-responsiva {
+    width: 100%;
+    border: 0;
+    border-radius: 4px;
+    padding: 10px 6px;
+    color: #fff;
+    background: #dc3545;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
+.btn-subir-responsiva:hover { background: #bd2130; }
+.estado-responsiva-modal {
+    margin-top: 8px;
+    color: #555;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+.acciones-responsiva-modal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 7px;
+}
+.acciones-responsiva-modal button {
+    border: 0;
+    border-radius: 4px;
+    padding: 6px 8px;
+    color: #fff;
+    background: #6c757d;
+    cursor: pointer;
+    font-size: 11px;
+}
+.ficha-campos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+}
+.ficha-campos .campo-completo { grid-column: 1 / -1; }
+@media(max-width:650px) {
+    .ficha-edicion-superior { grid-template-columns: 1fr; }
+    .ficha-foto { max-width: 240px; width: 100%; margin: 0 auto; }
+    .ficha-campos { grid-template-columns: 1fr; }
+    .ficha-campos .campo-completo { grid-column: auto; }
+}
+
+@media(max-width:550px) {
+    .modal-edicion-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+}
+
+/* Inicio de sesión IEEM: diseño original del acceso institucional */
+.auth-overlay {
+    position: fixed; inset: 0; z-index: 5000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 15px; box-sizing: border-box; overflow-y: auto;
+    background-color: #f3f3f9;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.auth-card {
+    width: 100%; max-width: 375px; box-sizing: border-box; margin: auto;
+    padding: 20px; background: #fff; border: 1px solid #e3e3e3;
+    border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.05);
+}
+.auth-logo-wrap { text-align: center; margin-bottom: 20px; }
+.auth-logo { width: 90%; max-width: 290px; height: auto; object-fit: contain; }
+.logo-rotar { animation: rotarLogo 1.5s ease-out forwards; transform-origin: center; }
+@keyframes rotarLogo {
+    from { transform: rotate(-360deg) scale(.3); opacity: 0; }
+    to { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+.auth-instruccion {
+    display: block; margin-top: 17px; color: #6c757d; font-size: 14px; line-height: 1.4;
+}
+.auth-campo { margin-bottom: 20px; }
+.form-control-centered {
+    display: block; width: 100%; box-sizing: border-box; padding: 12px 20px;
+    border: 1px solid #ced4da; border-radius: 20px; outline: none;
+    text-align: center; font-size: 16px; color: #333; background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+}
+.form-control-centered:focus {
+    border-color: #6f42c1; box-shadow: 0 0 0 3px rgba(111,66,193,.10);
+}
+.auth-password-container { position: relative; width: 100%; }
+.auth-password-container .form-control-centered { padding-right: 48px; }
+.toggle-password-icon {
+    position: absolute; top: 50%; right: 15px; z-index: 10;
+    display: flex; width: 20px; height: 20px; align-items: center; justify-content: center;
+    transform: translateY(-50%); cursor: pointer;
+}
+.toggle-password-icon svg { width: 100%; height: 100%; fill: #71748d; }
+.btn-3d-container { width: 100%; padding-top: 5px; text-align: center; }
+.btn-purple-3d {
+    position: relative; display: inline-block; width: 100%; padding: 12px 24px;
+    border: none; border-radius: 8px; outline: none; background: #6f42c1; color: #fff;
+    font-size: 18px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
+    box-shadow: 0 6px 0 #512da8, 0 10px 15px rgba(0,0,0,.2);
+    transition: all .1s ease;
+}
+.btn-purple-3d:hover { background: #8250df; color: #fff; }
+.btn-purple-3d:active {
+    transform: translateY(4px); box-shadow: 0 2px 0 #512da8, 0 4px 6px rgba(0,0,0,.2);
+}
+.btn-purple-3d:disabled { opacity: .65; cursor: wait; }
+.error-mensaje {
+    display: none; margin: 10px 0 0; color: #dc3545; font-size: 13px;
+    font-weight: bold; line-height: 1.4; text-align: center;
+}
+.auth-nota { margin: 14px 0 0; color: #888; font-size: 11px; line-height: 1.45; text-align: center; }
+.auth-login-layout { width: 100%; max-width: 375px; margin: auto; }
+.auth-footer {
+    position: fixed; right: 20px; bottom: 20px; z-index: 5001;
+    max-width: calc(100vw - 30px); color: #6c757d; font-size: 13px;
+    line-height: 1.5; text-align: right;
+}
+.auth-footer a { color: #6c757d; text-decoration: none; transition: color .2s; }
+.auth-footer a:hover { color: #6f42c1; }
+#auth-message { min-height: 0; }
+@media(max-width: 520px) {
+    .auth-overlay { align-items: flex-start; padding-top: 7vh; padding-bottom: 12px; }
+    .auth-footer { position: static; margin: 14px 5px 0; text-align: center; font-size: 12px; }
+}
+.session-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+.session-label { font-size:11px; color:#555; max-width:220px; overflow-wrap:anywhere; }
+.btn-salir { border:1px solid #ccd2dc; border-radius:4px; background:#fff; color:#334; padding:8px 11px; cursor:pointer; }
+.btn-ver { border:0; border-radius:50%; width:38px; height:38px; background:#6c757d; color:#fff; cursor:pointer; font-size:17px; }
+.btn-ver:hover { background:#565e64; }
+.btn-subir-responsiva:disabled { opacity:.6; cursor:not-allowed; }
+.archivo-modal-item { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid #eee; font-size:12px; }
+.archivo-modal-item span { overflow-wrap:anywhere; text-align:left; }
+.archivo-modal-item button { border:0; border-radius:4px; background:#6c757d; color:white; padding:6px 8px; cursor:pointer; white-space:nowrap; }
+.archivo-modal-item .eliminar-archivo { background:#dc3545; }
+.etiqueta-rol { font-weight:bold; color:#002060; }
+
+    </style>
+</head>
 <body>
-    <div class="splash-container">
-        <div class="card">
-            <div class="text-center" style="margin-bottom: 20px;">
-                <img class="logo-img logo-rotar" src="ieemlogo.png" alt="logo" width="90%">
-                <br><br>
-                <span style="color: #6c757d; font-size: 14px;"><strong>Escriba el usuario y la contraseña para acceder</strong></span>
+
+<div class="container" id="appShell" style="display:none;">
+    <div class="header">
+        <div>
+            <h2>Dashboard de Inventario</h2>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">Inventario institucional sincronizado en la nube (PC y celular)</p>
+        </div>
+        <div class="session-actions">
+            <div id="session-label" class="session-label"></div>
+            <button class="btn-excel" onclick="descargarExcel()">📊 Descargar Excel</button>
+            <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </div>
+
+    <div style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">
+        <strong>Permisos:</strong> DIRADMIN puede editar los registros y eliminar archivos. Los demás usuarios autenticados pueden consultar y cargar documentos.
+    </div>
+    <div class="kpi-row">
+        <div class="kpi-card"><h6>Total Ítems en Base</h6><h3 id="kpi-total">0</h3></div>
+        <div class="kpi-card si"><h6>Artículos Tapizados (SI)</h6><h3 style="color:#28a745;" id="kpi-si">0</h3></div>
+        <div class="kpi-card no"><h6>Artículos Sin Tapizar (NO)</h6><h3 style="color:#d39e00;" id="kpi-no">0</h3></div>
+    </div>
+
+    <div class="main-grid">
+        <div class="panel-left">
+            <div class="table-responsive">
+                <table id="tabla-resumen">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">MODELO</th>
+                            <th>TAPIZADA: NO</th>
+                            <th>TAPIZADA: SI</th>
+                            <th>TOTAL</th>
+                            <th>ALMACEN</th>
+                            <th>ASIGNADAS</th>
+                            <th>ENTRADA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-right">
+            <div class="chart-box">
+                <h4 style="margin:0 0 15px 0; font-size:14px; color:#495057;">Distribución del Total Físico</h4>
+                <div id="chart-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="border-top: 1px solid #dee2e6; padding-top: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+            <h4 style="margin:0; font-size:15px; color:#495057;">
+    Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
+</h4>
+
+            <div class="search-container">
+                <input type="text" id="buscador-crudo" onkeyup="filtrarTablaCruda()" placeholder="🔍 Buscar por serie, modelo, grupo, estatus...">
+                <button id="btn-limpiar" class="clear-btn" onclick="limpiarBuscador()">✖</button>
+            </div>
+        </div>
+        
+        <div class="table-responsive" style="max-height: 300px;">
+            <table>
+<thead style="position: sticky; top: 0; z-index: 10;">
+    <tr>
+        <th>FOTO</th>
+        <th>#</th>
+        <th>SERIE</th>
+        <th>MODELO</th>
+        <th>GRUPO</th>
+        <th>TARIMA</th>
+        <th>TAPIZADA</th>
+        <th>ESTATUS</th>
+        <th>ARCHIVOS</th>
+        <th>VER / EDITAR</th>
+    </tr>
+</thead>
+<tbody id="raw-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- Inicio de sesión institucional: diseño proporcionado, autenticación segura con Supabase -->
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-login-layout">
+        <div class="auth-card">
+            <div class="auth-logo-wrap">
+                <img class="auth-logo logo-rotar"
+                     src="https://ieemoperacion-png.github.io/softwareieem/ieemlogo.png"
+                     alt="Logotipo del IEEM">
+                <span class="auth-instruccion"><strong>Escriba el usuario y la contraseña para acceder</strong></span>
             </div>
 
-            <form onsubmit="return validar();" autocomplete="off">
-                <div class="espacio-campo">
-                    <input type="text" id="rfc" class="form-control-centered" placeholder="Usuario" autofocus>
+            <form onsubmit="iniciarSesion(event)" autocomplete="off">
+                <div class="auth-campo">
+                    <input type="email" id="loginEmail" class="form-control-centered"
+                           placeholder="Usuario" autocomplete="username"
+                           aria-label="Usuario o correo institucional" required autofocus>
                 </div>
 
-                <div class="espacio-campo">
-                    <div class="password-container">
-                        <input type="password" id="password" class="form-control-centered" placeholder="Contraseña">
-                        <span id="ojo-icono" class="toggle-password-icon" onclick="togglePassword()">
-                            <svg xmlns="http://w3.org" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                <div class="auth-campo">
+                    <div class="auth-password-container">
+                        <input type="password" id="loginPassword" class="form-control-centered"
+                               placeholder="Contraseña" autocomplete="current-password"
+                               aria-label="Contraseña" required>
+                        <span id="ojo-icono" class="toggle-password-icon"
+                              onclick="togglePassword()" role="button" tabindex="0"
+                              aria-label="Mostrar u ocultar contraseña"
+                              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePassword();}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
                         </span>
                     </div>
                 </div>
 
-                <div class="error-mensaje" id="mensaje-error"></div>
+                <div class="error-mensaje" id="auth-message" role="alert" aria-live="polite"></div>
 
                 <div class="btn-3d-container">
-                    <button type="submit" class="btn-purple-3d">Ingresar</button>
+                    <button id="loginButton" type="submit" class="btn-purple-3d">Ingresar</button>
                 </div>
+                <p class="auth-nota">Acceso para cuentas autorizadas. Utilice el correo registrado en Supabase. No hay registro público.</p>
             </form>
         </div>
-    </div>
-
-    <!-- Contenedor externo forzado al extremo derecho de la ventana -->
-    <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden;">
-        <div style="position: absolute; bottom: 20px; right: 20px; text-align: right; pointer-events: auto; line-height: 1.5;">
-            <span style="display: block; color: #6c757d; font-size: 13px; font-weight: 500;">IGNACIO EMMANUEL ILAGORRE SALGADO</span>
-            <a href="tel:+527203274468" style="display: inline-block; color: #6c757d; font-size: 13px; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#6f42c1'" onmouseout="this.style.color='#6c757d'">
-                Contacto: 720 327 4468
-            </a>
+        <div class="auth-footer">
+            <span style="display:block;font-weight:500;">IGNACIO EMMANUEL ILAGORRE SALGADO</span>
+            <a href="tel:+527203274468">Contacto: 720 327 4468</a>
         </div>
     </div>
+</div>
+
+<!-- Ventana Modal de Ampliación -->
+<div id="imagenModal" class="modal" onclick="cerrarModal()">
+    <button class="modal-close" onclick="cerrarModal()">×</button>
+    <img class="modal-content" id="imgAmpliada" onclick="event.stopPropagation();">
+</div>
+
+<!-- Ventana emergente para editar los datos de mantenimiento -->
+<div id="modalEdicion" class="modal-edicion" onclick="cerrarEdicionDesdeFondo(event)">
+    <div class="modal-edicion-contenido" role="dialog" aria-modal="true" aria-labelledby="tituloEdicion">
+        <div class="modal-edicion-header">
+            <div>
+                <h3 id="tituloEdicion">Editar registro de inventario</h3>
+                <div id="subtituloEdicion" style="font-size:12px;margin-top:5px;"></div>
+            </div>
+            <button type="button" onclick="cerrarEdicion()" aria-label="Cerrar">×</button>
+        </div>
+        <div class="modal-edicion-body">
+            <div class="ficha-edicion-superior">
+                <aside class="ficha-foto">
+                    <img id="editFotoRegistro" src="" alt="Fotografía del artículo">
+                    <div id="editSerieFoto" class="ficha-serie"></div>
+                    <button type="button" class="btn-subir-responsiva"
+                            onclick="seleccionarResponsiva(registroEnEdicionId)">
+                        ⬆ Subir carta responsiva / archivo
+                    </button>
+                    <div id="editEstadoResponsiva" class="estado-responsiva-modal">Sin archivos cargados</div>
+                    <div id="editListaArchivos" style="margin-top:8px;text-align:left;"></div>
+                </aside>
+                <section class="ficha-campos">
+                    <div class="campo-edicion">
+                        <label for="editEstatus">Estatus</label>
+                        <select id="editEstatus"></select>
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editTapizada">¿Está tapizada?</label>
+                        <select id="editTapizada">
+                            <option value="SI">SI</option>
+                            <option value="NO">NO</option>
+                        </select>
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editTarima">Tarima</label>
+                        <select id="editTarima"></select>
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editAsignado">Nombre de la persona asignada</label>
+                        <input type="text" id="editAsignado" placeholder="Escribe el nombre">
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editPiston">Cambio de pistón / detalle</label>
+                        <input type="text" id="editPiston" placeholder="Ej. Realizado, pendiente...">
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editFechaPiston">Fecha de cambio de pistón</label>
+                        <input type="date" id="editFechaPiston">
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editFEntrada">Fecha de entrada</label>
+                        <input type="date" id="editFEntrada">
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editFSalida">Fecha de salida</label>
+                        <input type="date" id="editFSalida">
+                    </div>
+                    <div class="campo-edicion campo-completo">
+                        <label for="editObservaciones">Observaciones</label>
+                        <textarea id="editObservaciones" placeholder="Escribe aquí las observaciones del artículo..."></textarea>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <div class="modal-edicion-footer">
+            <button type="button" class="btn-cancelar" onclick="cerrarEdicion()">Cerrar</button>
+            <button type="button" class="btn-guardar" onclick="guardarEdicion()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+    const svgOjoAbierto = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
+    const svgOjoCerrado = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.82l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.74-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z"/></svg>';
+
+    function togglePassword() {
+        const inputPassword = document.getElementById('loginPassword');
+        const btnIcono = document.getElementById('ojo-icono');
+        if (!inputPassword || !btnIcono) return;
+        const mostrar = inputPassword.type === 'password';
+        inputPassword.type = mostrar ? 'text' : 'password';
+        btnIcono.innerHTML = mostrar ? svgOjoCerrado : svgOjoAbierto;
+    }
+
+    let db = []; // Los registros se consultan exclusivamente desde Supabase después del inicio de sesión.
+// Conexión de Inventario IEEM a Supabase.
+let sb = null;
+let usuarioActual = null;
+let rolActual = 'CONSULTA';
+let esDirAdmin = false;
+let registroEnEdicionId = null;
+let archivosPorItem = {};
+const BUCKET_DOCUMENTOS = 'inventario-documentos';
+const MAX_ARCHIVO_BYTES = 10 * 1024 * 1024;
+
+function mostrarMensajeAcceso(mensaje, error = true) {
+    const el = document.getElementById('auth-message');
+    if (!el) return;
+    el.textContent = mensaje || '';
+    el.style.color = error ? '#dc3545' : '#198754';
+    el.style.display = mensaje ? 'block' : 'none';
+}
+
+function validarConfiguracionSupabase() {
+    const cfg = window.INVENTARIO_SUPABASE_CONFIG || {};
+    if (!cfg.url || !cfg.anonKey || cfg.url.includes('TU_PROYECTO') || cfg.anonKey.includes('TU_CLAVE')) {
+        mostrarMensajeAcceso('Falta configurar supabase-config.js con la URL del proyecto y la clave pública (publishable/anon).');
+        return false;
+    }
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        mostrarMensajeAcceso('No se pudo cargar la librería de Supabase. Revisa tu conexión a internet.');
+        return false;
+    }
+    sb = window.supabase.createClient(cfg.url, cfg.anonKey, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+    return true;
+}
+
+async function iniciarApp() {
+    if (!validarConfiguracionSupabase()) return;
+    sb.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_OUT') {
+            usuarioActual = null; rolActual = 'CONSULTA'; esDirAdmin = false;
+            document.getElementById('appShell').style.display = 'none';
+            document.getElementById('authOverlay').style.display = 'flex';
+        }
+    });
+    const { data, error } = await sb.auth.getSession();
+    if (error) { mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message); return; }
+    if (data.session) await prepararSesion(data.session);
+    else document.getElementById('authOverlay').style.display = 'flex';
+}
+
+async function iniciarSesion(event) {
+    event.preventDefault();
+    if (!sb && !validarConfiguracionSupabase()) return;
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const button = document.getElementById('loginButton');
+    button.disabled = true; button.textContent = 'Validando...';
+    mostrarMensajeAcceso('');
+    try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        await prepararSesion(data.session);
+    } catch (error) {
+        mostrarMensajeAcceso('No fue posible iniciar sesión. Verifica usuario y contraseña. ' + (error.message || ''));
+    } finally {
+        button.disabled = false; button.textContent = 'Ingresar';
+    }
+}
+
+async function cerrarSesion() {
+    if (!sb) return;
+    const { error } = await sb.auth.signOut();
+    if (error) alert('No se pudo cerrar la sesión: ' + error.message);
+}
+
+async function prepararSesion(session) {
+    usuarioActual = session.user;
+    try {
+        const { data: roleRow, error: roleError } = await sb
+            .from('user_roles').select('role').eq('user_id', usuarioActual.id).maybeSingle();
+        if (roleError) throw roleError;
+        rolActual = roleRow?.role || 'CONSULTA';
+        esDirAdmin = rolActual === 'DIRADMIN';
+        document.getElementById('session-label').innerHTML =
+            `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
+        document.getElementById('authOverlay').style.display = 'none';
+        document.getElementById('appShell').style.display = 'block';
+        await cargarInventarioNube();
+    } catch (error) {
+        document.getElementById('appShell').style.display = 'none';
+        document.getElementById('authOverlay').style.display = 'flex';
+        mostrarMensajeAcceso('No se pudo cargar el inventario. Revisa que hayas ejecutado supabase-setup.sql. ' + error.message);
+    }
+}
+
+function filaNubeARegistro(row) {
+    return {
+        id: row.id, s: row.serie, m: row.modelo, g: row.grupo, t: row.tarima,
+        tap: row.tapizada, est: row.estatus, imgId: row.imagen_url || '',
+        piston: row.cambio_piston || '', fechaPiston: row.fecha_piston || '',
+        fEntrada: row.fecha_entrada || '', fSalida: row.fecha_salida || '',
+        observaciones: row.observaciones || '', asignado: row.asignado || ''
+    };
+}
+
+function registroAUpdateNube(item) {
+    return {
+        estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
+        asignado: item.asignado || null, cambio_piston: item.piston || null,
+        fecha_piston: item.fechaPiston || null, fecha_entrada: item.fEntrada || null,
+        fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
+        updated_at: new Date().toISOString()
+    };
+}
+
+async function cargarInventarioNube() {
+    const { data: rows, error } = await sb.from('inventario').select('*').order('id');
+    if (error) throw error;
+    db = (rows || []).map(filaNubeARegistro);
+    await cargarArchivosNube();
+    renderizarTablaCruda();
+    calcularYRenderizarMetricas();
+}
+
+async function cargarArchivosNube() {
+    const { data, error } = await sb.from('inventory_files').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    archivosPorItem = {};
+    (data || []).forEach(file => {
+        const id = Number(file.inventory_id);
+        if (!archivosPorItem[id]) archivosPorItem[id] = [];
+        archivosPorItem[id].push(file);
+    });
+}
+
+function seleccionarResponsiva(id) {
+    if (!usuarioActual) { alert('Inicia sesión para cargar archivos.'); return; }
+    const selector = document.createElement('input');
+    selector.type = 'file'; selector.accept = '.pdf,.jpg,.jpeg,.png'; selector.style.display = 'none';
+    selector.onchange = async () => {
+        const archivo = selector.files && selector.files[0];
+        if (!archivo) { selector.remove(); return; }
+        const tipos = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!tipos.includes(archivo.type)) { alert('Selecciona un archivo PDF, JPG o PNG.'); selector.remove(); return; }
+        if (archivo.size > MAX_ARCHIVO_BYTES) { alert('El archivo supera el límite de 10 MB.'); selector.remove(); return; }
+        try {
+            const seguro = archivo.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100) || 'documento';
+            const uuid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+            const ruta = `${id}/${usuarioActual.id}/${uuid}-${seguro}`;
+            const { error: uploadError } = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {
+                cacheControl: '3600', upsert: false, contentType: archivo.type
+            });
+            if (uploadError) throw uploadError;
+            const { error: metaError } = await sb.from('inventory_files').insert({
+                inventory_id: id, file_name: archivo.name, object_path: ruta,
+                content_type: archivo.type, file_size: archivo.size, uploaded_by: usuarioActual.id
+            });
+            if (metaError) {
+                await sb.storage.from(BUCKET_DOCUMENTOS).remove([ruta]);
+                throw metaError;
+            }
+            await cargarArchivosNube();
+            renderizarTablaCruda();
+            const item = db.find(registro => registro.id === id);
+            if (registroEnEdicionId === id && item) actualizarResponsivaEnModal(item);
+            alert('Archivo cargado correctamente y disponible para los usuarios autorizados.');
+        } catch (error) {
+            console.error(error);
+            alert('No se pudo cargar el archivo: ' + (error.message || 'Verifica tu acceso y la configuración del almacenamiento.'));
+        } finally { selector.remove(); }
+    };
+    document.body.appendChild(selector); selector.click();
+}
+
+async function abrirArchivo(fileId) {
+    const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
+    if (!archivo) { alert('No se encontró el archivo. Actualiza la página.'); return; }
+    const win = window.open('about:blank', '_blank');
+    try {
+        const { data, error } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(archivo.object_path, 3600);
+        if (error) throw error;
+        if (win) win.location.href = data.signedUrl;
+        else window.location.href = data.signedUrl;
+    } catch (error) {
+        if (win) win.close();
+        alert('No se pudo abrir el archivo: ' + error.message);
+    }
+}
+
+async function abrirResponsiva(id) {
+    const lista = archivosPorItem[id] || [];
+    if (!lista.length) { alert('Este registro no tiene archivos cargados.'); return; }
+    await abrirArchivo(lista[0].id);
+}
+
+async function eliminarResponsiva(fileId) {
+    if (!esDirAdmin) { alert('Solo DIRADMIN puede eliminar archivos.'); return; }
+    const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
+    if (!archivo) return;
+    if (!confirm(`¿Deseas eliminar el archivo ${archivo.file_name}?`)) return;
+    try {
+        const { error: storageError } = await sb.storage.from(BUCKET_DOCUMENTOS).remove([archivo.object_path]);
+        if (storageError) throw storageError;
+        const { error: rowError } = await sb.from('inventory_files').delete().eq('id', fileId);
+        if (rowError) throw rowError;
+        await cargarArchivosNube(); renderizarTablaCruda();
+        const item = db.find(r => r.id === registroEnEdicionId);
+        if (item) actualizarResponsivaEnModal(item);
+    } catch (error) { alert('No se pudo eliminar el archivo: ' + error.message); }
+}
+
+function llenarOpcionesEdicion(selectId, opciones, seleccionado) {
+    const select = document.getElementById(selectId);
+    const valores = [...new Set(opciones.filter(v => v !== undefined && v !== null && String(v) !== '').map(v => String(v)))];
+    const actual = String(seleccionado ?? '');
+    if (actual && !valores.includes(actual)) valores.push(actual);
+    select.innerHTML = valores.map(v => `<option value="${escaparHTML(v)}">${escaparHTML(v)}</option>`).join('');
+    select.value = actual;
+}
+
+function actualizarResponsivaEnModal(item) {
+    const archivos = archivosPorItem[item.id] || [];
+    document.getElementById('editEstadoResponsiva').textContent = archivos.length
+        ? `${archivos.length} archivo(s) compartido(s) en la nube` : 'Sin archivos cargados';
+    const lista = document.getElementById('editListaArchivos');
+    lista.innerHTML = archivos.map(f => `
+        <div class="archivo-modal-item">
+            <span>📎 ${escaparHTML(f.file_name)}</span>
+            <div style="display:flex;gap:5px;">
+                <button type="button" onclick="abrirArchivo('${f.id}')">Abrir</button>
+                ${esDirAdmin ? `<button type="button" class="eliminar-archivo" onclick="eliminarResponsiva('${f.id}')">Eliminar</button>` : ''}
+            </div>
+        </div>`).join('');
+}
+
+function abrirEdicion(id) {
+    const item = db.find(registro => registro.id === id);
+    if (!item) return;
+    registroEnEdicionId = id;
+    const soloLectura = !esDirAdmin;
+    document.getElementById('tituloEdicion').textContent = soloLectura ? 'Consultar registro de inventario' : 'Editar registro de inventario';
+    document.getElementById('subtituloEdicion').textContent = `ID: ${item.id} | Serie: ${item.s} | Modelo: ${item.m}`;
+    const foto = document.getElementById('editFotoRegistro');
+    foto.src = item.imgId || ''; foto.style.display = item.imgId ? 'block' : 'none';
+    foto.alt = `Fotografía del registro ${item.s}`;
+    document.getElementById('editSerieFoto').textContent = `SERIE: ${item.s}`;
+    llenarOpcionesEdicion('editEstatus', ['ALMACEN','ASIGNADAS','ENTRADA'], item.est || 'ALMACEN');
+    document.getElementById('editTapizada').value = item.tap || 'NO';
+    const tarimas = [...new Set(db.map(r => r.t).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b) => Number(a)-Number(b));
+    llenarOpcionesEdicion('editTarima', tarimas, item.t);
+    document.getElementById('editAsignado').value = item.asignado || '';
+    document.getElementById('editPiston').value = item.piston || '';
+    document.getElementById('editFechaPiston').value = item.fechaPiston || '';
+    document.getElementById('editFEntrada').value = item.fEntrada || '';
+    document.getElementById('editFSalida').value = item.fSalida || '';
+    document.getElementById('editObservaciones').value = item.observaciones || '';
+    ['editEstatus','editTapizada','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
+        .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
+    document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
+    document.getElementById('editEstatus').disabled = soloLectura;
+    document.querySelector('.btn-subir-responsiva').disabled = false; // Todos los usuarios autenticados pueden cargar.
+    actualizarResponsivaEnModal(item);
+    document.getElementById('modalEdicion').style.display = 'flex';
+}
+
+function cerrarEdicion() {
+    document.getElementById('modalEdicion').style.display = 'none';
+    registroEnEdicionId = null;
+}
+function cerrarEdicionDesdeFondo(event) { if (event.target.id === 'modalEdicion') cerrarEdicion(); }
+
+async function guardarEdicion() {
+    if (!esDirAdmin) { alert('Tu cuenta tiene permisos de consulta. Solo DIRADMIN puede editar.'); return; }
+    const item = db.find(registro => registro.id === registroEnEdicionId);
+    if (!item) { alert('No se encontró el registro.'); return; }
+    item.est = document.getElementById('editEstatus').value;
+    item.tap = document.getElementById('editTapizada').value;
+    const tarima = document.getElementById('editTarima').value;
+    item.t = tarima === '' ? null : (Number.isNaN(Number(tarima)) ? tarima : Number(tarima));
+    item.asignado = document.getElementById('editAsignado').value.trim();
+    item.piston = document.getElementById('editPiston').value.trim();
+    item.fechaPiston = document.getElementById('editFechaPiston').value;
+    item.fEntrada = document.getElementById('editFEntrada').value;
+    item.fSalida = document.getElementById('editFSalida').value;
+    item.observaciones = document.getElementById('editObservaciones').value.trim();
+    const boton = document.querySelector('.btn-guardar'); boton.disabled = true; boton.textContent = 'Guardando...';
+    try {
+        const { error } = await sb.from('inventario').update(registroAUpdateNube(item)).eq('id', item.id);
+        if (error) throw error;
+        cerrarEdicion();
+        await cargarInventarioNube();
+        alert('Cambios guardados correctamente en la base de datos compartida.');
+    } catch (error) {
+        console.error(error);
+        alert('No se pudieron guardar los cambios: ' + error.message);
+    } finally { boton.disabled = false; boton.textContent = 'Guardar'; }
+}
+
+function escaparHTML(valor) {
+    return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[caracter]));
+}
+
+function renderizarTablaCruda() {
+    const tbody = document.getElementById('raw-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    db.forEach(item => {
+        const archivos = archivosPorItem[item.id] || [];
+        const tieneArchivo = archivos.length > 0;
+        const fotoHtml = item.imgId
+            ? `<img src="${escaparHTML(item.imgId)}" alt="Foto ${escaparHTML(item.s)}" style="width:40px;height:40px;object-fit:cover;cursor:pointer;border-radius:4px;" onclick="ampliarImagen('${escaparHTML(item.imgId)}')">`
+            : '<div class="sin-foto-box">SIN FOTO</div>';
+        tbody.innerHTML += `
+            <tr>
+                <td>${fotoHtml}</td>
+                <td>${item.id}</td>
+                <td style="font-weight:bold;">${escaparHTML(item.s)}</td>
+                <td style="text-align:left;">${escaparHTML(item.m)}</td>
+                <td>${escaparHTML(item.g)}</td>
+                <td>${escaparHTML(item.t)}</td>
+                <td>${escaparHTML(item.tap)}</td>
+                <td>${escaparHTML(item.est)}</td>
+                <td class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
+                    <div class="responsiva-acciones">
+                        <button class="btn-documento" title="Cargar archivo" onclick="seleccionarResponsiva(${item.id})">⬆</button>
+                        ${tieneArchivo ? `<button class="btn-documento" title="Abrir primer archivo (${archivos.length})" onclick="abrirResponsiva(${item.id})">📄 ${archivos.length}</button>` : '<span style="font-size:11px;">SIN ARCHIVOS</span>'}
+                    </div>
+                    ${tieneArchivo ? `<span class="nombre-documento">${escaparHTML(archivos[0].file_name)}${archivos.length > 1 ? ` (+${archivos.length-1})` : ''}</span>` : ''}
+                </td>
+                <td><button class="${esDirAdmin ? 'btn-editar' : 'btn-ver'}" title="${esDirAdmin ? 'Editar registro' : 'Consultar registro'}" onclick="abrirEdicion(${item.id})">${esDirAdmin ? '✎' : '👁'}</button></td>
+            </tr>`;
+    });
+    filtrarTablaCruda();
+}
+
+function ampliarImagen(url) {
+    if (!url) return;
+    let modal = document.getElementById('imagenModal');
+    let img = document.getElementById('imgAmpliada');
+    if(modal && img) {
+        modal.style.display = "flex";
+        img.src = url;
+    }
+}
+
+function cerrarModal() {
+    let modal = document.getElementById('imagenModal');
+    if(modal) modal.style.display = "none";
+}
+
+function cambiarDato(id, propiedad, valor) {
+    let elemento = db.find(item => item.id === id);
+    if (elemento) {
+        elemento[propiedad] = valor;
+        calcularYRenderizarMetricas();
+        filtrarTablaCruda();
+    }
+}
+
+function filtrarTablaCruda() {
+    let input = document.getElementById('buscador-crudo');
+    let btnLimpiar = document.getElementById('btn-limpiar');
+    if (!input) return;
+    
+    let textoBusqueda = input.value.toLowerCase();
+    let filas = document.querySelectorAll('#raw-body tr');
+    
+    if (btnLimpiar) btnLimpiar.style.display = textoBusqueda.length > 0 ? "block" : "none";
+    
+    let elementosVisibles = 0;
+    
+    filas.forEach((fila) => {
+        let textoCeldas = fila.textContent.toLowerCase();
+        let selects = fila.querySelectorAll('select');
+        
+        let selectTap = selects.length > 0 ? selects[0].value.toLowerCase() : '';
+        let selectEst = selects.length > 1 ? selects[1].value.toLowerCase() : '';
+        
+        let contenidoFilaCompleto = `${textoCeldas} tapizada: ${selectTap} estatus: ${selectEst}`;
+        
+        if (contenidoFilaCompleto.includes(textoBusqueda)) {
+            fila.style.display = "";
+            elementosVisibles++;
+        } else {
+            fila.style.display = "none";
+        }
+    });
+
+    let contenedorContador = document.getElementById('total-elementos-crudos');
+    if (contenedorContador) contenedorContador.innerText = elementosVisibles;
+}
+
+function limpiarBuscador() {
+    let input = document.getElementById('buscador-crudo');
+    if(input) {
+        input.value = '';
+        filtrarTablaCruda();
+    }
+}
+
+function calcularYRenderizarMetricas() {
+    let totalItems = db.length;
+    let totalSI = db.filter(item => item.tap === 'SI').length;
+    let totalNO = db.filter(item => item.tap === 'NO').length;
+
+    if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = totalItems;
+    if(document.getElementById('kpi-si')) document.getElementById('kpi-si').innerText = totalSI;
+    if(document.getElementById('kpi-no')) document.getElementById('kpi-no').innerText = totalNO;
+
+    let resumen = {};
+    db.forEach(item => {
+        if (!resumen[item.m]) {
+            resumen[item.m] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0 ,entrada: 0};
+        }
+        if (item.tap === 'NO') resumen[item.m].no++;
+        if (item.tap === 'SI') resumen[item.m].si++;
+        if (item.est === 'ALMACEN') resumen[item.m].almacen++;
+        if (item.est === 'ASIGNADAS') resumen[item.m].asignadas++;
+        if (item.est === 'ENTRADA') resumen[item.m].entrada++;
+        resumen[item.m].total++;
+    });
+
+    let summaryBody = document.getElementById('summary-body');
+    if(summaryBody) {
+        summaryBody.innerHTML = '';
+        let tNo = 0, tSi = 0, tTot = 0, tAlm = 0, tAsig = 0, tEnt = 0;
+
+        for (let modelo in resumen) {
+            let data = resumen[modelo];
+            tNo += data.no; tSi += data.si; tTot += data.total;
+            tAlm += data.almacen; tAsig += data.asignadas; tEnt += data.entrada;
+
+            summaryBody.innerHTML += `
+                <tr>
+                    <td style="text-align:left; font-weight:bold;">${modelo}</td>
+                    <td>${data.no}</td>
+                    <td>${data.si}</td>
+                    <td style="font-weight:bold;">${data.total}</td>
+                    <td>${data.almacen}</td>
+                    <td>${data.asignadas}</td>
+                    <td>${data.entrada}</td>
+                </tr>
+            `;
+        }
+
+        summaryBody.innerHTML += `
+            <tr class="total-row">
+                <td style="text-align:left; font-weight:bold;">TOTAL</td>
+                <td>${tNo}</td>
+                <td>${tSi}</td>
+                <td>${tTot}</td>
+                <td>${tAlm}</td>
+                <td>${tAsig}</td>
+                <td>${tEnt}</td>
+            </tr>
+        `;
+    }
+
+    let chartBody = document.getElementById('chart-body');
+    if(chartBody) {
+        chartBody.innerHTML = '';
+        for (let modelo in resumen) {
+            let data = resumen[modelo];
+            let porcentaje = totalItems > 0 ? (data.total / totalItems) * 100 : 0;
+            chartBody.innerHTML += `
+                <div class="bar-group">
+                    <div class="bar-label">${modelo} (${data.total})</div>
+                    <div class="bar-bg">
+                        <div class="bar-fill" style="width: ${porcentaje}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+
+async function descargarExcel() {
+    if (!db || db.length === 0) {
+        alert("No hay registros en la base de datos para exportar.");
+        return;
+    }
+
+    const datosExcel = db.map(item => ({
+        "ID": item.id,
+        "SERIE": item.s,
+        "MODELO": item.m,
+        "GRUPO": item.g,
+        "TARIMA": item.t,
+        "TAPIZADA": item.tap,
+        "ESTATUS": item.est,
+        "ASIGNADO A": item.asignado || "",
+        "CAMBIO DE PISTÓN": item.piston || "",
+        "FECHA CAMBIO PISTÓN": item.fechaPiston || "",
+        "F. ENTRADA": item.fEntrada || "",
+        "F. SALIDA": item.fSalida || "",
+        "OBSERVACIONES": item.observaciones || "",
+        "ARCHIVOS": (archivosPorItem[item.id] || []).map(f => f.file_name).join(" | ") || "SIN ARCHIVOS"
+    }));
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Inventario Crudo");
+
+    // Título de la tabla
+    worksheet.mergeCells("A1:N1");
+    const titulo = worksheet.getCell("A1");
+    titulo.value = "DASHBOARD DE INVENTARIO";
+    titulo.font = {
+        name: "Arial",
+        size: 16,
+        bold: true,
+        color: { argb: "FFFFFFFF" }
+    };
+    titulo.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF17365D" }
+    };
+    titulo.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+    };
+    worksheet.getRow(1).height = 35;
+
+    // Encabezados
+    const encabezados = Object.keys(datosExcel[0]);
+    worksheet.addRow(encabezados);
+
+    const filaEncabezado = worksheet.getRow(2);
+
+    filaEncabezado.height = 30;
+
+    filaEncabezado.eachCell(cell => {
+        cell.font = {
+            name: "Arial",
+            size: 10,
+            bold: true,
+            color: { argb: "FFFFFFFF" }
+        };
+
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF2874A6" }
+        };
+
+        cell.alignment = {
+            horizontal: "center",
+            vertical: "middle",
+            wrapText: true
+        };
+
+        cell.border = {
+            top: { style: "thin", color: { argb: "FF17365D" } },
+            bottom: { style: "medium", color: { argb: "FF17365D" } },
+            left: { style: "thin", color: { argb: "FFFFFFFF" } },
+            right: { style: "thin", color: { argb: "FFFFFFFF" } }
+        };
+    });
+
+    // Agregar registros
+    datosExcel.forEach((item, index) => {
+        const fila = worksheet.addRow(Object.values(item));
+
+        fila.height = 23;
+
+        fila.eachCell(cell => {
+            cell.font = {
+                name: "Arial",
+                size: 10,
+                color: { argb: "FF333333" }
+            };
+
+            cell.alignment = {
+                vertical: "middle",
+                horizontal: "center",
+                wrapText: true
+            };
+
+            cell.border = {
+                top: { style: "thin", color: { argb: "FFD9E2F3" } },
+                bottom: { style: "thin", color: { argb: "FFD9E2F3" } },
+                left: { style: "thin", color: { argb: "FFD9E2F3" } },
+                right: { style: "thin", color: { argb: "FFD9E2F3" } }
+            };
+
+            // Filas alternadas
+            if (index % 2 === 0) {
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FFEDF4FA" }
+                };
+            }
+        });
+    });
+
+    // Ancho de columnas
+    worksheet.columns = [
+        { width: 10 }, { width: 18 }, { width: 30 }, { width: 12 },
+        { width: 12 }, { width: 12 }, { width: 16 }, { width: 26 },
+        { width: 24 }, { width: 22 }, { width: 16 }, { width: 16 },
+        { width: 42 }, { width: 45 }
+    ];
+
+    // Filtros y encabezados fijos
+    worksheet.autoFilter = {
+        from: "A2",
+        to: "N2"
+    };
+
+    worksheet.views = [
+        {
+            state: "frozen",
+            ySplit: 2
+        }
+    ];
+
+    // Descargar archivo
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob(
+        [buffer],
+        {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Dashboard_Inventario.xlsx";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('modalEdicion');
+        if (modal && modal.style.display === 'flex') cerrarEdicion();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', iniciarApp);
+</script>
+
 </body>
 </html>
+
