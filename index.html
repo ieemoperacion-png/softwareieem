@@ -492,7 +492,9 @@
 #appShell { max-width:none; width:100%; min-height:100vh; margin:0; padding:0; border-radius:0; display:none; align-items:stretch; gap:0; background:#f3f4f8; box-shadow:none; }
 .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; box-sizing:border-box; padding:22px 14px; background:#dedfe2; color:#343a40; border-right:1px solid #c8cbd0; }
 .sidebar-brand { font-size:20px; font-weight:800; letter-spacing:1px; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
+.sidebar-logo { display:block; width:112px; max-width:100%; height:auto; max-height:58px; object-fit:contain; object-position:left center; margin:0 0 12px; }
 .sidebar-brand span { display:block; font-size:9px; letter-spacing:1.2px; font-weight:600; margin-top:4px; color:#626970; }
+
 .sidebar-link,.sidebar-page-link,.sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-align:left; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
 .sidebar-link:hover,.sidebar-page-link:hover,.sidebar-add:hover { background:#c9ccd1; }
 .sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
@@ -534,7 +536,12 @@
 
 <div class="container" id="appShell" style="display:none;">
     <aside class="app-sidebar" id="appSidebar" aria-label="Navegación principal">
-        <div class="sidebar-brand">IEEM <span>CONTROL PATRIMONIAL</span></div>
+        <div class="sidebar-brand">
+            <img class="sidebar-logo"
+                 src="https://ieemoperacion-png.github.io/softwareieem/ieemlogo.png"
+                 alt="Logotipo del IEEM">
+            <span>CONTROL PATRIMONIAL</span>
+        </div>
         <button type="button" class="sidebar-link" onclick="irCatalogo()">☷ <span>Catálogo</span></button>
         <div class="sidebar-pages-title">SUBPÁGINAS</div>
         <nav id="sidebarPages"></nav>
@@ -750,11 +757,11 @@
                         <label for="editEstatus">Estatus</label>
                         <select id="editEstatus"></select>
                     </div>
-                    <div class="campo-edicion desktop-only-field">
+                    <div class="campo-edicion">
                         <label for="editArea">Área</label>
                         <input type="text" id="editArea" placeholder="Área">
                     </div>
-                    <div class="campo-edicion desktop-only-field">
+                    <div class="campo-edicion">
                         <label for="editDepartamento">Departamento</label>
                         <input type="text" id="editDepartamento" placeholder="Departamento">
                     </div>
