@@ -487,11 +487,65 @@
     .modal-edicion-footer button { min-height: 42px; flex: 1; }
 }
 
+
+/* Navegación lateral adaptable */
+#appShell { max-width:none; width:100%; min-height:100vh; margin:0; padding:0; border-radius:0; display:none; align-items:stretch; gap:0; background:#f3f4f8; box-shadow:none; }
+.app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; box-sizing:border-box; padding:22px 14px; background:#dedfe2; color:#343a40; border-right:1px solid #c8cbd0; }
+.sidebar-brand { font-size:20px; font-weight:800; letter-spacing:1px; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
+.sidebar-brand span { display:block; font-size:9px; letter-spacing:1.2px; font-weight:600; margin-top:4px; color:#626970; }
+.sidebar-link,.sidebar-page-link,.sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-align:left; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
+.sidebar-link:hover,.sidebar-page-link:hover,.sidebar-add:hover { background:#c9ccd1; }
+.sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
+.sidebar-add { margin-top:12px; border:1px dashed #9da3aa; font-size:12px; }
+.app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
+.app-main > .header,.app-main > #desktop-permissions-note,.app-main > .kpi-row,.app-main > .main-grid,.app-main > .inventory-list-section { max-width:1200px; margin-left:auto; margin-right:auto; }
+.mobile-topbar { display:none; }
+.sidebar-backdrop { display:none; }
+.kpi-card.entrada { border-left-color:#fd7e14; }
+.btn-subir-foto { width:100%; margin:0 0 8px; border:0; border-radius:5px; padding:10px 7px; color:#fff; background:#198754; cursor:pointer; font-size:12px; font-weight:bold; }
+.btn-subir-foto:hover { background:#146c43; }
+.desktop-only-field { display:flex; }
+@media(max-width:700px) {
+    body { padding:0; }
+    #appShell { display:block; min-height:100vh; }
+    .app-main { padding:10px; padding-top:0; }
+    .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 -10px 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; color:#343a40; font-size:12px; font-weight:800; letter-spacing:.5px; }
+    .hamburger { border:0; background:transparent; color:#343a40; font-size:25px; line-height:1; padding:3px 6px; cursor:pointer; }
+    .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); min-height:100dvh; transform:translateX(-105%); transition:transform .25s ease; box-shadow:5px 0 20px rgba(0,0,0,.15); }
+    .app-sidebar.menu-open { transform:translateX(0); }
+    .sidebar-backdrop.visible { display:block; position:fixed; z-index:1400; inset:0; background:rgba(0,0,0,.42); }
+    .desktop-only-field { display:none !important; }
+    .kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    /* En móvil se conservan Foto, Serie, Modelo, Estatus y acción. */
+    .inventory-list-section table th:nth-child(2), .inventory-list-section table td:nth-child(2),
+    .inventory-list-section table th:nth-child(5), .inventory-list-section table td:nth-child(5),
+    .inventory-list-section table th:nth-child(6), .inventory-list-section table td:nth-child(6),
+    .inventory-list-section table th:nth-child(7), .inventory-list-section table td:nth-child(7),
+    .inventory-list-section table th:nth-child(9), .inventory-list-section table td:nth-child(9),
+    .inventory-list-section table th:nth-child(10), .inventory-list-section table td:nth-child(10),
+    .inventory-list-section table th:nth-child(11), .inventory-list-section table td:nth-child(11) { display:none; }
+    .inventory-list-section table th:nth-child(8), .inventory-list-section table td:nth-child(8) { display:table-cell !important; width:76px; }
+    .inventory-list-section table th:nth-child(12), .inventory-list-section table td:nth-child(12) { display:table-cell !important; width:70px; }
+}
+
     </style>
 </head>
 <body>
 
 <div class="container" id="appShell" style="display:none;">
+    <aside class="app-sidebar" id="appSidebar" aria-label="Navegación principal">
+        <div class="sidebar-brand">IEEM <span>CONTROL PATRIMONIAL</span></div>
+        <button type="button" class="sidebar-link" onclick="irCatalogo()">☷ <span>Catálogo</span></button>
+        <div class="sidebar-pages-title">SUBPÁGINAS</div>
+        <nav id="sidebarPages"></nav>
+        <button type="button" id="addSidebarPage" class="sidebar-add" onclick="agregarSubpagina()" style="display:none;">＋ Agregar subpágina</button>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleMenuMovil(false)"></div>
+    <main class="app-main">
+    <div class="mobile-topbar">
+        <button type="button" class="hamburger" aria-label="Abrir menú" onclick="toggleMenuMovil()">☰</button>
+        <span>CONTROL PATRIMONIAL</span>
+    </div>
     <div class="header">
         <div>
             <h2>Dashboard de Inventario</h2>
@@ -510,6 +564,7 @@
     <div class="kpi-row">
         <div class="kpi-card"><h6>Total Ítems en Base</h6><h3 id="kpi-total">0</h3></div>
         <div class="kpi-card asignados"><h6>Artículos Asignados</h6><h3 id="kpi-asignados">0</h3></div>
+        <div class="kpi-card entrada"><h6>Artículos en Entrada</h6><h3 id="kpi-entrada">0</h3></div>
         <div class="kpi-card si"><h6>Artículos Tapizados (SI)</h6><h3 style="color:#28a745;" id="kpi-si">0</h3></div>
         <div class="kpi-card no"><h6>Artículos Sin Tapizar (NO)</h6><h3 style="color:#d39e00;" id="kpi-no">0</h3></div>
     </div>
@@ -566,6 +621,8 @@
         <th>TARIMA</th>
         <th>TAPIZADA</th>
         <th>ESTATUS</th>
+        <th>ÁREA</th>
+        <th>DEPARTAMENTO</th>
         <th>ARCHIVOS</th>
         <th>VER / EDITAR</th>
     </tr>
@@ -574,6 +631,7 @@
             </table>
         </div>
     </div>
+    </main>
 </div>
 
 
@@ -677,6 +735,9 @@
                 <aside class="ficha-foto">
                     <img id="editFotoRegistro" src="" alt="Fotografía del artículo">
                     <div id="editSerieFoto" class="ficha-serie"></div>
+                    <button type="button" id="btnSubirFoto" class="btn-subir-foto" onclick="seleccionarFotoInventario(registroEnEdicionId)" style="display:none;">
+                        📷 Cargar / cambiar fotografía
+                    </button>
                     <button type="button" class="btn-subir-responsiva"
                             onclick="seleccionarResponsiva(registroEnEdicionId)">
                         ⬆ Subir carta responsiva / archivo
@@ -688,6 +749,14 @@
                     <div class="campo-edicion">
                         <label for="editEstatus">Estatus</label>
                         <select id="editEstatus"></select>
+                    </div>
+                    <div class="campo-edicion desktop-only-field">
+                        <label for="editArea">Área</label>
+                        <input type="text" id="editArea" placeholder="Área">
+                    </div>
+                    <div class="campo-edicion desktop-only-field">
+                        <label for="editDepartamento">Departamento</label>
+                        <input type="text" id="editDepartamento" placeholder="Departamento">
                     </div>
                     <div class="campo-edicion">
                         <label for="editTapizada">¿Está tapizada?</label>
@@ -962,7 +1031,8 @@ async function prepararSesion(session) {
         document.getElementById('session-label').innerHTML =
             `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
         document.getElementById('authOverlay').style.display = 'none';
-        document.getElementById('appShell').style.display = 'block';
+        document.getElementById('appShell').style.display = 'flex';
+        renderizarSubpaginas();
         await cargarInventarioNube();
     } catch (error) {
         document.getElementById('appShell').style.display = 'none';
@@ -975,6 +1045,7 @@ function filaNubeARegistro(row) {
     return {
         id: row.id, s: row.serie, m: row.modelo, g: row.grupo, t: row.tarima,
         tap: row.tapizada, est: row.estatus, imgId: row.imagen_url || '',
+        area: row.area || '', departamento: row.departamento || '',
         piston: row.cambio_piston || '', fechaPiston: row.fecha_piston || '',
         fEntrada: row.fecha_entrada || '', fSalida: row.fecha_salida || '',
         observaciones: row.observaciones || '', asignado: row.asignado || ''
@@ -984,6 +1055,7 @@ function filaNubeARegistro(row) {
 function registroAUpdateNube(item) {
     return {
         estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
+        area: item.area || null, departamento: item.departamento || null,
         asignado: item.asignado || null, cambio_piston: item.piston || null,
         fecha_piston: item.fechaPiston || null, fecha_entrada: item.fEntrada || null,
         fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
@@ -995,6 +1067,14 @@ async function cargarInventarioNube() {
     const { data: rows, error } = await sb.from('inventario').select('*').order('id');
     if (error) throw error;
     db = (rows || []).map(filaNubeARegistro);
+    // Las fotografías nuevas guardan la ruta del objeto; se genera una URL firmada al abrir la app.
+    for (const item of db) {
+        if (item.imgId && !/^https?:\/\//i.test(item.imgId) && !item.imgId.startsWith('data:')) {
+            const { data: fotoFirmada, error: fotoError } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(item.imgId, 60 * 60 * 24);
+            if (!fotoError && fotoFirmada?.signedUrl) item.imgId = fotoFirmada.signedUrl;
+            else console.warn('No se pudo generar URL para la fotografía del registro', item.id, fotoError);
+        }
+    }
     await cargarArchivosNube();
     renderizarTablaCruda();
     calcularYRenderizarMetricas();
@@ -1124,6 +1204,9 @@ function abrirEdicion(id) {
     document.getElementById('editSerieFoto').textContent = `SERIE: ${item.s}`;
     llenarOpcionesEdicion('editEstatus', ['ALMACEN','ASIGNADAS','ENTRADA'], item.est || 'ALMACEN');
     document.getElementById('editTapizada').value = item.tap || 'NO';
+    document.getElementById('editArea').value = item.area || '';
+    document.getElementById('editDepartamento').value = item.departamento || '';
+    document.getElementById('btnSubirFoto').style.display = esDirAdmin ? 'block' : 'none';
     const tarimas = [...new Set(db.map(r => r.t).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b) => Number(a)-Number(b));
     llenarOpcionesEdicion('editTarima', tarimas, item.t);
     document.getElementById('editAsignado').value = item.asignado || '';
@@ -1132,7 +1215,7 @@ function abrirEdicion(id) {
     document.getElementById('editFEntrada').value = item.fEntrada || '';
     document.getElementById('editFSalida').value = item.fSalida || '';
     document.getElementById('editObservaciones').value = item.observaciones || '';
-    ['editEstatus','editTapizada','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
+    ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
         .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
     document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
     document.getElementById('editEstatus').disabled = soloLectura;
@@ -1153,6 +1236,8 @@ async function guardarEdicion() {
     if (!item) { alert('No se encontró el registro.'); return; }
     item.est = document.getElementById('editEstatus').value;
     item.tap = document.getElementById('editTapizada').value;
+    item.area = document.getElementById('editArea').value.trim();
+    item.departamento = document.getElementById('editDepartamento').value.trim();
     const tarima = document.getElementById('editTarima').value;
     item.t = tarima === '' ? null : (Number.isNaN(Number(tarima)) ? tarima : Number(tarima));
     item.asignado = document.getElementById('editAsignado').value.trim();
@@ -1200,6 +1285,8 @@ function renderizarTablaCruda() {
                 <td>${escaparHTML(item.t)}</td>
                 <td>${escaparHTML(item.tap)}</td>
                 <td>${escaparHTML(item.est)}</td>
+                <td>${escaparHTML(item.area || '')}</td>
+                <td>${escaparHTML(item.departamento || '')}</td>
                 <td class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
                     <div class="responsiva-acciones">
                         <button class="btn-documento" title="Cargar archivo" onclick="seleccionarResponsiva(${item.id})">⬆</button>
@@ -1283,9 +1370,11 @@ function calcularYRenderizarMetricas() {
     let totalSI = db.filter(item => String(item.tap || '').toUpperCase() === 'SI').length;
     let totalNO = db.filter(item => String(item.tap || '').toUpperCase() === 'NO').length;
     let totalAsignados = db.filter(item => String(item.est || '').toUpperCase() === 'ASIGNADAS').length;
+    let totalEntrada = db.filter(item => String(item.est || '').toUpperCase() === 'ENTRADA').length;
 
     if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = totalItems;
     if(document.getElementById('kpi-asignados')) document.getElementById('kpi-asignados').innerText = totalAsignados;
+    if(document.getElementById('kpi-entrada')) document.getElementById('kpi-entrada').innerText = totalEntrada;
     if(document.getElementById('kpi-si')) document.getElementById('kpi-si').innerText = totalSI;
     if(document.getElementById('kpi-no')) document.getElementById('kpi-no').innerText = totalNO;
 
@@ -1370,6 +1459,8 @@ async function descargarExcel() {
         "TARIMA": item.t,
         "TAPIZADA": item.tap,
         "ESTATUS": item.est,
+        "ÁREA": item.area || "",
+        "DEPARTAMENTO": item.departamento || "",
         "ASIGNADO A": item.asignado || "",
         "CAMBIO DE PISTÓN": item.piston || "",
         "FECHA CAMBIO PISTÓN": item.fechaPiston || "",
@@ -1383,7 +1474,7 @@ async function descargarExcel() {
     const worksheet = workbook.addWorksheet("Inventario Crudo");
 
     // Título de la tabla
-    worksheet.mergeCells("A1:N1");
+    worksheet.mergeCells("A1:P1");
     const titulo = worksheet.getCell("A1");
     titulo.value = "DASHBOARD DE INVENTARIO";
     titulo.font = {
@@ -1481,13 +1572,13 @@ async function descargarExcel() {
         { width: 10 }, { width: 18 }, { width: 30 }, { width: 12 },
         { width: 12 }, { width: 12 }, { width: 16 }, { width: 26 },
         { width: 24 }, { width: 22 }, { width: 16 }, { width: 16 },
-        { width: 42 }, { width: 45 }
+        { width: 42 }, { width: 45 }, { width: 22 }, { width: 24 }
     ];
 
     // Filtros y encabezados fijos
     worksheet.autoFilter = {
         from: "A2",
-        to: "N2"
+        to: "P2"
     };
 
     worksheet.views = [
@@ -1515,6 +1606,79 @@ async function descargarExcel() {
     link.click();
 
     URL.revokeObjectURL(url);
+}
+
+
+const URL_CATALOGO_IEEM = 'https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0';
+function irCatalogo() { window.open(URL_CATALOGO_IEEM, '_blank', 'noopener'); toggleMenuMovil(false); }
+function toggleMenuMovil(forzar) {
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    if (!sidebar || !backdrop) return;
+    const abrir = typeof forzar === 'boolean' ? forzar : !sidebar.classList.contains('menu-open');
+    sidebar.classList.toggle('menu-open', abrir);
+    backdrop.classList.toggle('visible', abrir);
+}
+function obtenerSubpaginas() {
+    try { return JSON.parse(localStorage.getItem('ieem_subpaginas') || '[]'); } catch (_) { return []; }
+}
+function renderizarSubpaginas() {
+    const nav = document.getElementById('sidebarPages');
+    if (!nav) return;
+    nav.innerHTML = obtenerSubpaginas().map((p,i) =>
+        `<a class="sidebar-page-link" href="${escaparHTML(p.url)}" target="_blank" rel="noopener">▸ ${escaparHTML(p.nombre)}</a>`
+    ).join('');
+    const boton = document.getElementById('addSidebarPage');
+    if (boton) boton.style.display = esDirAdmin ? 'flex' : 'none';
+}
+function agregarSubpagina() {
+    if (!esDirAdmin) return;
+    const nombre = prompt('Nombre de la subpágina:');
+    if (!nombre || !nombre.trim()) return;
+    const url = prompt('Pega la dirección web de la subpágina:');
+    if (!url || !/^https:\/\/\S+$/i.test(url.trim())) { alert('Ingresa una dirección HTTPS válida.'); return; }
+    const paginas = obtenerSubpaginas();
+    paginas.push({nombre:nombre.trim(), url:url.trim()});
+    localStorage.setItem('ieem_subpaginas', JSON.stringify(paginas));
+    renderizarSubpaginas();
+}
+async function seleccionarFotoInventario(id) {
+    if (!esDirAdmin) { alert('Solo el administrador puede cargar fotografías.'); return; }
+    if (!id || !sb || !usuarioActual) return;
+    const selector = document.createElement('input');
+    selector.type = 'file'; selector.accept = 'image/jpeg,image/png,image/webp'; selector.setAttribute('capture','environment');
+    selector.style.display = 'none';
+    selector.onchange = async () => {
+        const archivo = selector.files && selector.files[0];
+        if (!archivo) { selector.remove(); return; }
+        if (!['image/jpeg','image/png','image/webp'].includes(archivo.type)) { alert('Selecciona una imagen JPG, PNG o WEBP.'); selector.remove(); return; }
+        if (archivo.size > 8 * 1024 * 1024) { alert('La imagen no debe superar 8 MB.'); selector.remove(); return; }
+        const boton = document.getElementById('btnSubirFoto');
+        try {
+            boton.disabled = true; boton.textContent = 'Cargando fotografía...';
+            const ext = archivo.type === 'image/jpeg' ? 'jpg' : archivo.type.split('/')[1];
+            const ruta = `fotografias/${id}/${(window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now()}.${ext}`;
+            const {error: uploadError} = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {upsert:false, contentType:archivo.type, cacheControl:'3600'});
+            if (uploadError) throw uploadError;
+            const {data: signed, error: signedError} = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(ruta, 60 * 60 * 24);
+            if (signedError) throw signedError;
+            const {error:updateError} = await sb.from('inventario').update({imagen_url:ruta}).eq('id',id);
+            if (updateError) throw updateError;
+            const item = db.find(r => r.id === id);
+            if (item) item.imgId = signed.signedUrl;
+            const foto = document.getElementById('editFotoRegistro');
+            foto.src = signed.signedUrl; foto.style.display = 'block';
+            renderizarTablaCruda();
+            alert('Fotografía actualizada correctamente.');
+        } catch (error) {
+            console.error(error);
+            alert('No se pudo cargar la fotografía: ' + (error.message || 'Verifica el almacenamiento de Supabase.'));
+        } finally {
+            boton.disabled = false; boton.textContent = '📷 Cargar / cambiar fotografía';
+            selector.remove();
+        }
+    };
+    document.body.appendChild(selector); selector.click();
 }
 
 document.addEventListener('keydown', event => {
