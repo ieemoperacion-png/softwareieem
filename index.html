@@ -423,6 +423,70 @@
 .archivo-modal-item .eliminar-archivo { background:#dc3545; }
 .etiqueta-rol { font-weight:bold; color:#002060; }
 
+
+/* Vista móvil IEEM: solo indicadores esenciales y columnas de consulta rápida.
+   La edición completa se conserva en la ficha emergente existente. */
+.kpi-card.asignados { border-left-color: #6f42c1; }
+@media (max-width: 700px) {
+    body { padding: 8px; background: #f3f4f8; }
+    .container { width: 100%; max-width: none; box-sizing: border-box; padding: 12px; border-radius: 10px; }
+    .header { align-items: flex-start; margin-bottom: 12px; gap: 8px; }
+    .header h2 { font-size: 18px; }
+    .header p { display: none; }
+    .session-actions { width: 100%; justify-content: space-between; gap: 6px; }
+    .session-label { max-width: calc(100% - 110px); font-size: 10px; }
+    .btn-excel { display: none; }
+    .btn-salir { padding: 7px 10px; font-size: 12px; }
+    #desktop-permissions-note, .main-grid { display: none !important; }
+    .kpi-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0 16px; }
+    .kpi-card { min-width: 0; padding: 11px 10px; border-left-width: 4px; border-radius: 8px; }
+    .kpi-card h6 { font-size: 10px; line-height: 1.25; }
+    .kpi-card h3 { font-size: 23px; }
+    .inventory-list-section { border-top: 0 !important; padding-top: 0 !important; }
+    .inventory-list-section > div:first-child { display: flex !important; flex-direction: column; align-items: stretch !important; gap: 9px !important; }
+    .inventory-list-section h4 { font-size: 14px !important; }
+    .search-container { display: block; width: 100%; }
+    .search-container input { min-height: 40px; font-size: 14px; }
+    .inventory-list-section .table-responsive { max-height: none !important; overflow-x: auto; border-radius: 8px; }
+    .inventory-list-section table { min-width: 0 !important; width: 100%; table-layout: fixed; font-size: 12px; }
+    .inventory-list-section th, .inventory-list-section td { padding: 7px 4px; }
+    /* Mostrar únicamente FOTO, SERIE, MODELO y VER/EDITAR. */
+    .inventory-list-section table th:nth-child(2),
+    .inventory-list-section table td:nth-child(2),
+    .inventory-list-section table th:nth-child(5),
+    .inventory-list-section table td:nth-child(5),
+    .inventory-list-section table th:nth-child(6),
+    .inventory-list-section table td:nth-child(6),
+    .inventory-list-section table th:nth-child(7),
+    .inventory-list-section table td:nth-child(7),
+    .inventory-list-section table th:nth-child(8),
+    .inventory-list-section table td:nth-child(8),
+    .inventory-list-section table th:nth-child(9),
+    .inventory-list-section table td:nth-child(9) { display: none; }
+    .inventory-list-section table th:nth-child(1), .inventory-list-section table td:nth-child(1) { width: 58px; }
+    .inventory-list-section table th:nth-child(3), .inventory-list-section table td:nth-child(3) { width: 31%; overflow-wrap: anywhere; }
+    .inventory-list-section table th:nth-child(4), .inventory-list-section table td:nth-child(4) { width: auto; overflow-wrap: anywhere; text-align: left; }
+    .inventory-list-section table th:nth-child(10), .inventory-list-section table td:nth-child(10) { width: 70px; }
+    .inventory-list-section table td:nth-child(1) img,
+    .inventory-list-section table td:nth-child(1) .sin-foto-box { width: 46px !important; height: 46px !important; }
+    .btn-editar, .btn-ver { width: auto; min-width: 64px; height: 36px; padding: 0 9px; border-radius: 7px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
+    .accion-icono { font-size: 15px; }
+    .accion-texto { font-size: 11px; font-weight: 600; }
+    /* La ficha completa ocupa casi toda la pantalla y permite desplazamiento. */
+    .modal-edicion { padding: 0; align-items: stretch; }
+    .modal-edicion-contenido { width: 100%; max-width: none; max-height: 100dvh; height: 100%; border-radius: 0; overflow-y: auto; }
+    .modal-edicion-header { position: sticky; top: 0; z-index: 2; padding: 12px 15px; }
+    .modal-edicion-header h3 { font-size: 16px; }
+    .modal-edicion-body { padding: 12px; }
+    .ficha-edicion-superior { grid-template-columns: 1fr; gap: 12px; }
+    .ficha-foto { max-width: 220px; width: 100%; margin: 0 auto; }
+    .ficha-foto img { height: 140px; }
+    .ficha-campos { grid-template-columns: 1fr; gap: 10px; }
+    .ficha-campos .campo-completo { grid-column: auto; }
+    .modal-edicion-footer { position: sticky; bottom: 0; z-index: 2; background: #fff; padding: 10px 12px; }
+    .modal-edicion-footer button { min-height: 42px; flex: 1; }
+}
+
     </style>
 </head>
 <body>
@@ -440,11 +504,12 @@
         </div>
     </div>
 
-    <div style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">
+    <div id="desktop-permissions-note" style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">
         <strong>Permisos:</strong> DIRADMIN puede editar los registros y eliminar archivos. Los demás usuarios autenticados pueden consultar y cargar documentos.
     </div>
     <div class="kpi-row">
         <div class="kpi-card"><h6>Total Ítems en Base</h6><h3 id="kpi-total">0</h3></div>
+        <div class="kpi-card asignados"><h6>Artículos Asignados</h6><h3 id="kpi-asignados">0</h3></div>
         <div class="kpi-card si"><h6>Artículos Tapizados (SI)</h6><h3 style="color:#28a745;" id="kpi-si">0</h3></div>
         <div class="kpi-card no"><h6>Artículos Sin Tapizar (NO)</h6><h3 style="color:#d39e00;" id="kpi-no">0</h3></div>
     </div>
@@ -477,7 +542,7 @@
         </div>
     </div>
 
-    <div style="border-top: 1px solid #dee2e6; padding-top: 15px;">
+    <div class="inventory-list-section" style="border-top: 1px solid #dee2e6; padding-top: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
             <h4 style="margin:0; font-size:15px; color:#495057;">
     Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
@@ -1142,7 +1207,7 @@ function renderizarTablaCruda() {
                     </div>
                     ${tieneArchivo ? `<span class="nombre-documento">${escaparHTML(archivos[0].file_name)}${archivos.length > 1 ? ` (+${archivos.length-1})` : ''}</span>` : ''}
                 </td>
-                <td><button class="${esDirAdmin ? 'btn-editar' : 'btn-ver'}" title="${esDirAdmin ? 'Editar registro' : 'Consultar registro'}" onclick="abrirEdicion(${item.id})">${esDirAdmin ? '✎' : '👁'}</button></td>
+                <td><button class="${esDirAdmin ? 'btn-editar' : 'btn-ver'}" title="${esDirAdmin ? 'Editar registro' : 'Consultar registro'}" onclick="abrirEdicion(${item.id})"><span class="accion-icono">${esDirAdmin ? '✎' : '👁'}</span><span class="accion-texto">${esDirAdmin ? 'Editar' : 'Ver'}</span></button></td>
             </tr>`;
     });
     filtrarTablaCruda();
@@ -1215,10 +1280,12 @@ function limpiarBuscador() {
 
 function calcularYRenderizarMetricas() {
     let totalItems = db.length;
-    let totalSI = db.filter(item => item.tap === 'SI').length;
-    let totalNO = db.filter(item => item.tap === 'NO').length;
+    let totalSI = db.filter(item => String(item.tap || '').toUpperCase() === 'SI').length;
+    let totalNO = db.filter(item => String(item.tap || '').toUpperCase() === 'NO').length;
+    let totalAsignados = db.filter(item => String(item.est || '').toUpperCase() === 'ASIGNADAS').length;
 
     if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = totalItems;
+    if(document.getElementById('kpi-asignados')) document.getElementById('kpi-asignados').innerText = totalAsignados;
     if(document.getElementById('kpi-si')) document.getElementById('kpi-si').innerText = totalSI;
     if(document.getElementById('kpi-no')) document.getElementById('kpi-no').innerText = totalNO;
 
