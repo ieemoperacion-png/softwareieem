@@ -27,7 +27,7 @@
         .kpi-card h6 { margin: 0 0 5px 0; color: #666; font-size: 11px; text-transform: uppercase; }
         .kpi-card h3 { margin: 0; font-size: 24px; }
 
-        /* Panel de Filtros Superiores ubicado en medio */
+        /* Panel de Filtros Superiores en medio */
         .filtros-superiores { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; background: #f1f4f9; padding: 14px; border-radius: 6px; align-items: center; border: 1px solid #e2e8f0; }
         .filtro-grupo { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 190px; }
         .filtro-grupo label { font-size: 11px; font-weight: bold; color: #444; text-transform: uppercase; }
@@ -37,7 +37,6 @@
         .panel-left { flex: 1.3; min-width: 320px; }
         .panel-right { flex: 0.7; min-width: 280px; }
         
-        /* Tabla responsiva adaptada */
         .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; table-layout: auto; }
         th, td { padding: 7px 5px; border: 1px solid #dee2e6; vertical-align: middle; word-break: break-word; }
@@ -51,6 +50,14 @@
 
         .sin-foto-box { width: 40px; height: 40px; background: #eee; color: #aaa; font-size: 8px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid #ddd; user-select: none; margin: 0 auto; }
         
+        /* Selector de columnas flotante */
+        .column-selector-wrap { position: relative; display: inline-block; }
+        .btn-columnas { background: #495057; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-columnas:hover { background: #343a40; }
+        .column-dropdown { display: none; position: absolute; right: 0; top: 100%; margin-top: 5px; background: #fff; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 12px; z-index: 1000; min-width: 210px; text-align: left; }
+        .column-dropdown.show { display: block; }
+        .column-dropdown label { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 6px; cursor: pointer; user-select: none; }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; backdrop-filter: blur(3px); }
         .modal-content { max-width: 85%; max-height: 85%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; padding: 6px; }
         .modal-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; font-weight: bold; cursor: pointer; background: none; border: none; }
@@ -69,7 +76,7 @@
         .btn-documento { border: 0; border-radius: 4px; min-width: 30px; min-height: 28px; padding: 4px 6px; color: #fff; background: rgba(0,0,0,.22); cursor: pointer; font-size: 14px; }
 
         /* =========================================================================
-           FORMATO DE MOVIMIENTOS DE BIENES MUEBLES (CARTA RESPONSIVA)
+           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL
            ========================================================================= */
         .modal-responsiva { display: none; position: fixed; z-index: 4500; inset: 0; background-color: rgba(0, 0, 0, 0.72); overflow-y: auto; justify-content: center; align-items: flex-start; padding: 65px 15px 30px; box-sizing: border-box; }
         .modal-botones-barra { position: fixed; top: 0; left: 0; right: 0; z-index: 4600; background: #1b263b; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
@@ -100,7 +107,6 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Firmas centradas y nombre abajo visible */
         .ieem-excel-firmas { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; padding: 0 18px; font-size: 9.5pt; }
         .ieem-firma-col { width: 42%; text-align: center; position: relative; }
         .ieem-firma-titulo { font-weight: bold; margin-bottom: 55px; }
@@ -219,7 +225,7 @@
             <strong>Permisos:</strong> DIRADMIN administra y edita todo. SUPADMIN consulta todo de forma global. Usuarios estándar visualizan únicamente los bienes asignados a su persona.
         </div>
 
-        <!-- KPI Cards con funcionalidad de clic -->
+        <!-- KPI Cards -->
         <div class="kpi-row">
             <div class="kpi-card" onclick="filtrarPorKpi('TODOS')"><h6>Stock</h6><h3 id="kpi-total">0</h3></div>
             <div class="kpi-card asignados" onclick="filtrarPorKpi('ASIGNADAS')"><h6>Asignados</h6><h3 id="kpi-asignados">0</h3></div>
@@ -255,7 +261,7 @@
             </div>
         </div>
 
-        <!-- FILTROS SUPERIORES UBICADOS EN MEDIO DE LAS 2 TABLAS -->
+        <!-- FILTROS SUPERIORES EN MEDIO -->
         <div class="filtros-superiores">
             <div class="filtro-grupo">
                 <label for="filtroAreaSup">Área</label>
@@ -280,9 +286,34 @@
 
         <div class="inventory-list-section" style="border-top: 1px solid #dee2e6; padding-top: 15px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-                <h4 style="margin:0; font-size:15px; color:#495057;">
-                    Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
-                </h4>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <h4 style="margin:0; font-size:15px; color:#495057;">
+                        Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
+                    </h4>
+                    <!-- BOTÓN DINÁMICO PARA MOSTRAR/OCULTAR COLUMNAS -->
+                    <div class="column-selector-wrap">
+                        <button type="button" class="btn-columnas" onclick="toggleMenuColumnas(event)">⚙️ Columnas</button>
+                        <div id="columnDropdown" class="column-dropdown" onclick="event.stopPropagation()">
+                            <div style="font-weight:bold; font-size:11px; margin-bottom:8px; color:#002060; border-bottom:1px solid #eee; padding-bottom:4px;">MOSTRAR / OCULTAR COLUMNAS</div>
+                            <label><input type="checkbox" data-col="foto" checked onchange="actualizarVisibilidadColumnas()"> Foto</label>
+                            <label><input type="checkbox" data-col="id" checked onchange="actualizarVisibilidadColumnas()"> # (ID)</label>
+                            <label><input type="checkbox" data-col="serie" checked onchange="actualizarVisibilidadColumnas()"> Serie</label>
+                            <label><input type="checkbox" data-col="modelo" checked onchange="actualizarVisibilidadColumnas()"> Modelo</label>
+                            <label><input type="checkbox" data-col="activo" checked onchange="actualizarVisibilidadColumnas()"> Activo</label>
+                            <label><input type="checkbox" data-col="grupo" checked onchange="actualizarVisibilidadColumnas()"> Grupo</label>
+                            <label><input type="checkbox" data-col="tarima" checked onchange="actualizarVisibilidadColumnas()"> Tarima</label>
+                            <label><input type="checkbox" data-col="tapizada" checked onchange="actualizarVisibilidadColumnas()"> Tapizada</label>
+                            <label><input type="checkbox" data-col="estatus" checked onchange="actualizarVisibilidadColumnas()"> Estatus</label>
+                            <label><input type="checkbox" data-col="area" checked onchange="actualizarVisibilidadColumnas()"> Área</label>
+                            <label><input type="checkbox" data-col="departamento" checked onchange="actualizarVisibilidadColumnas()"> Departamento</label>
+                            <label><input type="checkbox" data-col="asignado" checked onchange="actualizarVisibilidadColumnas()"> Asignado</label>
+                            <label><input type="checkbox" data-col="archivos" checked onchange="actualizarVisibilidadColumnas()"> Archivos</label>
+                            <label><input type="checkbox" data-col="responsiva" checked onchange="actualizarVisibilidadColumnas()"> Responsiva</label>
+                            <label><input type="checkbox" data-col="acciones" checked onchange="actualizarVisibilidadColumnas()"> Ver / Editar</label>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="search-container">
                     <input type="text" id="buscador-crudo" onkeyup="aplicarFiltrosTabla()" placeholder="🔍 Buscar por serie, modelo, activo...">
                     <button id="btn-limpiar" class="clear-btn" onclick="limpiarBuscador()">✖</button>
@@ -293,21 +324,21 @@
                 <table>
                     <thead style="position: sticky; top: 0; z-index: 10;">
                         <tr>
-                            <th>FOTO</th>
-                            <th>#</th>
-                            <th>SERIE</th>
-                            <th>MODELO</th>
-                            <th>ACTIVO</th>
-                            <th>GRUPO</th>
-                            <th>TARIMA</th>
-                            <th>TAPIZADA</th>
-                            <th>ESTATUS</th>
-                            <th>ÁREA</th>
-                            <th>DEPARTAMENTO</th>
-                            <th>ASIGNADO</th>
-                            <th>ARCHIVOS</th>
-                            <th>RESPONSIVA</th>
-                            <th>VER / EDITAR</th>
+                            <th data-col="foto">FOTO</th>
+                            <th data-col="id">#</th>
+                            <th data-col="serie">SERIE</th>
+                            <th data-col="modelo">MODELO</th>
+                            <th data-col="activo">ACTIVO</th>
+                            <th data-col="grupo">GRUPO</th>
+                            <th data-col="tarima">TARIMA</th>
+                            <th data-col="tapizada">TAPIZADA</th>
+                            <th data-col="estatus">ESTATUS</th>
+                            <th data-col="area">ÁREA</th>
+                            <th data-col="departamento">DEPARTAMENTO</th>
+                            <th data-col="asignado">ASIGNADO</th>
+                            <th data-col="archivos">ARCHIVOS</th>
+                            <th data-col="responsiva">RESPONSIVA</th>
+                            <th data-col="acciones">VER / EDITAR</th>
                         </tr>
                     </thead>
                     <tbody id="raw-body"></tbody>
@@ -388,7 +419,6 @@
             <tr><td class="meta-label">Departamento</td><td class="meta-valor" id="lblRespDepto"></td></tr>
         </table>
 
-        <!-- Casillas Entrada / Salida automáticas -->
         <div class="ieem-excel-mov-row">
             <div class="ieem-mov-opcion">
                 <span>Entrada a Bodega</span>
@@ -413,7 +443,6 @@
             <tbody id="tbodyFormatoExcel"></tbody>
         </table>
 
-        <!-- Firmas: Firma centrada y nombre de Lázaro visible abajo -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
@@ -452,43 +481,43 @@
                     <div id="editListaArchivos" style="margin-top:8px;text-align:left;"></div>
                 </aside>
                 <section class="ficha-campos">
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="estatus">
                         <label for="editEstatus">Estatus</label>
                         <select id="editEstatus"></select>
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="activo">
                         <label for="editActivo">Activo / Clasificación</label>
                         <input type="text" id="editActivo" placeholder="Ej. Mobiliario, Equipo...">
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="area">
                         <label for="editArea">Área</label>
                         <input type="text" id="editArea" placeholder="Área">
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="departamento">
                         <label for="editDepartamento">Departamento</label>
                         <input type="text" id="editDepartamento" placeholder="Departamento">
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="tapizada">
                         <label for="editTapizada">¿Está tapizada?</label>
                         <select id="editTapizada"><option value="SI">SI</option><option value="NO">NO</option></select>
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="tarima">
                         <label for="editTarima">Tarima</label>
                         <select id="editTarima"></select>
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="asignado">
                         <label for="editAsignado">Persona Asignada (Nombre de Usuario)</label>
                         <input type="text" id="editAsignado" placeholder="Nombre completo">
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="fechas">
                         <label for="editFEntrada">Fecha de Entrada</label>
                         <input type="date" id="editFEntrada">
                     </div>
-                    <div class="campo-edicion">
+                    <div class="campo-edicion" data-campo-modal="fechas">
                         <label for="editFSalida">Fecha de Salida</label>
                         <input type="date" id="editFSalida">
                     </div>
-                    <div class="campo-edicion campo-completo">
+                    <div class="campo-edicion campo-completo" data-campo-modal="observaciones">
                         <label for="editObservaciones">Observaciones</label>
                         <textarea id="editObservaciones" placeholder="Observaciones..."></textarea>
                     </div>
@@ -588,7 +617,6 @@
             rolActual = roleRow?.role || 'CONSULTA';
             nombreUsuarioLogueado = roleRow?.nombre || correoUser.split('@')[0];
 
-            // CORRECCIÓN AUTOMÁTICA DE ROL PARA tu correo DIRADMIN
             if (correoUser === 'ieemoperacion@gmail.com') {
                 rolActual = 'DIRADMIN';
             }
@@ -715,7 +743,6 @@
         if(btnLimpiar) btnLimpiar.style.display = textoBusqueda ? 'block' : 'none';
 
         let datasetBase = db;
-        // Si no es DIRADMIN ni SUPADMIN, solo visualiza lo asignado a su nombre
         if (!esDirAdmin && !esSupAdmin) {
             datasetBase = db.filter(item => String(item.asignado || '').trim().toUpperCase() === nombreUsuarioLogueado.trim().toUpperCase());
         }
@@ -755,37 +782,70 @@
             const puedeModificar = esDirAdmin;
             tbody.innerHTML += `
                 <tr>
-                    <td>${fotoHtml}</td>
-                    <td>${item.id}</td>
-                    <td style="font-weight:bold;">${escaparHTML(item.s)}</td>
-                    <td style="text-align:left;">${escaparHTML(item.m)}</td>
-                    <td>${escaparHTML(item.activo || 'GENERAL')}</td>
-                    <td>${escaparHTML(item.g)}</td>
-                    <td>${escaparHTML(item.t)}</td>
-                    <td>${escaparHTML(item.tap)}</td>
-                    <td>${escaparHTML(item.est)}</td>
-                    <td>${escaparHTML(item.area)}</td>
-                    <td>${escaparHTML(item.departamento)}</td>
-                    <td>${escaparHTML(item.asignado)}</td>
-                    <td class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
+                    <td data-col="foto">${fotoHtml}</td>
+                    <td data-col="id">${item.id}</td>
+                    <td data-col="serie" style="font-weight:bold;">${escaparHTML(item.s)}</td>
+                    <td data-col="modelo" style="text-align:left;">${escaparHTML(item.m)}</td>
+                    <td data-col="activo">${escaparHTML(item.activo || 'GENERAL')}</td>
+                    <td data-col="grupo">${escaparHTML(item.g)}</td>
+                    <td data-col="tarima">${escaparHTML(item.t)}</td>
+                    <td data-col="tapizada">${escaparHTML(item.tap)}</td>
+                    <td data-col="estatus">${escaparHTML(item.est)}</td>
+                    <td data-col="area">${escaparHTML(item.area)}</td>
+                    <td data-col="departamento">${escaparHTML(item.departamento)}</td>
+                    <td data-col="asignado">${escaparHTML(item.asignado)}</td>
+                    <td data-col="archivos" class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
                         <div class="responsiva-acciones">
                             <button class="btn-documento" title="Cargar archivo" onclick="seleccionarResponsiva(${item.id})">⬆</button>
                             ${tieneArchivo ? `<button class="btn-documento" onclick="abrirResponsiva(${item.id})">📄 ${archivos.length}</button>` : '<span style="font-size:10px;">SIN ARCHIVOS</span>'}
                         </div>
                     </td>
-                    <td>
+                    <td data-col="responsiva">
                         <button class="btn-imprimir-responsiva" title="Generar Carta Responsiva" onclick="abrirModalResponsiva(${item.id})">🖨️</button>
                     </td>
-                    <td>
+                    <td data-col="acciones">
                         <button class="${puedeModificar ? 'btn-editar' : 'btn-ver'}" title="${puedeModificar ? 'Editar' : 'Consultar'}" onclick="abrirEdicion(${item.id})">${puedeModificar ? '✎' : '👁'}</button>
                     </td>
                 </tr>`;
         });
         document.getElementById('total-elementos-crudos').innerText = lista.length;
+        actualizarVisibilidadColumnas(); // Aplicar estado de columnas seleccionadas
     }
 
     // =========================================================================
-    // CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL
+    // CONTROL DINÁMICO DE COLUMNAS (TABLA Y MODAL)
+    // =========================================================================
+    function toggleMenuColumnas(e) {
+        e.stopPropagation();
+        const drop = document.getElementById('columnDropdown');
+        drop.classList.toggle('show');
+    }
+
+    window.addEventListener('click', () => {
+        const drop = document.getElementById('columnDropdown');
+        if (drop && drop.classList.contains('show')) drop.classList.remove('show');
+    });
+
+    function actualizarVisibilidadColumnas() {
+        const checkboxes = document.querySelectorAll('#columnDropdown input[type="checkbox"]');
+        checkboxes.forEach(chk => {
+            const colName = chk.getAttribute('data-col');
+            const mostrar = chk.checked;
+            
+            // Ocultar/Mostrar en la Tabla Principal
+            document.querySelectorAll(`[data-col="${colName}"]`).forEach(el => {
+                el.style.display = mostrar ? '' : 'none';
+            });
+
+            // Ocultar/Mostrar campos equivalentes en el Modal de Edición
+            document.querySelectorAll(`[data-campo-modal="${colName}"]`).forEach(el => {
+                el.style.display = mostrar ? '' : 'none';
+            });
+        });
+    }
+
+    // =========================================================================
+    // CARTA RESPONSIVA: ENTRADA / SALIDA AUTOMÁTICA CON X
     // =========================================================================
     function abrirModalResponsiva(id) {
         const item = db.find(r => r.id === id);
@@ -803,12 +863,22 @@
 
         const chkEntrada = document.getElementById('chkEntradaBodega');
         const chkSalida = document.getElementById('chkSalidaAsignacion');
-        if (item.fEntrada && !item.fSalida) {
-            chkEntrada.textContent = 'X';
-            chkSalida.textContent = '';
-        } else {
+        
+        const tieneEntrada = Boolean(item.fEntrada);
+        const tieneSalida = Boolean(item.fSalida);
+
+        if (tieneSalida && !tieneEntrada) {
             chkEntrada.textContent = '';
             chkSalida.textContent = 'X';
+        } else if (tieneEntrada && !tieneSalida) {
+            chkEntrada.textContent = 'X';
+            chkSalida.textContent = '';
+        } else if (String(item.est).toUpperCase() === 'ASIGNADAS') {
+            chkEntrada.textContent = '';
+            chkSalida.textContent = 'X';
+        } else {
+            chkEntrada.textContent = 'X';
+            chkSalida.textContent = '';
         }
 
         const tbody = document.getElementById('tbodyFormatoExcel');
@@ -864,7 +934,7 @@
     }
 
     // =========================================================================
-    // EDICIÓN
+    // EDICIÓN Y GUARDADO
     // =========================================================================
     function abrirEdicion(id) {
         const item = db.find(r => r.id === id);
@@ -899,6 +969,7 @@
         document.getElementById('btnSubirFoto').style.display = soloLectura ? 'none' : 'block';
 
         actualizarResponsivaEnModal(item);
+        actualizarVisibilidadColumnas(); // Asegurar sincronización con el modal de edición
         document.getElementById('modalEdicion').style.display = 'flex';
     }
 
@@ -929,7 +1000,10 @@
         item.observaciones = document.getElementById('editObservaciones').value.trim();
 
         try {
-            await sb.from('inventario').update(registroAUpdateNube(item)).eq('id', item.id);
+            const payload = registroAUpdateNube(item);
+            const { error } = await sb.from('inventario').update(payload).eq('id', item.id);
+            if (error) throw error;
+
             await registrarMovimientoBitacora('EDITAR_REGISTRO', `Modificó el registro ID ${item.id} (Serie: ${item.s})`);
             cerrarEdicion();
             await cargarInventarioNube();
