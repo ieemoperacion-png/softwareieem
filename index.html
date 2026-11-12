@@ -6,9 +6,9 @@
     <title>Dirección de Administración | Inventario IEEM</title>
     <link rel="icon" type="image/png" sizes="32x32" href="https://ieemoperacion-png.github.io/softwareieem/favicon.png">
     
-    <!-- Librería oficial de SheetJS (XLSX) cargada correctamente mediante CDNJS -->
-   <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
-</head>
+    <!-- Librería ExcelJS y html2pdf para generar PDF real desde la vista previa -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; background: #f8f9fa; margin: 0; padding: 15px; color: #333; }
         .container { max-width: 1140px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -54,639 +54,754 @@
         .modal-content { max-width: 85%; max-height: 85%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; padding: 6px; }
         .modal-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; font-weight: bold; cursor: pointer; background: none; border: none; }
         .modal-close:hover { color: #ccc; }
-        /* Tabla de consulta: todos los campos son de solo lectura */
-#raw-body td {
-    background: #fff;
-    color: #333;
-}
 
-.btn-editar {
-    background: #079bb8;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 38px;
-    height: 38px;
-    font-size: 19px;
-    cursor: pointer;
-    transition: .2s;
-}
+        #raw-body td {
+            background: #fff;
+            color: #333;
+        }
 
-.btn-editar:hover {
-    background: #007c96;
-    transform: scale(1.08);
-}
+        .btn-editar {
+            background: #079bb8;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 19px;
+            cursor: pointer;
+            transition: .2s;
+        }
 
-.celda-responsiva {
-    font-weight: bold;
-    color: white !important;
-    min-width: 100px;
-}
+        .btn-editar:hover {
+            background: #007c96;
+            transform: scale(1.08);
+        }
 
-.responsiva-si {
-    background: #078b13 !important;
-}
+        .btn-imprimir-responsiva {
+            background: #002060;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: .2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-imprimir-responsiva:hover {
+            background: #00359e;
+            transform: scale(1.08);
+        }
 
-.responsiva-no {
-    background: #dc3545 !important;
-}
+        /* Estado y acciones de Carta Responsiva dentro de una sola celda */
+        .celda-responsiva {
+            min-width: 150px;
+            padding: 6px !important;
+            color: #fff;
+            font-weight: bold;
+        }
+        .responsiva-si { background: #078b13 !important; }
+        .responsiva-no { background: #dc3545 !important; }
+        .responsiva-acciones {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-documento {
+            border: 0;
+            border-radius: 5px;
+            min-width: 34px;
+            min-height: 32px;
+            padding: 5px 8px;
+            color: #fff;
+            background: rgba(0,0,0,.22);
+            cursor: pointer;
+            font-size: 17px;
+        }
+        .btn-documento:hover { background: rgba(0,0,0,.38); }
+        .nombre-documento {
+            display: block;
+            width: 100%;
+            max-width: 145px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 3px auto 0;
+            font-size: 10px;
+            font-weight: normal;
+        }
 
+        /* =========================================================================
+           MODAL Y FORMATO DE MOVIMIENTOS DE BIENES MUEBLES (EXCEL IEEM EXACTO)
+           ========================================================================= */
+        .modal-responsiva {
+            display: none;
+            position: fixed;
+            z-index: 4500;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.72);
+            overflow-y: auto;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 65px 15px 30px;
+            box-sizing: border-box;
+        }
 
-/* Estado y acciones de Carta Responsiva dentro de una sola celda */
-.celda-responsiva {
-    min-width: 150px;
-    padding: 6px !important;
-    color: #fff;
-    font-weight: bold;
-}
-.responsiva-si { background: #078b13 !important; }
-.responsiva-no { background: #dc3545 !important; }
-.responsiva-acciones {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-.btn-documento {
-    border: 0;
-    border-radius: 5px;
-    min-width: 34px;
-    min-height: 32px;
-    padding: 5px 8px;
-    color: #fff;
-    background: rgba(0,0,0,.22);
-    cursor: pointer;
-    font-size: 17px;
-}
-.btn-documento:hover { background: rgba(0,0,0,.38); }
-.nombre-documento {
-    display: block;
-    width: 100%;
-    max-width: 145px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin: 3px auto 0;
-    font-size: 10px;
-    font-weight: normal;
-}
+        .modal-botones-barra {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 4600;
+            background: #1b263b;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        }
 
-/* Ventana emergente de edición */
-.modal-edicion {
-    display: none;
-    position: fixed;
-    z-index: 3000;
-    inset: 0;
-    background: rgba(0,0,0,.65);
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
-}
+        .modal-botones-grupo {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-.modal-edicion-contenido {
-    background: white;
-    width: 100%;
-    max-width: 650px;
-    max-height: 90vh;
-    overflow-y: auto;
-    border-radius: 8px;
-    box-shadow: 0 5px 25px rgba(0,0,0,.3);
-}
+        .btn-accion-pdf {
+            background-color: #d90429;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-accion-pdf:hover { background-color: #b00321; }
 
-.modal-edicion-header {
-    background: #858585;
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .btn-accion-imprimir {
+            background-color: #198754;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-accion-imprimir:hover { background-color: #146c43; }
 
-.modal-edicion-header h3 {
-    margin: 0;
-    font-size: 18px;
-}
+        .btn-accion-cerrar {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-accion-cerrar:hover { background-color: #545b62; }
 
-.modal-edicion-header button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 27px;
-    cursor: pointer;
-}
+        /* Hoja tamaño carta que replica fielmente formato de movimientosweb.xlsx */
+        .hoja-excel-ieem {
+            background-color: #ffffff;
+            width: 215.9mm;
+            min-height: 279.4mm;
+            padding: 10mm 12mm;
+            margin: 0 auto;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.45);
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #000000;
+        }
 
-.modal-edicion-body {
-    padding: 20px;
-}
+        .ieem-excel-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
 
-.modal-edicion-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
+        .ieem-excel-logo {
+            width: 155px;
+            height: auto;
+            object-fit: contain;
+        }
 
-.campo-edicion {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
+        .ieem-excel-org {
+            text-align: right;
+            font-weight: bold;
+            font-size: 11pt;
+            line-height: 1.35;
+        }
 
-.campo-edicion label {
-    font-size: 12px;
-    font-weight: bold;
-    color: #555;
-}
+        .ieem-excel-fecha-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 10.5pt;
+        }
 
-.campo-edicion input,
-.campo-edicion select,
-.campo-edicion textarea {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 9px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 13px;
-}
+        .ieem-excel-fecha-val {
+            border-bottom: 1.5px solid #000;
+            font-weight: bold;
+            padding: 0 14px 2px;
+            margin-left: 6px;
+            min-width: 95px;
+            text-align: center;
+        }
 
-.campo-edicion textarea {
-    min-height: 85px;
-    resize: vertical;
-}
+        .ieem-excel-linea-sep {
+            border-top: 1px solid #000;
+            width: 58%;
+            margin: 6px 0 8px auto;
+        }
 
-.campo-completo {
-    grid-column: 1 / -1;
-}
+        .ieem-excel-banner {
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12pt;
+            padding: 5px 0;
+            letter-spacing: 0.4px;
+            border: 1px solid #000;
+        }
 
-.archivo-responsiva {
-    border: 2px dashed #aaa;
-    padding: 18px;
-    text-align: center;
-    border-radius: 6px;
-    background: #f8f9fa;
-}
+        .ieem-excel-meta {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10pt;
+            min-width: 0 !important;
+        }
 
-.modal-edicion-footer {
-    padding: 15px 20px;
-    border-top: 1px solid #ddd;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-}
+        .ieem-excel-meta td {
+            border: 1px solid #000;
+            padding: 4px 8px;
+            color: #000;
+            background: #fff;
+        }
 
-.btn-cancelar {
-    background: #ffc107;
-    color: #333;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+        .ieem-excel-meta .meta-label {
+            width: 24%;
+            text-align: left;
+            font-weight: normal;
+        }
 
-.btn-guardar {
-    background: #0879dc;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+        .ieem-excel-meta .meta-valor {
+            width: 76%;
+            text-align: center;
+            font-weight: normal;
+            text-transform: uppercase;
+        }
 
-/* Ficha emergente de edición con fotografía y carta responsiva */
-.modal-edicion-contenido { max-width: 850px; }
-.ficha-edicion-superior {
-    display: grid;
-    grid-template-columns: 180px minmax(0, 1fr);
-    gap: 18px;
-    align-items: start;
-}
-.ficha-foto {
-    border: 1px solid #bbb;
-    padding: 10px;
-    text-align: center;
-    background: #fafafa;
-}
-.ficha-foto img {
-    display: block;
-    width: 100%;
-    height: 155px;
-    object-fit: contain;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-.ficha-serie {
-    font-size: 11px;
-    font-weight: bold;
-    color: #555;
-    margin: 7px 0 10px;
-    overflow-wrap: anywhere;
-}
-.btn-subir-responsiva {
-    width: 100%;
-    border: 0;
-    border-radius: 4px;
-    padding: 10px 6px;
-    color: #fff;
-    background: #dc3545;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
-}
-.btn-subir-responsiva:hover { background: #bd2130; }
-.estado-responsiva-modal {
-    margin-top: 8px;
-    color: #555;
-    font-size: 11px;
-    overflow-wrap: anywhere;
-}
-.acciones-responsiva-modal {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 5px;
-    margin-top: 7px;
-}
-.acciones-responsiva-modal button {
-    border: 0;
-    border-radius: 4px;
-    padding: 6px 8px;
-    color: #fff;
-    background: #6c757d;
-    cursor: pointer;
-    font-size: 11px;
-}
-.ficha-campos {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 13px;
-}
-.ficha-campos .campo-completo { grid-column: 1 / -1; }
-@media(max-width:650px) {
-    .ficha-edicion-superior { grid-template-columns: 1fr; }
-    .ficha-foto { max-width: 240px; width: 100%; margin: 0 auto; }
-    .ficha-campos { grid-template-columns: 1fr; }
-    .ficha-campos .campo-completo { grid-column: auto; }
-}
+        .ieem-excel-mov-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 7px 0 9px;
+            font-size: 10pt;
+        }
 
-@media(max-width:550px) {
-    .modal-edicion-grid {
-        grid-template-columns: 1fr;
-    }
+        .ieem-mov-opcion {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
 
-    .campo-completo {
-        grid-column: auto;
-    }
-}
+        .ieem-mov-cuadro {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 22px;
+            border: 1.5px solid #000;
+            font-weight: bold;
+            font-size: 14pt;
+            line-height: 1;
+            user-select: none;
+        }
 
-/* Inicio de sesión IEEM: diseño original del acceso institucional */
-.auth-overlay {
-    position: fixed; inset: 0; z-index: 5000;
-    display: flex; align-items: center; justify-content: center;
-    padding: 15px; box-sizing: border-box; overflow-y: auto;
-    background-color: #f3f3f9;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-.auth-card {
-    width: 100%; max-width: 375px; box-sizing: border-box; margin: auto;
-    padding: 20px; background: #fff; border: 1px solid #e3e3e3;
-    border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.05);
-}
-.auth-logo-wrap { text-align: center; margin-bottom: 20px; }
-.auth-logo { width: 90%; max-width: 290px; height: auto; object-fit: contain; }
-.logo-rotar { animation: rotarLogo 1.5s ease-out forwards; transform-origin: center; }
-@keyframes rotarLogo {
-    from { transform: rotate(-360deg) scale(.3); opacity: 0; }
-    to { transform: rotate(0deg) scale(1); opacity: 1; }
-}
-.auth-instruccion {
-    display: block; margin-top: 17px; color: #6c757d; font-size: 14px; line-height: 1.4;
-}
-.auth-campo { margin-bottom: 20px; }
-.form-control-centered {
-    display: block; width: 100%; box-sizing: border-box; padding: 12px 20px;
-    border: 1px solid #ced4da; border-radius: 20px; outline: none;
-    text-align: center; font-size: 16px; color: #333; background: #fff;
-    transition: border-color .2s, box-shadow .2s;
-}
-.form-control-centered:focus {
-    border-color: #6f42c1; box-shadow: 0 0 0 3px rgba(111,66,193,.10);
-}
-.auth-password-container { position: relative; width: 100%; }
-.auth-password-container .form-control-centered { padding-right: 48px; }
-.toggle-password-icon {
-    position: absolute; top: 50%; right: 15px; z-index: 10;
-    display: flex; width: 20px; height: 20px; align-items: center; justify-content: center;
-    transform: translateY(-50%); cursor: pointer;
-}
-.toggle-password-icon svg { width: 100%; height: 100%; fill: #71748d; }
-.btn-3d-container { width: 100%; padding-top: 5px; text-align: center; }
-.btn-purple-3d {
-    position: relative; display: inline-block; width: 100%; padding: 12px 24px;
-    border: none; border-radius: 8px; outline: none; background: #6f42c1; color: #fff;
-    font-size: 18px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
-    box-shadow: 0 6px 0 #512da8, 0 10px 15px rgba(0,0,0,.2);
-    transition: all .1s ease;
-}
-.btn-purple-3d:hover { background: #8250df; color: #fff; }
-.btn-purple-3d:active {
-    transform: translateY(4px); box-shadow: 0 2px 0 #512da8, 0 4px 6px rgba(0,0,0,.2);
-}
-.btn-purple-3d:disabled { opacity: .65; cursor: wait; }
-.error-mensaje {
-    display: none; margin: 10px 0 0; color: #dc3545; font-size: 13px;
-    font-weight: bold; line-height: 1.4; text-align: center;
-}
-.auth-nota { margin: 14px 0 0; color: #888; font-size: 11px; line-height: 1.45; text-align: center; }
-.auth-login-layout { width: 100%; max-width: 375px; margin: auto; }
-.auth-footer {
-    position: fixed; right: 20px; bottom: 20px; z-index: 5001;
-    max-width: calc(100vw - 30px); color: #6c757d; font-size: 13px;
-    line-height: 1.5; text-align: right;
-}
-.auth-footer a { color: #6c757d; text-decoration: none; transition: color .2s; }
-.auth-footer a:hover { color: #6f42c1; }
-#auth-message { min-height: 0; }
-@media(max-width: 520px) {
-    .auth-overlay { align-items: flex-start; padding-top: 7vh; padding-bottom: 12px; }
-    .auth-footer { position: static; margin: 14px 5px 0; text-align: center; font-size: 12px; }
-}
-.session-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
-.session-label { font-size:11px; color:#555; max-width:220px; overflow-wrap:anywhere; }
-.btn-salir { border:1px solid #ccd2dc; border-radius:4px; background:#fff; color:#334; padding:8px 11px; cursor:pointer; }
-.btn-ver { border:0; border-radius:50%; width:38px; height:38px; background:#6c757d; color:#fff; cursor:pointer; font-size:17px; }
-.btn-ver:hover { background:#565e64; }
-.btn-subir-responsiva:disabled { opacity:.6; cursor:not-allowed; }
-.archivo-modal-item { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid #eee; font-size:12px; }
-.archivo-modal-item span { overflow-wrap:anywhere; text-align:left; }
-.archivo-modal-item button { border:0; border-radius:4px; background:#6c757d; color:white; padding:6px 8px; cursor:pointer; white-space:nowrap; }
-.archivo-modal-item .eliminar-archivo { background:#dc3545; }
-.etiqueta-rol { font-weight:bold; color:#002060; }
+        .ieem-excel-grid {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+            min-width: 0 !important;
+            table-layout: fixed;
+        }
 
+        .ieem-excel-grid th {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #000 !important;
+            font-weight: bold;
+            text-align: center;
+            padding: 6px 4px;
+            font-size: 9pt;
+        }
 
-/* Vista móvil IEEM: solo indicadores esenciales y columnas de consulta rápida.
-   La edición completa se conserva en la ficha emergente existente. */
-.kpi-card.asignados { border-left-color: #6f42c1; }
-@media (max-width: 700px) {
-    body { padding: 8px; background: #f3f4f8; }
-    .container { width: 100%; max-width: none; box-sizing: border-box; padding: 12px; border-radius: 10px; }
-    .header { align-items: flex-start; margin-bottom: 12px; gap: 8px; }
-    .header h2 { font-size: 18px; }
-    .header p { display: none; }
-    .session-actions { width: 100%; justify-content: space-between; gap: 6px; }
-    .session-label { max-width: calc(100% - 110px); font-size: 10px; }
-    .btn-excel { display: none; }
-    .btn-salir { padding: 7px 10px; font-size: 12px; }
-    #desktop-permissions-note, .main-grid { display: none !important; }
-    .kpi-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 10px 0 16px; }
-    .kpi-card { min-width: 0; padding: 11px 10px; border-left-width: 4px; border-radius: 8px; }
-    .kpi-card h6 { font-size: 10px; line-height: 1.25; }
-    .kpi-card h3 { font-size: 23px; }
-    .inventory-list-section { border-top: 0 !important; padding-top: 0 !important; }
-    .inventory-list-section > div:first-child { display: flex !important; flex-direction: column; align-items: stretch !important; gap: 9px !important; }
-    .inventory-list-section h4 { font-size: 14px !important; }
-    .search-container { display: block; width: 100%; }
-    .search-container input { min-height: 40px; font-size: 14px; }
-    .inventory-list-section .table-responsive { max-height: none !important; overflow-x: auto; border-radius: 8px; }
-    .inventory-list-section table { min-width: 0 !important; width: 100%; table-layout: fixed; font-size: 12px; }
-    .inventory-list-section th, .inventory-list-section td { padding: 7px 4px; }
-    /* Mostrar únicamente FOTO, SERIE, MODELO y VER/EDITAR. */
-    .inventory-list-section table th:nth-child(2),
-    .inventory-list-section table td:nth-child(2),
-    .inventory-list-section table th:nth-child(5),
-    .inventory-list-section table td:nth-child(5),
-    .inventory-list-section table th:nth-child(6),
-    .inventory-list-section table td:nth-child(6),
-    .inventory-list-section table th:nth-child(7),
-    .inventory-list-section table td:nth-child(7),
-    .inventory-list-section table th:nth-child(8),
-    .inventory-list-section table td:nth-child(8),
-    .inventory-list-section table th:nth-child(9),
-    .inventory-list-section table td:nth-child(9) { display: none; }
-    .inventory-list-section table th:nth-child(1), .inventory-list-section table td:nth-child(1) { width: 58px; }
-    .inventory-list-section table th:nth-child(3), .inventory-list-section table td:nth-child(3) { width: 31%; overflow-wrap: anywhere; }
-    .inventory-list-section table th:nth-child(4), .inventory-list-section table td:nth-child(4) { width: auto; overflow-wrap: anywhere; text-align: left; }
-    .inventory-list-section table th:nth-child(10), .inventory-list-section table td:nth-child(10) { width: 70px; }
-    .inventory-list-section table td:nth-child(1) img,
-    .inventory-list-section table td:nth-child(1) .sin-foto-box { width: 46px !important; height: 46px !important; }
-    .btn-editar, .btn-ver { width: auto; min-width: 64px; height: 36px; padding: 0 9px; border-radius: 7px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
-    .accion-icono { font-size: 15px; }
-    .accion-texto { font-size: 11px; font-weight: 600; }
-    /* La ficha completa ocupa casi toda la pantalla y permite desplazamiento. */
-    .modal-edicion { padding: 0; align-items: stretch; }
-    .modal-edicion-contenido { width: 100%; max-width: none; max-height: 100dvh; height: 100%; border-radius: 0; overflow-y: auto; }
-    .modal-edicion-header { position: sticky; top: 0; z-index: 2; padding: 12px 15px; }
-    .modal-edicion-header h3 { font-size: 16px; }
-    .modal-edicion-body { padding: 12px; }
-    .ficha-edicion-superior { grid-template-columns: 1fr; gap: 12px; }
-    .ficha-foto { max-width: 220px; width: 100%; margin: 0 auto; }
-    .ficha-foto img { height: 140px; }
-    .ficha-campos { grid-template-columns: 1fr; gap: 10px; }
-    .ficha-campos .campo-completo { grid-column: auto; }
-    .modal-edicion-footer { position: sticky; bottom: 0; z-index: 2; background: #fff; padding: 10px 12px; }
-    .modal-edicion-footer button { min-height: 42px; flex: 1; }
-}
+        .ieem-excel-grid td {
+            border: 1px solid #000 !important;
+            padding: 2.5px 5px;
+            height: 17px;
+            color: #000;
+            background: #fff;
+            font-size: 9pt;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
 
+        .ieem-excel-firmas {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 22px;
+            padding: 0 18px;
+            font-size: 9.5pt;
+        }
 
-/* Navegación lateral adaptable */
-#appShell { max-width:none; width:100%; min-height:100vh; margin:0; padding:0; border-radius:0; display:none; align-items:stretch; gap:0; background:#f3f4f8; box-shadow:none; }
-.app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; box-sizing:border-box; padding:22px 14px; background:#dedfe2; color:#343a40; border-right:1px solid #c8cbd0; }
-.sidebar-brand { font-size:20px; font-weight:800; letter-spacing:1px; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
-.sidebar-logo { display:block; width:112px; max-width:100%; height:auto; max-height:58px; object-fit:contain; object-position:left center; margin:0 0 12px; }
-.sidebar-brand span { display:block; font-size:9px; letter-spacing:1.2px; font-weight:600; margin-top:4px; color:#626970; }
+        .ieem-firma-col {
+            width: 42%;
+            text-align: center;
+            position: relative;
+        }
 
-.sidebar-link,.sidebar-page-link,.sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-align:left; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
-.sidebar-link:hover,.sidebar-page-link:hover,.sidebar-add:hover { background:#c9ccd1; }
-.sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
-.sidebar-add { margin-top:12px; border:1px dashed #9da3aa; font-size:12px; }
-.app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
-.app-main > .header,.app-main > #desktop-permissions-note,.app-main > .kpi-row,.app-main > .main-grid,.app-main > .inventory-list-section { max-width:1200px; margin-left:auto; margin-right:auto; }
-.mobile-topbar { display:none; }
-.sidebar-backdrop { display:none; }
-.kpi-card.entrada { border-left-color:#fd7e14; }
-.btn-subir-foto { width:100%; margin:0 0 8px; border:0; border-radius:5px; padding:10px 7px; color:#fff; background:#198754; cursor:pointer; font-size:12px; font-weight:bold; }
-.btn-subir-foto:hover { background:#146c43; }
-.desktop-only-field { display:flex; }
-@media(max-width:700px) {
-    body { padding:0; }
-    #appShell { display:block; min-height:100vh; }
-    .app-main { padding:10px; padding-top:0; }
-    .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 -10px 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; color:#343a40; font-size:12px; font-weight:800; letter-spacing:.5px; }
-    .hamburger { border:0; background:transparent; color:#343a40; font-size:25px; line-height:1; padding:3px 6px; cursor:pointer; }
-    .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); min-height:100dvh; transform:translateX(-105%); transition:transform .25s ease; box-shadow:5px 0 20px rgba(0,0,0,.15); }
-    .app-sidebar.menu-open { transform:translateX(0); }
-    .sidebar-backdrop.visible { display:block; position:fixed; z-index:1400; inset:0; background:rgba(0,0,0,.42); }
-    .desktop-only-field { display:none !important; }
-    .kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    /* En móvil se conservan Foto, Serie, Modelo, Estatus y acción. */
-    .inventory-list-section table th:nth-child(2), .inventory-list-section table td:nth-child(2),
-    .inventory-list-section table th:nth-child(5), .inventory-list-section table td:nth-child(5),
-    .inventory-list-section table th:nth-child(6), .inventory-list-section table td:nth-child(6),
-    .inventory-list-section table th:nth-child(7), .inventory-list-section table td:nth-child(7),
-    .inventory-list-section table th:nth-child(9), .inventory-list-section table td:nth-child(9),
-    .inventory-list-section table th:nth-child(10), .inventory-list-section table td:nth-child(10),
-    .inventory-list-section table th:nth-child(11), .inventory-list-section table td:nth-child(11) { display:none; }
-    .inventory-list-section table th:nth-child(8), .inventory-list-section table td:nth-child(8) { display:table-cell !important; width:76px; }
-    .inventory-list-section table th:nth-child(12), .inventory-list-section table td:nth-child(12) { display:table-cell !important; width:70px; }
-}
+        .ieem-firma-titulo {
+            font-weight: bold;
+            margin-bottom: 42px;
+        }
 
-    
+        .ieem-firma-img-auth {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-height: 52px;
+            max-width: 170px;
+            object-fit: contain;
+            pointer-events: none;
+        }
 
-/* Rediseño móvil definitivo: tarjetas compactas con datos en columna */
-@media (max-width:700px) {
-    .inventory-list-section .table-responsive {
-        width: 100% !important;
-        max-height: none !important;
-        overflow-x: hidden !important;
-        overflow-y: visible !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-    }
+        .ieem-firma-nombre {
+            border-bottom: 2px solid #000;
+            padding-bottom: 3px;
+            min-height: 18px;
+            font-size: 9.5pt;
+            text-transform: uppercase;
+        }
 
-    .inventory-list-section table {
-        display: block !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        table-layout: auto !important;
-        border: 0 !important;
-        border-collapse: separate !important;
-        border-spacing: 0 !important;
-        font-size: 12px !important;
-    }
+        .ieem-firma-pie {
+            font-weight: bold;
+            padding-top: 3px;
+            font-size: 9.5pt;
+        }
 
-    .inventory-list-section thead {
-        display: none !important;
-    }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #modalResponsiva, #modalResponsiva * {
+                visibility: visible;
+            }
+            #modalResponsiva {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #fff !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            .modal-botones-barra {
+                display: none !important;
+            }
+            .hoja-excel-ieem {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                min-height: auto !important;
+                padding: 6mm 8mm !important;
+            }
+        }
 
-    .inventory-list-section tbody {
-        display: block !important;
-        width: 100% !important;
-    }
+        /* Ventana emergente de edición */
+        .modal-edicion {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            inset: 0;
+            background: rgba(0,0,0,.65);
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
 
-    .inventory-list-section tbody tr {
-        display: grid !important;
-        grid-template-columns: 58px minmax(0, 1fr) 66px !important;
-        grid-template-rows: repeat(3, minmax(22px, auto)) !important;
-        grid-template-areas:
-            "photo serie action"
-            "photo modelo action"
-            "photo estatus action" !important;
-        align-items: center !important;
-        column-gap: 9px !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        min-height: 86px !important;
-        box-sizing: border-box !important;
-        margin: 0 0 10px !important;
-        padding: 8px !important;
-        background: #fff !important;
-        border: 1px solid #dce1e8 !important;
-        border-radius: 10px !important;
-        box-shadow: 0 2px 5px rgba(25, 40, 65, .07) !important;
-        overflow: hidden !important;
-    }
+        .modal-edicion-contenido {
+            background: white;
+            width: 100%;
+            max-width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,.3);
+        }
 
-    .inventory-list-section tbody td {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        box-sizing: border-box !important;
-        width: auto !important;
-        min-width: 0 !important;
-        min-height: 0 !important;
-        height: auto !important;
-        padding: 2px 0 !important;
-        margin: 0 !important;
-        border: 0 !important;
-        background: transparent !important;
-        color: #263238 !important;
-        text-align: left !important;
-        white-space: normal !important;
-        word-break: normal !important;
-        overflow-wrap: anywhere !important;
-        font-size: 11px !important;
-        line-height: 1.25 !important;
-    }
+        .modal-edicion-header {
+            background: #858585;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .inventory-list-section tbody td:nth-child(1) {
-        grid-area: photo !important;
-        justify-content: center !important;
-        align-self: center !important;
-    }
+        .modal-edicion-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
 
-    .inventory-list-section tbody td:nth-child(1) img,
-    .inventory-list-section tbody td:nth-child(1) .sin-foto-box {
-        display: block !important;
-        width: 54px !important;
-        height: 54px !important;
-        max-width: 54px !important;
-        object-fit: cover !important;
-        border-radius: 6px !important;
-    }
+        .modal-edicion-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 27px;
+            cursor: pointer;
+        }
 
-    .inventory-list-section tbody td:nth-child(3) {
-        grid-area: serie !important;
-        font-weight: 700 !important;
-        color: #17365d !important;
-        font-size: 11px !important;
-    }
+        .modal-edicion-body {
+            padding: 20px;
+        }
 
-    .inventory-list-section tbody td:nth-child(4) {
-        grid-area: modelo !important;
-        font-size: 10px !important;
-        color: #4b5563 !important;
-    }
+        .campo-edicion {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-    .inventory-list-section tbody td:nth-child(8) {
-        grid-area: estatus !important;
-        font-size: 10px !important;
-        color: #59636e !important;
-    }
+        .campo-edicion label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+        }
 
-    .inventory-list-section tbody td:nth-child(12) {
-        grid-area: action !important;
-        justify-content: center !important;
-        align-self: center !important;
-    }
+        .campo-edicion input,
+        .campo-edicion select,
+        .campo-edicion textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
 
-    .inventory-list-section tbody td:nth-child(12) button {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 3px !important;
-        width: 62px !important;
-        min-width: 62px !important;
-        height: 34px !important;
-        padding: 0 3px !important;
-        border-radius: 7px !important;
-        font-size: 10px !important;
-        white-space: nowrap !important;
-    }
+        .campo-edicion textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
 
-    .inventory-list-section tbody td:nth-child(12) .accion-icono {
-        font-size: 12px !important;
-    }
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
 
-    .inventory-list-section tbody td:nth-child(12) .accion-texto {
-        display: inline !important;
-        font-size: 9px !important;
-    }
+        .modal-edicion-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
 
-    /* Ocultar ID, Grupo, Tarima, Tapizada, Área, Departamento y archivos
-       de la tabla compacta; permanecen disponibles en la ficha del artículo. */
-    .inventory-list-section tbody td:nth-child(2),
-    .inventory-list-section tbody td:nth-child(5),
-    .inventory-list-section tbody td:nth-child(6),
-    .inventory-list-section tbody td:nth-child(7),
-    .inventory-list-section tbody td:nth-child(9),
-    .inventory-list-section tbody td:nth-child(10),
-    .inventory-list-section tbody td:nth-child(11) {
-        display: none !important;
-    }
-}
+        .btn-cancelar {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-</style>
+        .btn-guardar {
+            background: #0879dc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .ficha-edicion-superior {
+            display: grid;
+            grid-template-columns: 180px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+        }
+        .ficha-foto {
+            border: 1px solid #bbb;
+            padding: 10px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .ficha-foto img {
+            display: block;
+            width: 100%;
+            height: 155px;
+            object-fit: contain;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .ficha-serie {
+            font-size: 11px;
+            font-weight: bold;
+            color: #555;
+            margin: 7px 0 10px;
+            overflow-wrap: anywhere;
+        }
+        .btn-subir-responsiva {
+            width: 100%;
+            border: 0;
+            border-radius: 4px;
+            padding: 10px 6px;
+            color: #fff;
+            background: #dc3545;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .btn-subir-responsiva:hover { background: #bd2130; }
+        .estado-responsiva-modal {
+            margin-top: 8px;
+            color: #555;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+        .ficha-campos {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+        .ficha-campos .campo-completo { grid-column: 1 / -1; }
+
+        /* Inicio de sesión IEEM */
+        .auth-overlay {
+            position: fixed; inset: 0; z-index: 5000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 15px; box-sizing: border-box; overflow-y: auto;
+            background-color: #f3f3f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .auth-card {
+            width: 100%; max-width: 375px; box-sizing: border-box; margin: auto;
+            padding: 20px; background: #fff; border: 1px solid #e3e3e3;
+            border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.05);
+        }
+        .auth-logo-wrap { text-align: center; margin-bottom: 20px; }
+        .auth-logo { width: 90%; max-width: 290px; height: auto; object-fit: contain; }
+        .logo-rotar { animation: rotarLogo 1.5s ease-out forwards; transform-origin: center; }
+        @keyframes rotarLogo {
+            from { transform: rotate(-360deg) scale(.3); opacity: 0; }
+            to { transform: rotate(0deg) scale(1); opacity: 1; }
+        }
+        .auth-instruccion {
+            display: block; margin-top: 17px; color: #6c757d; font-size: 14px; line-height: 1.4;
+        }
+        .auth-campo { margin-bottom: 20px; }
+        .form-control-centered {
+            display: block; width: 100%; box-sizing: border-box; padding: 12px 20px;
+            border: 1px solid #ced4da; border-radius: 20px; outline: none;
+            text-align: center; font-size: 16px; color: #333; background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .form-control-centered:focus {
+            border-color: #6f42c1; box-shadow: 0 0 0 3px rgba(111,66,193,.10);
+        }
+        .auth-password-container { position: relative; width: 100%; }
+        .auth-password-container .form-control-centered { padding-right: 48px; }
+        .toggle-password-icon {
+            position: absolute; top: 50%; right: 15px; z-index: 10;
+            display: flex; width: 20px; height: 20px; align-items: center; justify-content: center;
+            transform: translateY(-50%); cursor: pointer;
+        }
+        .toggle-password-icon svg { width: 100%; height: 100%; fill: #71748d; }
+        .btn-3d-container { width: 100%; padding-top: 5px; text-align: center; }
+        .btn-purple-3d {
+            position: relative; display: inline-block; width: 100%; padding: 12px 24px;
+            border: none; border-radius: 8px; outline: none; background: #6f42c1; color: #fff;
+            font-size: 18px; font-weight: bold; letter-spacing: 1px; cursor: pointer;
+            box-shadow: 0 6px 0 #512da8, 0 10px 15px rgba(0,0,0,.2);
+            transition: all .1s ease;
+        }
+        .btn-purple-3d:hover { background: #8250df; color: #fff; }
+        .btn-purple-3d:active {
+            transform: translateY(4px); box-shadow: 0 2px 0 #512da8, 0 4px 6px rgba(0,0,0,.2);
+        }
+        .btn-purple-3d:disabled { opacity: .65; cursor: wait; }
+        .error-mensaje {
+            display: none; margin: 10px 0 0; color: #dc3545; font-size: 13px;
+            font-weight: bold; line-height: 1.4; text-align: center;
+        }
+        .auth-nota { margin: 14px 0 0; color: #888; font-size: 11px; line-height: 1.45; text-align: center; }
+        .auth-login-layout { width: 100%; max-width: 375px; margin: auto; }
+        .auth-footer {
+            position: fixed; right: 20px; bottom: 20px; z-index: 5001;
+            max-width: calc(100vw - 30px); color: #6c757d; font-size: 13px;
+            line-height: 1.5; text-align: right;
+        }
+        .auth-footer a { color: #6c757d; text-decoration: none; transition: color .2s; }
+        .auth-footer a:hover { color: #6f42c1; }
+
+        .session-actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end; }
+        .session-label { font-size:11px; color:#555; max-width:220px; overflow-wrap:anywhere; }
+        .btn-salir { border:1px solid #ccd2dc; border-radius:4px; background:#fff; color:#334; padding:8px 11px; cursor:pointer; }
+        .btn-ver { border:0; border-radius:50%; width:38px; height:38px; background:#6c757d; color:#fff; cursor:pointer; font-size:17px; }
+        .btn-ver:hover { background:#565e64; }
+        .btn-subir-responsiva:disabled { opacity:.6; cursor:not-allowed; }
+        .archivo-modal-item { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:7px 0; border-bottom:1px solid #eee; font-size:12px; }
+        .archivo-modal-item span { overflow-wrap:anywhere; text-align:left; }
+        .archivo-modal-item button { border:0; border-radius:4px; background:#6c757d; color:white; padding:6px 8px; cursor:pointer; white-space:nowrap; }
+        .archivo-modal-item .eliminar-archivo { background:#dc3545; }
+        .etiqueta-rol { font-weight:bold; color:#002060; }
+
+        /* Navegación lateral adaptable */
+        #appShell { max-width:none; width:100%; min-height:100vh; margin:0; padding:0; border-radius:0; display:none; align-items:stretch; gap:0; background:#f3f4f8; box-shadow:none; }
+        .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; box-sizing:border-box; padding:22px 14px; background:#dedfe2; color:#343a40; border-right:1px solid #c8cbd0; }
+        .sidebar-brand { font-size:20px; font-weight:800; letter-spacing:1px; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
+        .sidebar-logo { display:block; width:112px; max-width:100%; height:auto; max-height:58px; object-fit:contain; object-position:left center; margin:0 0 12px; }
+        .sidebar-brand span { display:block; font-size:9px; letter-spacing:1.2px; font-weight:600; margin-top:4px; color:#626970; }
+
+        .sidebar-link,.sidebar-page-link,.sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-align:left; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
+        .sidebar-link:hover,.sidebar-page-link:hover,.sidebar-add:hover { background:#c9ccd1; }
+        .sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
+        .sidebar-add { margin-top:12px; border:1px dashed #9da3aa; font-size:12px; }
+        .app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
+        .app-main > .header,.app-main > #desktop-permissions-note,.app-main > .kpi-row,.app-main > .main-grid,.app-main > .inventory-list-section { max-width:1200px; margin-left:auto; margin-right:auto; }
+        .mobile-topbar { display:none; }
+        .sidebar-backdrop { display:none; }
+        .kpi-card.asignados { border-left-color: #6f42c1; }
+        .kpi-card.entrada { border-left-color:#fd7e14; }
+        .btn-subir-foto { width:100%; margin:0 0 8px; border:0; border-radius:5px; padding:10px 7px; color:#fff; background:#198754; cursor:pointer; font-size:12px; font-weight:bold; }
+        .btn-subir-foto:hover { background:#146c43; }
+
+        /* Rediseño móvil definitivo: tarjetas compactas con botón de impresora y edición */
+        @media (max-width:700px) {
+            body { padding:0; }
+            #appShell { display:block; min-height:100vh; }
+            .app-main { padding:10px; padding-top:0; }
+            .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 -10px 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; color:#343a40; font-size:12px; font-weight:800; letter-spacing:.5px; }
+            .hamburger { border:0; background:transparent; color:#343a40; font-size:25px; line-height:1; padding:3px 6px; cursor:pointer; }
+            .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); min-height:100dvh; transform:translateX(-105%); transition:transform .25s ease; box-shadow:5px 0 20px rgba(0,0,0,.15); }
+            .app-sidebar.menu-open { transform:translateX(0); }
+            .sidebar-backdrop.visible { display:block; position:fixed; z-index:1400; inset:0; background:rgba(0,0,0,.42); }
+            #desktop-permissions-note, .main-grid, .btn-excel { display: none !important; }
+            .kpi-row { display: grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap: 8px; margin: 10px 0 16px; }
+            .kpi-card { min-width: 0; padding: 11px 10px; border-left-width: 4px; border-radius: 8px; }
+            .kpi-card h6 { font-size: 10px; line-height: 1.25; }
+            .kpi-card h3 { font-size: 23px; }
+            .search-container { display: block; width: 100%; }
+            .search-container input { min-height: 40px; font-size: 14px; }
+
+            .inventory-list-section .table-responsive {
+                width: 100% !important;
+                max-height: none !important;
+                overflow-x: hidden !important;
+                overflow-y: visible !important;
+                border: 0 !important;
+                background: transparent !important;
+            }
+            .inventory-list-section table,
+            .inventory-list-section tbody {
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            .inventory-list-section thead { display: none !important; }
+
+            .inventory-list-section tbody tr {
+                display: grid !important;
+                grid-template-columns: 58px minmax(0, 1fr) 74px !important;
+                grid-template-rows: repeat(3, minmax(22px, auto)) !important;
+                grid-template-areas:
+                    "photo serie print"
+                    "photo modelo action"
+                    "photo estatus action" !important;
+                align-items: center !important;
+                column-gap: 9px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                margin: 0 0 10px !important;
+                padding: 8px !important;
+                background: #fff !important;
+                border: 1px solid #dce1e8 !important;
+                border-radius: 10px !important;
+                box-shadow: 0 2px 5px rgba(25, 40, 65, .07) !important;
+            }
+
+            .inventory-list-section tbody td {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                border: 0 !important;
+                padding: 2px 0 !important;
+                background: transparent !important;
+                font-size: 11px !important;
+                text-align: left !important;
+            }
+
+            .inventory-list-section tbody td:nth-child(1) { grid-area: photo !important; justify-content: center !important; }
+            .inventory-list-section tbody td:nth-child(1) img,
+            .inventory-list-section tbody td:nth-child(1) .sin-foto-box { width: 54px !important; height: 54px !important; border-radius: 6px !important; }
+            .inventory-list-section tbody td:nth-child(3) { grid-area: serie !important; font-weight: 700 !important; color: #17365d !important; }
+            .inventory-list-section tbody td:nth-child(4) { grid-area: modelo !important; font-size: 10px !important; color: #4b5563 !important; }
+            .inventory-list-section tbody td:nth-child(8) { grid-area: estatus !important; font-size: 10px !important; color: #59636e !important; }
+            .inventory-list-section tbody td:nth-child(12) { grid-area: print !important; justify-content: center !important; }
+            .inventory-list-section tbody td:nth-child(13) { grid-area: action !important; justify-content: center !important; }
+
+            .inventory-list-section tbody td:nth-child(12) button {
+                width: 68px !important;
+                height: 30px !important;
+                border-radius: 7px !important;
+                font-size: 13px !important;
+            }
+
+            .inventory-list-section tbody td:nth-child(13) button {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 3px !important;
+                width: 68px !important;
+                height: 32px !important;
+                border-radius: 7px !important;
+                font-size: 10px !important;
+            }
+
+            .inventory-list-section tbody td:nth-child(2),
+            .inventory-list-section tbody td:nth-child(5),
+            .inventory-list-section tbody td:nth-child(6),
+            .inventory-list-section tbody td:nth-child(7),
+            .inventory-list-section tbody td:nth-child(9),
+            .inventory-list-section tbody td:nth-child(10),
+            .inventory-list-section tbody td:nth-child(11) {
+                display: none !important;
+            }
+
+            .ficha-edicion-superior, .ficha-campos { grid-template-columns: 1fr; }
+            .ficha-campos .campo-completo { grid-column: auto; }
+        }
+    </style>
 </head>
 <body>
 
@@ -712,7 +827,7 @@
     <div class="header">
         <div>
             <h2>Dashboard de Inventario</h2>
-            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">Inventario institucional -Dirección de Administración)</p>
+            <p style="margin:5px 0 0 0; font-size:13px; color:#666;">Inventario institucional - Dirección de Administración</p>
         </div>
         <div class="session-actions">
             <div id="session-label" class="session-label"></div>
@@ -722,7 +837,7 @@
     </div>
 
     <div id="desktop-permissions-note" style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">
-        <strong>Permisos:</strong> DIRADMIN puede editar los registros y eliminar archivos. Los demás usuarios autenticados pueden consultar y cargar documentos.
+        <strong>Permisos:</strong> DIRADMIN puede editar los registros y eliminar archivos. Los demás usuarios autenticados pueden consultar, generar responsivas y cargar documentos.
     </div>
     <div class="kpi-row">
         <div class="kpi-card"><h6>Stock</h6><h3 id="kpi-total">0</h3></div>
@@ -763,8 +878,8 @@
     <div class="inventory-list-section" style="border-top: 1px solid #dee2e6; padding-top: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
             <h4 style="margin:0; font-size:15px; color:#495057;">
-    Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
-</h4>
+                Inventario General (<span id="total-elementos-crudos">0</span> Elementos)
+            </h4>
 
             <div class="search-container">
                 <input type="text" id="buscador-crudo" onkeyup="filtrarTablaCruda()" placeholder="🔍 Buscar por serie, modelo, grupo, estatus...">
@@ -774,31 +889,31 @@
         
         <div class="table-responsive" style="max-height: 300px;">
             <table>
-<thead style="position: sticky; top: 0; z-index: 10;">
-    <tr>
-        <th>FOTO</th>
-        <th>#</th>
-        <th>SERIE</th>
-        <th>MODELO</th>
-        <th>GRUPO</th>
-        <th>TARIMA</th>
-        <th>TAPIZADA</th>
-        <th>ESTATUS</th>
-        <th>ÁREA</th>
-        <th>DEPARTAMENTO</th>
-        <th>ARCHIVOS</th>
-        <th>VER / EDITAR</th>
-    </tr>
-</thead>
-<tbody id="raw-body"></tbody>
+                <thead style="position: sticky; top: 0; z-index: 10;">
+                    <tr>
+                        <th>FOTO</th>
+                        <th>#</th>
+                        <th>SERIE</th>
+                        <th>MODELO</th>
+                        <th>GRUPO</th>
+                        <th>TARIMA</th>
+                        <th>TAPIZADA</th>
+                        <th>ESTATUS</th>
+                        <th>ÁREA</th>
+                        <th>DEPARTAMENTO</th>
+                        <th>ARCHIVOS</th>
+                        <th>RESPONSIVA</th>
+                        <th>VER / EDITAR</th>
+                    </tr>
+                </thead>
+                <tbody id="raw-body"></tbody>
             </table>
         </div>
     </div>
     </main>
 </div>
 
-
-<!-- Inicio de sesión institucional: diseño proporcionado, autenticación segura con Supabase -->
+<!-- Inicio de sesión institucional -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-login-layout">
         <div class="auth-card">
@@ -881,6 +996,106 @@
 <div id="imagenModal" class="modal" onclick="cerrarModal()">
     <button class="modal-close" onclick="cerrarModal()">×</button>
     <img class="modal-content" id="imgAmpliada" onclick="event.stopPropagation();">
+</div>
+
+<!-- =========================================================================
+     MODAL DE VISTA PREVIA Y PDF DEL FORMATO EXCEL "MOVIMIENTOS DE BIENES MUEBLES"
+     ========================================================================= -->
+<div id="modalResponsiva" class="modal-responsiva" onclick="if(event.target.id==='modalResponsiva') cerrarResponsivaModal()">
+    <!-- Barra superior de vista previa -->
+    <div class="modal-botones-barra">
+        <div style="font-size: 13px; font-weight: bold;">
+            Vista Previa — Movimientos de Bienes Muebles (IEEM)
+        </div>
+        <div class="modal-botones-grupo">
+            <button type="button" class="btn-accion-pdf" id="btnDescargarPdfResp" onclick="descargarResponsivaPDF()">📥 Descargar PDF</button>
+            <button type="button" class="btn-accion-imprimir" onclick="imprimirResponsiva()">🖨️ Imprimir</button>
+            <button type="button" class="btn-accion-cerrar" onclick="cerrarResponsivaModal()">✖ Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Hoja exacta replicada de formato de movimientosweb.xlsx (hoja: entrada salida) -->
+    <div id="hojaFormatoMovimientos" class="hoja-excel-ieem">
+        <!-- Encabezado: Logotipo IEEM a la izquierda y textos institucionales a la derecha -->
+        <div class="ieem-excel-top">
+            <img src="ieemlogo.png"
+                 alt="IEEM"
+                 class="ieem-excel-logo"
+                 onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://ieemoperacion-png.github.io/softwareieem/ieemlogo.png';}else{this.style.display='none';}">
+            <div style="flex: 1;">
+                <div class="ieem-excel-org">
+                    Dirección de Administración<br>
+                    Subdirección de Recursos Materiales<br>
+                    Departamento de Control Patrimonial
+                </div>
+                <div class="ieem-excel-fecha-row">
+                    <span>Fecha:</span>
+                    <span id="lblFechaActual" class="ieem-excel-fecha-val">--/--/----</span>
+                </div>
+                <div class="ieem-excel-linea-sep"></div>
+            </div>
+        </div>
+
+        <!-- Franja negra con título -->
+        <div class="ieem-excel-banner">Movimientos de Bienes Muebles</div>
+
+        <!-- Tabla de Área y Departamento -->
+        <table class="ieem-excel-meta">
+            <tr>
+                <td class="meta-label">Área</td>
+                <td class="meta-valor" id="lblRespArea"></td>
+            </tr>
+            <tr>
+                <td class="meta-label">Departamento</td>
+                <td class="meta-valor" id="lblRespDepto"></td>
+            </tr>
+        </table>
+
+        <!-- Casillas Entrada a Bodega / Salida por asignación (clicables para alternar) -->
+        <div class="ieem-excel-mov-row">
+            <div class="ieem-mov-opcion" onclick="seleccionarTipoMovimiento('ENTRADA')" title="Clic para marcar Entrada a Bodega">
+                <span>Entrada a Bodega</span>
+                <span id="chkEntradaBodega" class="ieem-mov-cuadro"></span>
+            </div>
+            <div class="ieem-mov-opcion" onclick="seleccionarTipoMovimiento('SALIDA')" title="Clic para marcar Salida por asignación">
+                <span>Salida por asignación</span>
+                <span id="chkSalidaAsignacion" class="ieem-mov-cuadro">x</span>
+            </div>
+        </div>
+
+        <!-- Tabla de Bienes Muebles (22 filas idénticas a la plantilla Excel) -->
+        <table class="ieem-excel-grid">
+            <thead>
+                <tr>
+                    <th style="width: 7%;">N.P.</th>
+                    <th style="width: 39%;">Descripción</th>
+                    <th style="width: 19%;">Número de Inventario</th>
+                    <th style="width: 17%;">Número de Serie</th>
+                    <th style="width: 18%;">Observaciones</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyFormatoExcel"></tbody>
+        </table>
+
+        <!-- Sección de Firmas idéntica al formato Excel con firmaautorizacion.jpg fija -->
+        <div class="ieem-excel-firmas">
+            <div class="ieem-firma-col">
+                <div class="ieem-firma-titulo">Solicitante</div>
+                <div id="lblSolicitanteNombre" class="ieem-firma-nombre"></div>
+                <div class="ieem-firma-pie">Nombre y Firma</div>
+            </div>
+
+            <div class="ieem-firma-col">
+                <div class="ieem-firma-titulo">Entrega / Recibe</div>
+                <img src="firmaautorizacion.jpg"
+                     alt="Firma Autorización"
+                     class="ieem-firma-img-auth"
+                     onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg';}else{this.style.display='none';}">
+                <div class="ieem-firma-nombre">LAZARO SEGURA MUCIÑO</div>
+                <div class="ieem-firma-pie">Nombre y Firma</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Ventana emergente para editar los datos de mantenimiento -->
@@ -981,879 +1196,897 @@
         btnIcono.innerHTML = mostrar ? svgOjoCerrado : svgOjoAbierto;
     }
 
-    let db = []; // Los registros se consultan exclusivamente desde Supabase después del inicio de sesión.
-// Conexión de Inventario IEEM a Supabase.
-let sb = null;
-let usuarioActual = null;
-let rolActual = 'CONSULTA';
-let esDirAdmin = false;
-let registroEnEdicionId = null;
-let archivosPorItem = {};
-const BUCKET_DOCUMENTOS = 'inventario-documentos';
-const MAX_ARCHIVO_BYTES = 10 * 1024 * 1024;
+    let db = [];
+    let sb = null;
+    let usuarioActual = null;
+    let rolActual = 'CONSULTA';
+    let esDirAdmin = false;
+    let registroEnEdicionId = null;
+    let itemResponsivaActual = null;
+    let archivosPorItem = {};
+    const BUCKET_DOCUMENTOS = 'inventario-documentos';
+    const MAX_ARCHIVO_BYTES = 10 * 1024 * 1024;
 
-function mostrarMensajeAcceso(mensaje, error = true) {
-    const el = document.getElementById('auth-message');
-    if (!el) return;
-    el.textContent = mensaje || '';
-    el.style.color = error ? '#dc3545' : '#198754';
-    el.style.display = mensaje ? 'block' : 'none';
-}
-
-function validarConfiguracionSupabase() {
-    const cfg = window.INVENTARIO_SUPABASE_CONFIG || {};
-    if (!cfg.url || !cfg.anonKey || cfg.url.includes('TU_PROYECTO') || cfg.anonKey.includes('TU_CLAVE')) {
-        mostrarMensajeAcceso('Falta configurar supabase-config.js con la URL del proyecto y la clave pública (publishable/anon).');
-        return false;
+    function mostrarMensajeAcceso(mensaje, error = true) {
+        const el = document.getElementById('auth-message');
+        if (!el) return;
+        el.textContent = mensaje || '';
+        el.style.color = error ? '#dc3545' : '#198754';
+        el.style.display = mensaje ? 'block' : 'none';
     }
-    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-        mostrarMensajeAcceso('No se pudo cargar la librería de Supabase. Revisa tu conexión a internet.');
-        return false;
+
+    function validarConfiguracionSupabase() {
+        const cfg = window.INVENTARIO_SUPABASE_CONFIG || {};
+        if (!cfg.url || !cfg.anonKey || cfg.url.includes('TU_PROYECTO') || cfg.anonKey.includes('TU_CLAVE')) {
+            mostrarMensajeAcceso('Falta configurar supabase-config.js con la URL del proyecto y la clave pública.');
+            return false;
+        }
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+            mostrarMensajeAcceso('No se pudo cargar la librería de Supabase. Revisa tu conexión a internet.');
+            return false;
+        }
+        sb = window.supabase.createClient(cfg.url, cfg.anonKey, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        });
+        return true;
     }
-    sb = window.supabase.createClient(cfg.url, cfg.anonKey, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
-    return true;
-}
 
-async function iniciarApp() {
-    if (!validarConfiguracionSupabase()) return;
+    async function iniciarApp() {
+        if (!validarConfiguracionSupabase()) return;
 
-    // El evento PASSWORD_RECOVERY es la señal fiable de que Supabase validó
-    // el enlace enviado por correo y creó la sesión temporal de recuperación.
-    sb.auth.onAuthStateChange((event) => {
-        if (event === 'PASSWORD_RECOVERY') {
-            mostrarPantallaNuevaContrasena();
+        sb.auth.onAuthStateChange((event) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                mostrarPantallaNuevaContrasena();
+                return;
+            }
+            if (event === 'SIGNED_OUT') {
+                usuarioActual = null; rolActual = 'CONSULTA'; esDirAdmin = false;
+                document.getElementById('appShell').style.display = 'none';
+                document.getElementById('authOverlay').style.display = 'flex';
+                ocultarPantallaNuevaContrasena();
+            }
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        const esRutaRecuperacion = params.get('restablecer') === '1';
+
+        const { data, error } = await sb.auth.getSession();
+        if (error) {
+            if (esRutaRecuperacion) {
+                mostrarPantallaNuevaContrasena();
+                mostrarMensajeRecuperacion('No se pudo validar el enlace. Solicita uno nuevo desde la pantalla de acceso.');
+            } else {
+                mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message);
+            }
             return;
         }
-        if (event === 'SIGNED_OUT') {
-            usuarioActual = null; rolActual = 'CONSULTA'; esDirAdmin = false;
-            document.getElementById('appShell').style.display = 'none';
-            document.getElementById('authOverlay').style.display = 'flex';
-            ocultarPantallaNuevaContrasena();
-        }
-    });
 
-    const params = new URLSearchParams(window.location.search);
-    const esRutaRecuperacion = params.get('restablecer') === '1';
-
-    // Supabase procesa el code/token del enlace al inicializar el cliente.
-    // Esperamos a getSession antes de decidir si se abre el inventario.
-    const { data, error } = await sb.auth.getSession();
-    if (error) {
         if (esRutaRecuperacion) {
             mostrarPantallaNuevaContrasena();
-            mostrarMensajeRecuperacion('No se pudo validar el enlace. Solicita uno nuevo desde la pantalla de acceso.');
+            if (!data.session) {
+                mostrarMensajeRecuperacion('El enlace no se validó o ya venció. Solicita un nuevo correo de recuperación.');
+            }
+            return;
+        }
+
+        if (data.session) {
+            await prepararSesion(data.session);
         } else {
-            mostrarMensajeAcceso('No se pudo comprobar la sesión: ' + error.message);
+            document.getElementById('authOverlay').style.display = 'flex';
         }
-        return;
     }
 
-    if (esRutaRecuperacion) {
-        // Nunca enviar al inventario desde la ruta de recuperación.
-        mostrarPantallaNuevaContrasena();
-        if (!data.session) {
-            mostrarMensajeRecuperacion('El enlace no se validó o ya venció. Solicita un nuevo correo de recuperación y abre el enlace más reciente.');
-        }
-        return;
-    }
-
-    if (data.session) {
-        await prepararSesion(data.session);
-    } else {
-        document.getElementById('authOverlay').style.display = 'flex';
-    }
-}
-
-function mostrarPantallaNuevaContrasena() {
-    const app = document.getElementById('appShell');
-    const overlay = document.getElementById('authOverlay');
-    const panel = document.getElementById('passwordRecoveryPanel');
-    if (app) app.style.display = 'none';
-    if (overlay) overlay.style.display = 'flex';
-    if (panel) panel.style.display = 'block';
-
-    const loginForm = document.getElementById('loginForm');
-    const recoveryLink = document.getElementById('recoveryLinkWrap');
-    if (loginForm) loginForm.style.display = 'none';
-    if (recoveryLink) recoveryLink.style.display = 'none';
-
-    const authMessage = document.getElementById('auth-message');
-    if (authMessage) authMessage.style.display = 'none';
-}
-
-function ocultarPantallaNuevaContrasena() {
-    const panel = document.getElementById('passwordRecoveryPanel');
-    const loginForm = document.getElementById('loginForm');
-    const recoveryLink = document.getElementById('recoveryLinkWrap');
-    if (panel) panel.style.display = 'none';
-    if (loginForm) loginForm.style.display = '';
-    if (recoveryLink) recoveryLink.style.display = '';
-}
-
-function mostrarMensajeRecuperacion(mensaje, correcto = false) {
-    const el = document.getElementById('recovery-message');
-    if (!el) return;
-    el.textContent = mensaje || '';
-    el.style.color = correcto ? '#198754' : '#dc3545';
-    el.style.display = mensaje ? 'block' : 'none';
-}
-
-async function solicitarRestablecimiento() {
-    if (!sb && !validarConfiguracionSupabase()) return;
-    const email = document.getElementById('loginEmail').value.trim();
-    if (!email) {
-        mostrarMensajeAcceso('Escribe primero tu correo institucional para enviarte el enlace de recuperación.');
-        document.getElementById('loginEmail').focus();
-        return;
-    }
-    mostrarMensajeAcceso('');
-    try {
-        const redirectTo = window.location.origin + window.location.pathname + '?restablecer=1';
-        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
-        if (error) throw error;
-        mostrarMensajeAcceso('Si el correo está registrado, recibirás un enlace para restablecer tu contraseña. Revisa también tu carpeta de correo no deseado.', false);
-    } catch (error) {
-        mostrarMensajeAcceso('No se pudo enviar el enlace de recuperación: ' + (error.message || 'Intenta nuevamente.'));
-    }
-}
-
-async function guardarNuevaContrasena(event) {
-    event.preventDefault();
-    if (!sb && !validarConfiguracionSupabase()) return;
-    const password = document.getElementById('newPassword').value;
-    const confirmacion = document.getElementById('confirmNewPassword').value;
-    const button = document.getElementById('saveNewPasswordButton');
-    const mensaje = document.getElementById('recovery-message');
-
-    mensaje.style.display = 'block';
-    mensaje.style.color = '#dc3545';
-    if (password.length < 8) {
-        mensaje.textContent = 'La contraseña debe tener al menos 8 caracteres.';
-        return;
-    }
-    if (password !== confirmacion) {
-        mensaje.textContent = 'Las contraseñas no coinciden.';
-        return;
-    }
-
-    button.disabled = true;
-    button.textContent = 'Guardando...';
-    try {
-        const { error } = await sb.auth.updateUser({ password });
-        if (error) throw error;
-        mensaje.style.color = '#198754';
-        mensaje.textContent = 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.';
-        await sb.auth.signOut();
-        window.history.replaceState({}, document.title, window.location.pathname);
-        ocultarPantallaNuevaContrasena();
-        mostrarMensajeAcceso('Tu contraseña fue actualizada. Ingresa con tu nueva contraseña.', false);
-    } catch (error) {
-        mensaje.style.color = '#dc3545';
-        mensaje.textContent = 'No se pudo actualizar la contraseña: ' + (error.message || '');
-    } finally {
-        button.disabled = false;
-        button.textContent = 'Guardar nueva contraseña';
-    }
-}
-
-async function iniciarSesion(event) {
-    event.preventDefault();
-    if (!sb && !validarConfiguracionSupabase()) return;
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const button = document.getElementById('loginButton');
-    button.disabled = true; button.textContent = 'Validando...';
-    mostrarMensajeAcceso('');
-    try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await prepararSesion(data.session);
-    } catch (error) {
-        mostrarMensajeAcceso('No fue posible iniciar sesión. Verifica usuario y contraseña. ' + (error.message || ''));
-    } finally {
-        button.disabled = false; button.textContent = 'Ingresar';
-    }
-}
-
-async function cerrarSesion() {
-    if (!sb) return;
-    const { error } = await sb.auth.signOut();
-    if (error) alert('No se pudo cerrar la sesión: ' + error.message);
-}
-
-async function prepararSesion(session) {
-    usuarioActual = session.user;
-    try {
-        const { data: roleRow, error: roleError } = await sb
-            .from('user_roles').select('role').eq('user_id', usuarioActual.id).maybeSingle();
-        if (roleError) throw roleError;
-        rolActual = roleRow?.role || 'CONSULTA';
-        esDirAdmin = rolActual === 'DIRADMIN';
-        document.getElementById('session-label').innerHTML =
-            `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
-        document.getElementById('authOverlay').style.display = 'none';
-        document.getElementById('appShell').style.display = 'flex';
-        renderizarSubpaginas();
-        await cargarInventarioNube();
-    } catch (error) {
+    function mostrarPantallaNuevaContrasena() {
         document.getElementById('appShell').style.display = 'none';
         document.getElementById('authOverlay').style.display = 'flex';
-        mostrarMensajeAcceso('No se pudo cargar el inventario. Revisa que hayas ejecutado supabase-setup.sql. ' + error.message);
+        document.getElementById('passwordRecoveryPanel').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('recoveryLinkWrap').style.display = 'none';
+        document.getElementById('auth-message').style.display = 'none';
     }
-}
 
-function filaNubeARegistro(row) {
-    return {
-        id: row.id, s: row.serie, m: row.modelo, g: row.grupo, t: row.tarima,
-        tap: row.tapizada, est: row.estatus, imgId: row.imagen_url || '',
-        area: row.area || '', departamento: row.departamento || '',
-        piston: row.cambio_piston || '', fechaPiston: row.fecha_piston || '',
-        fEntrada: row.fecha_entrada || '', fSalida: row.fecha_salida || '',
-        observaciones: row.observaciones || '', asignado: row.asignado || ''
-    };
-}
+    function ocultarPantallaNuevaContrasena() {
+        document.getElementById('passwordRecoveryPanel').style.display = 'none';
+        document.getElementById('loginForm').style.display = '';
+        document.getElementById('recoveryLinkWrap').style.display = '';
+    }
 
-function registroAUpdateNube(item) {
-    return {
-        estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
-        area: item.area || null, departamento: item.departamento || null,
-        asignado: item.asignado || null, cambio_piston: item.piston || null,
-        fecha_piston: item.fechaPiston || null, fecha_entrada: item.fEntrada || null,
-        fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
-        updated_at: new Date().toISOString()
-    };
-}
+    function mostrarMensajeRecuperacion(mensaje, correcto = false) {
+        const el = document.getElementById('recovery-message');
+        if (!el) return;
+        el.textContent = mensaje || '';
+        el.style.color = correcto ? '#198754' : '#dc3545';
+        el.style.display = mensaje ? 'block' : 'none';
+    }
 
-async function cargarInventarioNube() {
-    const { data: rows, error } = await sb.from('inventario').select('*').order('id');
-    if (error) throw error;
-    db = (rows || []).map(filaNubeARegistro);
-    // Las fotografías nuevas guardan la ruta del objeto; se genera una URL firmada al abrir la app.
-    for (const item of db) {
-        if (item.imgId && !/^https?:\/\//i.test(item.imgId) && !item.imgId.startsWith('data:')) {
-            const { data: fotoFirmada, error: fotoError } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(item.imgId, 60 * 60 * 24);
-            if (!fotoError && fotoFirmada?.signedUrl) item.imgId = fotoFirmada.signedUrl;
-            else console.warn('No se pudo generar URL para la fotografía del registro', item.id, fotoError);
+    async function solicitarRestablecimiento() {
+        if (!sb && !validarConfiguracionSupabase()) return;
+        const email = document.getElementById('loginEmail').value.trim();
+        if (!email) {
+            mostrarMensajeAcceso('Escribe primero tu correo institucional para enviarte el enlace de recuperación.');
+            document.getElementById('loginEmail').focus();
+            return;
+        }
+        mostrarMensajeAcceso('');
+        try {
+            const redirectTo = window.location.origin + window.location.pathname + '?restablecer=1';
+            const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+            if (error) throw error;
+            mostrarMensajeAcceso('Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.', false);
+        } catch (error) {
+            mostrarMensajeAcceso('No se pudo enviar el enlace de recuperación: ' + (error.message || ''));
         }
     }
-    await cargarArchivosNube();
-    renderizarTablaCruda();
-    calcularYRenderizarMetricas();
-}
 
-async function cargarArchivosNube() {
-    const { data, error } = await sb.from('inventory_files').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    archivosPorItem = {};
-    (data || []).forEach(file => {
-        const id = Number(file.inventory_id);
-        if (!archivosPorItem[id]) archivosPorItem[id] = [];
-        archivosPorItem[id].push(file);
-    });
-}
+    async function guardarNuevaContrasena(event) {
+        event.preventDefault();
+        if (!sb && !validarConfiguracionSupabase()) return;
+        const password = document.getElementById('newPassword').value;
+        const confirmacion = document.getElementById('confirmNewPassword').value;
+        const button = document.getElementById('saveNewPasswordButton');
+        const mensaje = document.getElementById('recovery-message');
 
-function seleccionarResponsiva(id) {
-    if (!usuarioActual) { alert('Inicia sesión para cargar archivos.'); return; }
-    const selector = document.createElement('input');
-    selector.type = 'file'; selector.accept = '.pdf,.jpg,.jpeg,.png'; selector.style.display = 'none';
-    selector.onchange = async () => {
-        const archivo = selector.files && selector.files[0];
-        if (!archivo) { selector.remove(); return; }
-        const tipos = ['application/pdf', 'image/jpeg', 'image/png'];
-        if (!tipos.includes(archivo.type)) { alert('Selecciona un archivo PDF, JPG o PNG.'); selector.remove(); return; }
-        if (archivo.size > MAX_ARCHIVO_BYTES) { alert('El archivo supera el límite de 10 MB.'); selector.remove(); return; }
+        mensaje.style.display = 'block';
+        mensaje.style.color = '#dc3545';
+        if (password.length < 8) {
+            mensaje.textContent = 'La contraseña debe tener al menos 8 caracteres.';
+            return;
+        }
+        if (password !== confirmacion) {
+            mensaje.textContent = 'Las contraseñas no coinciden.';
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Guardando...';
         try {
-            const seguro = archivo.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100) || 'documento';
-            const uuid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-            const ruta = `${id}/${usuarioActual.id}/${uuid}-${seguro}`;
-            const { error: uploadError } = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {
-                cacheControl: '3600', upsert: false, contentType: archivo.type
-            });
-            if (uploadError) throw uploadError;
-            const { error: metaError } = await sb.from('inventory_files').insert({
-                inventory_id: id, file_name: archivo.name, object_path: ruta,
-                content_type: archivo.type, file_size: archivo.size, uploaded_by: usuarioActual.id
-            });
-            if (metaError) {
-                await sb.storage.from(BUCKET_DOCUMENTOS).remove([ruta]);
-                throw metaError;
+            const { error } = await sb.auth.updateUser({ password });
+            if (error) throw error;
+            mensaje.style.color = '#198754';
+            mensaje.textContent = 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.';
+            await sb.auth.signOut();
+            window.history.replaceState({}, document.title, window.location.pathname);
+            ocultarPantallaNuevaContrasena();
+            mostrarMensajeAcceso('Tu contraseña fue actualizada. Ingresa con tu nueva contraseña.', false);
+        } catch (error) {
+            mensaje.style.color = '#dc3545';
+            mensaje.textContent = 'No se pudo actualizar la contraseña: ' + (error.message || '');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Guardar nueva contraseña';
+        }
+    }
+
+    async function iniciarSesion(event) {
+        event.preventDefault();
+        if (!sb && !validarConfiguracionSupabase()) return;
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const button = document.getElementById('loginButton');
+        button.disabled = true; button.textContent = 'Validando...';
+        mostrarMensajeAcceso('');
+        try {
+            const { data, error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            await prepararSesion(data.session);
+        } catch (error) {
+            mostrarMensajeAcceso('No fue posible iniciar sesión. Verifica usuario y contraseña. ' + (error.message || ''));
+        } finally {
+            button.disabled = false; button.textContent = 'Ingresar';
+        }
+    }
+
+    async function cerrarSesion() {
+        if (!sb) return;
+        const { error } = await sb.auth.signOut();
+        if (error) alert('No se pudo cerrar la sesión: ' + error.message);
+    }
+
+    async function prepararSesion(session) {
+        usuarioActual = session.user;
+        try {
+            const { data: roleRow, error: roleError } = await sb
+                .from('user_roles').select('role').eq('user_id', usuarioActual.id).maybeSingle();
+            if (roleError) throw roleError;
+            rolActual = roleRow?.role || 'CONSULTA';
+            esDirAdmin = rolActual === 'DIRADMIN';
+            document.getElementById('session-label').innerHTML =
+                `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('appShell').style.display = 'flex';
+            renderizarSubpaginas();
+            await cargarInventarioNube();
+        } catch (error) {
+            document.getElementById('appShell').style.display = 'none';
+            document.getElementById('authOverlay').style.display = 'flex';
+            mostrarMensajeAcceso('No se pudo cargar el inventario: ' + error.message);
+        }
+    }
+
+    function filaNubeARegistro(row) {
+        return {
+            id: row.id, s: row.serie, m: row.modelo, g: row.grupo, t: row.tarima,
+            tap: row.tapizada, est: row.estatus, imgId: row.imagen_url || '',
+            area: row.area || '', departamento: row.departamento || '',
+            piston: row.cambio_piston || '', fechaPiston: row.fecha_piston || '',
+            fEntrada: row.fecha_entrada || '', fSalida: row.fecha_salida || '',
+            observaciones: row.observaciones || '', asignado: row.asignado || '',
+            numInventario: row.numero_inventario || row.inventario || row.clave_inventario || ''
+        };
+    }
+
+    function registroAUpdateNube(item) {
+        return {
+            estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
+            area: item.area || null, departamento: item.departamento || null,
+            asignado: item.asignado || null, cambio_piston: item.piston || null,
+            fecha_piston: item.fechaPiston || null, fecha_entrada: item.fEntrada || null,
+            fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
+            updated_at: new Date().toISOString()
+        };
+    }
+
+    async function cargarInventarioNube() {
+        const { data: rows, error } = await sb.from('inventario').select('*').order('id');
+        if (error) throw error;
+        db = (rows || []).map(filaNubeARegistro);
+        for (const item of db) {
+            if (item.imgId && !/^https?:\/\//i.test(item.imgId) && !item.imgId.startsWith('data:')) {
+                const { data: fotoFirmada, error: fotoError } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(item.imgId, 60 * 60 * 24);
+                if (!fotoError && fotoFirmada?.signedUrl) item.imgId = fotoFirmada.signedUrl;
             }
-            await cargarArchivosNube();
-            renderizarTablaCruda();
-            const item = db.find(registro => registro.id === id);
-            if (registroEnEdicionId === id && item) actualizarResponsivaEnModal(item);
-            alert('Archivo cargado correctamente y disponible para los usuarios autorizados.');
+        }
+        await cargarArchivosNube();
+        renderizarTablaCruda();
+        calcularYRenderizarMetricas();
+    }
+
+    async function cargarArchivosNube() {
+        const { data, error } = await sb.from('inventory_files').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        archivosPorItem = {};
+        (data || []).forEach(file => {
+            const id = Number(file.inventory_id);
+            if (!archivosPorItem[id]) archivosPorItem[id] = [];
+            archivosPorItem[id].push(file);
+        });
+    }
+
+    function seleccionarResponsiva(id) {
+        if (!usuarioActual) { alert('Inicia sesión para cargar archivos.'); return; }
+        const selector = document.createElement('input');
+        selector.type = 'file'; selector.accept = '.pdf,.jpg,.jpeg,.png'; selector.style.display = 'none';
+        selector.onchange = async () => {
+            const archivo = selector.files && selector.files[0];
+            if (!archivo) { selector.remove(); return; }
+            const tipos = ['application/pdf', 'image/jpeg', 'image/png'];
+            if (!tipos.includes(archivo.type)) { alert('Selecciona un archivo PDF, JPG o PNG.'); selector.remove(); return; }
+            if (archivo.size > MAX_ARCHIVO_BYTES) { alert('El archivo supera el límite de 10 MB.'); selector.remove(); return; }
+            try {
+                const seguro = archivo.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100) || 'documento';
+                const uuid = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                const ruta = `${id}/${usuarioActual.id}/${uuid}-${seguro}`;
+                const { error: uploadError } = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {
+                    cacheControl: '3600', upsert: false, contentType: archivo.type
+                });
+                if (uploadError) throw uploadError;
+                const { error: metaError } = await sb.from('inventory_files').insert({
+                    inventory_id: id, file_name: archivo.name, object_path: ruta,
+                    content_type: archivo.type, file_size: archivo.size, uploaded_by: usuarioActual.id
+                });
+                if (metaError) {
+                    await sb.storage.from(BUCKET_DOCUMENTOS).remove([ruta]);
+                    throw metaError;
+                }
+                await cargarArchivosNube();
+                renderizarTablaCruda();
+                const item = db.find(registro => registro.id === id);
+                if (registroEnEdicionId === id && item) actualizarResponsivaEnModal(item);
+                alert('Archivo cargado correctamente.');
+            } catch (error) {
+                console.error(error);
+                alert('No se pudo cargar el archivo: ' + (error.message || ''));
+            } finally { selector.remove(); }
+        };
+        document.body.appendChild(selector); selector.click();
+    }
+
+    async function abrirArchivo(fileId) {
+        const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
+        if (!archivo) { alert('No se encontró el archivo.'); return; }
+        const win = window.open('about:blank', '_blank');
+        try {
+            const { data, error } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(archivo.object_path, 3600);
+            if (error) throw error;
+            if (win) win.location.href = data.signedUrl;
+            else window.location.href = data.signedUrl;
+        } catch (error) {
+            if (win) win.close();
+            alert('No se pudo abrir el archivo: ' + error.message);
+        }
+    }
+
+    async function abrirResponsiva(id) {
+        const lista = archivosPorItem[id] || [];
+        if (!lista.length) { alert('Este registro no tiene archivos cargados.'); return; }
+        await abrirArchivo(lista[0].id);
+    }
+
+    async function eliminarResponsiva(fileId) {
+        if (!esDirAdmin) { alert('Solo DIRADMIN puede eliminar archivos.'); return; }
+        const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
+        if (!archivo) return;
+        if (!confirm(`¿Deseas eliminar el archivo ${archivo.file_name}?`)) return;
+        try {
+            const { error: storageError } = await sb.storage.from(BUCKET_DOCUMENTOS).remove([archivo.object_path]);
+            if (storageError) throw storageError;
+            const { error: rowError } = await sb.from('inventory_files').delete().eq('id', fileId);
+            if (rowError) throw rowError;
+            await cargarArchivosNube(); renderizarTablaCruda();
+            const item = db.find(r => r.id === registroEnEdicionId);
+            if (item) actualizarResponsivaEnModal(item);
+        } catch (error) { alert('No se pudo eliminar el archivo: ' + error.message); }
+    }
+
+    function llenarOpcionesEdicion(selectId, opciones, seleccionado) {
+        const select = document.getElementById(selectId);
+        const valores = [...new Set(opciones.filter(v => v !== undefined && v !== null && String(v) !== '').map(v => String(v)))];
+        const actual = String(seleccionado ?? '');
+        if (actual && !valores.includes(actual)) valores.push(actual);
+        select.innerHTML = valores.map(v => `<option value="${escaparHTML(v)}">${escaparHTML(v)}</option>`).join('');
+        select.value = actual;
+    }
+
+    function actualizarResponsivaEnModal(item) {
+        const archivos = archivosPorItem[item.id] || [];
+        document.getElementById('editEstadoResponsiva').textContent = archivos.length
+            ? `${archivos.length} archivo(s) compartido(s) en la nube` : 'Sin archivos cargados';
+        const lista = document.getElementById('editListaArchivos');
+        lista.innerHTML = archivos.map(f => `
+            <div class="archivo-modal-item">
+                <span>📎 ${escaparHTML(f.file_name)}</span>
+                <div style="display:flex;gap:5px;">
+                    <button type="button" onclick="abrirArchivo('${f.id}')">Abrir</button>
+                    ${esDirAdmin ? `<button type="button" class="eliminar-archivo" onclick="eliminarResponsiva('${f.id}')">Eliminar</button>` : ''}
+                </div>
+            </div>`).join('');
+    }
+
+    function abrirEdicion(id) {
+        const item = db.find(registro => registro.id === id);
+        if (!item) return;
+        registroEnEdicionId = id;
+        const soloLectura = !esDirAdmin;
+        document.getElementById('tituloEdicion').textContent = soloLectura ? 'Consultar registro de inventario' : 'Editar registro de inventario';
+        document.getElementById('subtituloEdicion').textContent = `ID: ${item.id} | Serie: ${item.s} | Modelo: ${item.m}`;
+        const foto = document.getElementById('editFotoRegistro');
+        foto.src = item.imgId || ''; foto.style.display = item.imgId ? 'block' : 'none';
+        foto.alt = `Fotografía del registro ${item.s}`;
+        document.getElementById('editSerieFoto').textContent = `SERIE: ${item.s}`;
+        llenarOpcionesEdicion('editEstatus', ['ALMACEN','ASIGNADAS','ENTRADA'], item.est || 'ALMACEN');
+        document.getElementById('editTapizada').value = item.tap || 'NO';
+        document.getElementById('editArea').value = item.area || '';
+        document.getElementById('editDepartamento').value = item.departamento || '';
+        document.getElementById('btnSubirFoto').style.display = esDirAdmin ? 'block' : 'none';
+        const tarimas = [...new Set(db.map(r => r.t).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b) => Number(a)-Number(b));
+        llenarOpcionesEdicion('editTarima', tarimas, item.t);
+        document.getElementById('editAsignado').value = item.asignado || '';
+        document.getElementById('editPiston').value = item.piston || '';
+        document.getElementById('editFechaPiston').value = item.fechaPiston || '';
+        document.getElementById('editFEntrada').value = item.fEntrada || '';
+        document.getElementById('editFSalida').value = item.fSalida || '';
+        document.getElementById('editObservaciones').value = item.observaciones || '';
+        ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
+            .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
+        document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
+        document.getElementById('editEstatus').disabled = soloLectura;
+        document.querySelector('.btn-subir-responsiva').disabled = false;
+        actualizarResponsivaEnModal(item);
+        document.getElementById('modalEdicion').style.display = 'flex';
+    }
+
+    function cerrarEdicion() {
+        document.getElementById('modalEdicion').style.display = 'none';
+        registroEnEdicionId = null;
+    }
+    function cerrarEdicionDesdeFondo(event) { if (event.target.id === 'modalEdicion') cerrarEdicion(); }
+
+    async function guardarEdicion() {
+        if (!esDirAdmin) { alert('Tu cuenta tiene permisos de consulta. Solo DIRADMIN puede editar.'); return; }
+        const item = db.find(registro => registro.id === registroEnEdicionId);
+        if (!item) { alert('No se encontró el registro.'); return; }
+        item.est = document.getElementById('editEstatus').value;
+        item.tap = document.getElementById('editTapizada').value;
+        item.area = document.getElementById('editArea').value.trim();
+        item.departamento = document.getElementById('editDepartamento').value.trim();
+        const tarima = document.getElementById('editTarima').value;
+        item.t = tarima === '' ? null : (Number.isNaN(Number(tarima)) ? tarima : Number(tarima));
+        item.asignado = document.getElementById('editAsignado').value.trim();
+        item.piston = document.getElementById('editPiston').value.trim();
+        item.fechaPiston = document.getElementById('editFechaPiston').value;
+        item.fEntrada = document.getElementById('editFEntrada').value;
+        item.fSalida = document.getElementById('editFSalida').value;
+        item.observaciones = document.getElementById('editObservaciones').value.trim();
+        const boton = document.querySelector('.btn-guardar'); boton.disabled = true; boton.textContent = 'Guardando...';
+        try {
+            const { error } = await sb.from('inventario').update(registroAUpdateNube(item)).eq('id', item.id);
+            if (error) throw error;
+            cerrarEdicion();
+            await cargarInventarioNube();
+            alert('Cambios guardados correctamente en la base de datos compartida.');
         } catch (error) {
             console.error(error);
-            alert('No se pudo cargar el archivo: ' + (error.message || 'Verifica tu acceso y la configuración del almacenamiento.'));
-        } finally { selector.remove(); }
-    };
-    document.body.appendChild(selector); selector.click();
-}
-
-async function abrirArchivo(fileId) {
-    const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
-    if (!archivo) { alert('No se encontró el archivo. Actualiza la página.'); return; }
-    const win = window.open('about:blank', '_blank');
-    try {
-        const { data, error } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(archivo.object_path, 3600);
-        if (error) throw error;
-        if (win) win.location.href = data.signedUrl;
-        else window.location.href = data.signedUrl;
-    } catch (error) {
-        if (win) win.close();
-        alert('No se pudo abrir el archivo: ' + error.message);
+            alert('No se pudieron guardar los cambios: ' + error.message);
+        } finally { boton.disabled = false; boton.textContent = 'Guardar'; }
     }
-}
 
-async function abrirResponsiva(id) {
-    const lista = archivosPorItem[id] || [];
-    if (!lista.length) { alert('Este registro no tiene archivos cargados.'); return; }
-    await abrirArchivo(lista[0].id);
-}
-
-async function eliminarResponsiva(fileId) {
-    if (!esDirAdmin) { alert('Solo DIRADMIN puede eliminar archivos.'); return; }
-    const archivo = Object.values(archivosPorItem).flat().find(f => f.id === fileId);
-    if (!archivo) return;
-    if (!confirm(`¿Deseas eliminar el archivo ${archivo.file_name}?`)) return;
-    try {
-        const { error: storageError } = await sb.storage.from(BUCKET_DOCUMENTOS).remove([archivo.object_path]);
-        if (storageError) throw storageError;
-        const { error: rowError } = await sb.from('inventory_files').delete().eq('id', fileId);
-        if (rowError) throw rowError;
-        await cargarArchivosNube(); renderizarTablaCruda();
-        const item = db.find(r => r.id === registroEnEdicionId);
-        if (item) actualizarResponsivaEnModal(item);
-    } catch (error) { alert('No se pudo eliminar el archivo: ' + error.message); }
-}
-
-function llenarOpcionesEdicion(selectId, opciones, seleccionado) {
-    const select = document.getElementById(selectId);
-    const valores = [...new Set(opciones.filter(v => v !== undefined && v !== null && String(v) !== '').map(v => String(v)))];
-    const actual = String(seleccionado ?? '');
-    if (actual && !valores.includes(actual)) valores.push(actual);
-    select.innerHTML = valores.map(v => `<option value="${escaparHTML(v)}">${escaparHTML(v)}</option>`).join('');
-    select.value = actual;
-}
-
-function actualizarResponsivaEnModal(item) {
-    const archivos = archivosPorItem[item.id] || [];
-    document.getElementById('editEstadoResponsiva').textContent = archivos.length
-        ? `${archivos.length} archivo(s) compartido(s) en la nube` : 'Sin archivos cargados';
-    const lista = document.getElementById('editListaArchivos');
-    lista.innerHTML = archivos.map(f => `
-        <div class="archivo-modal-item">
-            <span>📎 ${escaparHTML(f.file_name)}</span>
-            <div style="display:flex;gap:5px;">
-                <button type="button" onclick="abrirArchivo('${f.id}')">Abrir</button>
-                ${esDirAdmin ? `<button type="button" class="eliminar-archivo" onclick="eliminarResponsiva('${f.id}')">Eliminar</button>` : ''}
-            </div>
-        </div>`).join('');
-}
-
-function abrirEdicion(id) {
-    const item = db.find(registro => registro.id === id);
-    if (!item) return;
-    registroEnEdicionId = id;
-    const soloLectura = !esDirAdmin;
-    document.getElementById('tituloEdicion').textContent = soloLectura ? 'Consultar registro de inventario' : 'Editar registro de inventario';
-    document.getElementById('subtituloEdicion').textContent = `ID: ${item.id} | Serie: ${item.s} | Modelo: ${item.m}`;
-    const foto = document.getElementById('editFotoRegistro');
-    foto.src = item.imgId || ''; foto.style.display = item.imgId ? 'block' : 'none';
-    foto.alt = `Fotografía del registro ${item.s}`;
-    document.getElementById('editSerieFoto').textContent = `SERIE: ${item.s}`;
-    llenarOpcionesEdicion('editEstatus', ['ALMACEN','ASIGNADAS','ENTRADA'], item.est || 'ALMACEN');
-    document.getElementById('editTapizada').value = item.tap || 'NO';
-    document.getElementById('editArea').value = item.area || '';
-    document.getElementById('editDepartamento').value = item.departamento || '';
-    document.getElementById('btnSubirFoto').style.display = esDirAdmin ? 'block' : 'none';
-    const tarimas = [...new Set(db.map(r => r.t).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b) => Number(a)-Number(b));
-    llenarOpcionesEdicion('editTarima', tarimas, item.t);
-    document.getElementById('editAsignado').value = item.asignado || '';
-    document.getElementById('editPiston').value = item.piston || '';
-    document.getElementById('editFechaPiston').value = item.fechaPiston || '';
-    document.getElementById('editFEntrada').value = item.fEntrada || '';
-    document.getElementById('editFSalida').value = item.fSalida || '';
-    document.getElementById('editObservaciones').value = item.observaciones || '';
-    ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
-        .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
-    document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
-    document.getElementById('editEstatus').disabled = soloLectura;
-    document.querySelector('.btn-subir-responsiva').disabled = false; // Todos los usuarios autenticados pueden cargar.
-    actualizarResponsivaEnModal(item);
-    document.getElementById('modalEdicion').style.display = 'flex';
-}
-
-function cerrarEdicion() {
-    document.getElementById('modalEdicion').style.display = 'none';
-    registroEnEdicionId = null;
-}
-function cerrarEdicionDesdeFondo(event) { if (event.target.id === 'modalEdicion') cerrarEdicion(); }
-
-async function guardarEdicion() {
-    if (!esDirAdmin) { alert('Tu cuenta tiene permisos de consulta. Solo DIRADMIN puede editar.'); return; }
-    const item = db.find(registro => registro.id === registroEnEdicionId);
-    if (!item) { alert('No se encontró el registro.'); return; }
-    item.est = document.getElementById('editEstatus').value;
-    item.tap = document.getElementById('editTapizada').value;
-    item.area = document.getElementById('editArea').value.trim();
-    item.departamento = document.getElementById('editDepartamento').value.trim();
-    const tarima = document.getElementById('editTarima').value;
-    item.t = tarima === '' ? null : (Number.isNaN(Number(tarima)) ? tarima : Number(tarima));
-    item.asignado = document.getElementById('editAsignado').value.trim();
-    item.piston = document.getElementById('editPiston').value.trim();
-    item.fechaPiston = document.getElementById('editFechaPiston').value;
-    item.fEntrada = document.getElementById('editFEntrada').value;
-    item.fSalida = document.getElementById('editFSalida').value;
-    item.observaciones = document.getElementById('editObservaciones').value.trim();
-    const boton = document.querySelector('.btn-guardar'); boton.disabled = true; boton.textContent = 'Guardando...';
-    try {
-        const { error } = await sb.from('inventario').update(registroAUpdateNube(item)).eq('id', item.id);
-        if (error) throw error;
-        cerrarEdicion();
-        await cargarInventarioNube();
-        alert('Cambios guardados correctamente en la base de datos compartida.');
-    } catch (error) {
-        console.error(error);
-        alert('No se pudieron guardar los cambios: ' + error.message);
-    } finally { boton.disabled = false; boton.textContent = 'Guardar'; }
-}
-
-function escaparHTML(valor) {
-    return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[caracter]));
-}
-
-function renderizarTablaCruda() {
-    const tbody = document.getElementById('raw-body');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    db.forEach(item => {
-        const archivos = archivosPorItem[item.id] || [];
-        const tieneArchivo = archivos.length > 0;
-        const fotoHtml = item.imgId
-            ? `<img src="${escaparHTML(item.imgId)}" alt="Foto ${escaparHTML(item.s)}" style="width:40px;height:40px;object-fit:cover;cursor:pointer;border-radius:4px;" onclick="ampliarImagen('${escaparHTML(item.imgId)}')">`
-            : '<div class="sin-foto-box">SIN FOTO</div>';
-        tbody.innerHTML += `
-            <tr>
-                <td>${fotoHtml}</td>
-                <td>${item.id}</td>
-                <td style="font-weight:bold;">${escaparHTML(item.s)}</td>
-                <td style="text-align:left;">${escaparHTML(item.m)}</td>
-                <td>${escaparHTML(item.g)}</td>
-                <td>${escaparHTML(item.t)}</td>
-                <td>${escaparHTML(item.tap)}</td>
-                <td>${escaparHTML(item.est)}</td>
-                <td>${escaparHTML(item.area || '')}</td>
-                <td>${escaparHTML(item.departamento || '')}</td>
-                <td class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
-                    <div class="responsiva-acciones">
-                        <button class="btn-documento" title="Cargar archivo" onclick="seleccionarResponsiva(${item.id})">⬆</button>
-                        ${tieneArchivo ? `<button class="btn-documento" title="Abrir primer archivo (${archivos.length})" onclick="abrirResponsiva(${item.id})">📄 ${archivos.length}</button>` : '<span style="font-size:11px;">SIN ARCHIVOS</span>'}
-                    </div>
-                    ${tieneArchivo ? `<span class="nombre-documento">${escaparHTML(archivos[0].file_name)}${archivos.length > 1 ? ` (+${archivos.length-1})` : ''}</span>` : ''}
-                </td>
-                <td><button class="${esDirAdmin ? 'btn-editar' : 'btn-ver'}" title="${esDirAdmin ? 'Editar registro' : 'Consultar registro'}" onclick="abrirEdicion(${item.id})"><span class="accion-icono">${esDirAdmin ? '✎' : '👁'}</span><span class="accion-texto">${esDirAdmin ? 'Editar' : 'Ver'}</span></button></td>
-            </tr>`;
-    });
-    filtrarTablaCruda();
-}
-
-function ampliarImagen(url) {
-    if (!url) return;
-    let modal = document.getElementById('imagenModal');
-    let img = document.getElementById('imgAmpliada');
-    if(modal && img) {
-        modal.style.display = "flex";
-        img.src = url;
+    function escaparHTML(valor) {
+        return String(valor ?? '').replace(/[&<>"']/g, caracter => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[caracter]));
     }
-}
 
-function cerrarModal() {
-    let modal = document.getElementById('imagenModal');
-    if(modal) modal.style.display = "none";
-}
-
-function cambiarDato(id, propiedad, valor) {
-    let elemento = db.find(item => item.id === id);
-    if (elemento) {
-        elemento[propiedad] = valor;
-        calcularYRenderizarMetricas();
+    function renderizarTablaCruda() {
+        const tbody = document.getElementById('raw-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        db.forEach(item => {
+            const archivos = archivosPorItem[item.id] || [];
+            const tieneArchivo = archivos.length > 0;
+            const fotoHtml = item.imgId
+                ? `<img src="${escaparHTML(item.imgId)}" alt="Foto ${escaparHTML(item.s)}" style="width:40px;height:40px;object-fit:cover;cursor:pointer;border-radius:4px;" onclick="ampliarImagen('${escaparHTML(item.imgId)}')">`
+                : '<div class="sin-foto-box">SIN FOTO</div>';
+            tbody.innerHTML += `
+                <tr>
+                    <td>${fotoHtml}</td>
+                    <td>${item.id}</td>
+                    <td style="font-weight:bold;">${escaparHTML(item.s)}</td>
+                    <td style="text-align:left;">${escaparHTML(item.m)}</td>
+                    <td>${escaparHTML(item.g)}</td>
+                    <td>${escaparHTML(item.t)}</td>
+                    <td>${escaparHTML(item.tap)}</td>
+                    <td>${escaparHTML(item.est)}</td>
+                    <td>${escaparHTML(item.area || '')}</td>
+                    <td>${escaparHTML(item.departamento || '')}</td>
+                    <td class="celda-responsiva ${tieneArchivo ? 'responsiva-si' : 'responsiva-no'}">
+                        <div class="responsiva-acciones">
+                            <button class="btn-documento" title="Cargar archivo" onclick="seleccionarResponsiva(${item.id})">⬆</button>
+                            ${tieneArchivo ? `<button class="btn-documento" title="Abrir primer archivo (${archivos.length})" onclick="abrirResponsiva(${item.id})">📄 ${archivos.length}</button>` : '<span style="font-size:11px;">SIN ARCHIVOS</span>'}
+                        </div>
+                        ${tieneArchivo ? `<span class="nombre-documento">${escaparHTML(archivos[0].file_name)}${archivos.length > 1 ? ` (+${archivos.length-1})` : ''}</span>` : ''}
+                    </td>
+                    <td>
+                        <button class="btn-imprimir-responsiva" title="Generar Responsiva PDF" onclick="abrirModalResponsiva(${item.id})">🖨️</button>
+                    </td>
+                    <td>
+                        <button class="${esDirAdmin ? 'btn-editar' : 'btn-ver'}" title="${esDirAdmin ? 'Editar registro' : 'Consultar registro'}" onclick="abrirEdicion(${item.id})"><span class="accion-icono">${esDirAdmin ? '✎' : '👁'}</span><span class="accion-texto">${esDirAdmin ? 'Editar' : 'Ver'}</span></button>
+                    </td>
+                </tr>`;
+        });
         filtrarTablaCruda();
     }
-}
 
-function filtrarTablaCruda() {
-    let input = document.getElementById('buscador-crudo');
-    let btnLimpiar = document.getElementById('btn-limpiar');
-    if (!input) return;
-    
-    let textoBusqueda = input.value.toLowerCase();
-    let filas = document.querySelectorAll('#raw-body tr');
-    
-    if (btnLimpiar) btnLimpiar.style.display = textoBusqueda.length > 0 ? "block" : "none";
-    
-    let elementosVisibles = 0;
-    
-    filas.forEach((fila) => {
-        let textoCeldas = fila.textContent.toLowerCase();
-        let selects = fila.querySelectorAll('select');
-        
-        let selectTap = selects.length > 0 ? selects[0].value.toLowerCase() : '';
-        let selectEst = selects.length > 1 ? selects[1].value.toLowerCase() : '';
-        
-        let contenidoFilaCompleto = `${textoCeldas} tapizada: ${selectTap} estatus: ${selectEst}`;
-        
-        if (contenidoFilaCompleto.includes(textoBusqueda)) {
-            fila.style.display = "";
-            elementosVisibles++;
+    // =========================================================================
+    // LÓGICA DE RESPONSIVA EN FORMATO MOVIMIENTOS DE BIENES MUEBLES (EXCEL IEEM)
+    // =========================================================================
+    function obtenerFechaFormatoExcel() {
+        const hoy = new Date();
+        const dd = String(hoy.getDate()).padStart(2, '0');
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const yyyy = hoy.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+    }
+
+    function seleccionarTipoMovimiento(tipo) {
+        const chkEntrada = document.getElementById('chkEntradaBodega');
+        const chkSalida = document.getElementById('chkSalidaAsignacion');
+        if (tipo === 'ENTRADA') {
+            chkEntrada.textContent = 'x';
+            chkSalida.textContent = '';
         } else {
-            fila.style.display = "none";
+            chkEntrada.textContent = '';
+            chkSalida.textContent = 'x';
         }
-    });
-
-    let contenedorContador = document.getElementById('total-elementos-crudos');
-    if (contenedorContador) contenedorContador.innerText = elementosVisibles;
-}
-
-function limpiarBuscador() {
-    let input = document.getElementById('buscador-crudo');
-    if(input) {
-        input.value = '';
-        filtrarTablaCruda();
     }
-}
 
-function calcularYRenderizarMetricas() {
-    let totalItems = db.length;
-    let totalSI = db.filter(item => String(item.tap || '').toUpperCase() === 'SI').length;
-    let totalNO = db.filter(item => String(item.tap || '').toUpperCase() === 'NO').length;
-    let totalAsignados = db.filter(item => String(item.est || '').toUpperCase() === 'ASIGNADAS').length;
-    let totalEntrada = db.filter(item => String(item.est || '').toUpperCase() === 'ENTRADA').length;
+    function abrirModalResponsiva(id) {
+        const item = db.find(r => r.id === id);
+        if (!item) return;
+        itemResponsivaActual = item;
 
-    if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = totalItems;
-    if(document.getElementById('kpi-asignados')) document.getElementById('kpi-asignados').innerText = totalAsignados;
-    if(document.getElementById('kpi-entrada')) document.getElementById('kpi-entrada').innerText = totalEntrada;
-    if(document.getElementById('kpi-si')) document.getElementById('kpi-si').innerText = totalSI;
-    if(document.getElementById('kpi-no')) document.getElementById('kpi-no').innerText = totalNO;
+        // Fecha automática del día actual (formato DD-MM-YYYY como en el Excel)
+        document.getElementById('lblFechaActual').textContent = obtenerFechaFormatoExcel();
 
-    let resumen = {};
-    db.forEach(item => {
-        if (!resumen[item.m]) {
-            resumen[item.m] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0 ,entrada: 0};
+        // Área y Departamento desde Supabase
+        document.getElementById('lblRespArea').textContent = item.area || 'DIRECCIÓN DE ADMINISTRACIÓN';
+        document.getElementById('lblRespDepto').textContent = item.departamento || 'CONTROL PATRIMONIAL';
+
+        // Tipo de movimiento según estatus actual del registro
+        const estatusUpper = String(item.est || '').toUpperCase();
+        if (estatusUpper === 'ENTRADA' || estatusUpper === 'ALMACEN') {
+            seleccionarTipoMovimiento('ENTRADA');
+        } else {
+            seleccionarTipoMovimiento('SALIDA');
         }
-        if (item.tap === 'NO') resumen[item.m].no++;
-        if (item.tap === 'SI') resumen[item.m].si++;
-        if (item.est === 'ALMACEN') resumen[item.m].almacen++;
-        if (item.est === 'ASIGNADAS') resumen[item.m].asignadas++;
-        if (item.est === 'ENTRADA') resumen[item.m].entrada++;
-        resumen[item.m].total++;
-    });
 
-    let summaryBody = document.getElementById('summary-body');
-    if(summaryBody) {
-        summaryBody.innerHTML = '';
-        let tNo = 0, tSi = 0, tTot = 0, tAlm = 0, tAsig = 0, tEnt = 0;
+        // Construir las 22 filas de la tabla igual que en formato de movimientosweb.xlsx
+        const tbody = document.getElementById('tbodyFormatoExcel');
+        const descripcion = `${item.m || ''}${item.g ? ' - GRUPO ' + item.g : ''}${item.tap ? ' (TAPIZADA: ' + item.tap + ')' : ''}`.trim();
+        const numInv = item.numInventario || `ID-${item.id}`;
+        const numSerie = item.s || 'S/N';
+        const obs = item.observaciones || '';
 
-        for (let modelo in resumen) {
-            let data = resumen[modelo];
-            tNo += data.no; tSi += data.si; tTot += data.total;
-            tAlm += data.almacen; tAsig += data.asignadas; tEnt += data.entrada;
+        let filasHtml = `
+            <tr>
+                <td style="text-align:center;">1</td>
+                <td style="text-align:center;">${escaparHTML(descripcion)}</td>
+                <td style="text-align:center;">${escaparHTML(numInv)}</td>
+                <td style="text-align:center;">${escaparHTML(numSerie)}</td>
+                <td style="text-align:center;">${escaparHTML(obs)}</td>
+            </tr>
+        `;
+
+        // Rellenar las 21 filas vacías restantes para conservar la altura exacta del formato Excel
+        for (let i = 2; i <= 22; i++) {
+            filasHtml += `
+                <tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            `;
+        }
+        tbody.innerHTML = filasHtml;
+
+        // Nombre del solicitante / persona asignada
+        document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
+
+        document.getElementById('modalResponsiva').style.display = 'flex';
+    }
+
+    function cerrarResponsivaModal() {
+        document.getElementById('modalResponsiva').style.display = 'none';
+        itemResponsivaActual = null;
+    }
+
+    function imprimirResponsiva() {
+        window.print();
+    }
+
+    async function descargarResponsivaPDF() {
+        const elemento = document.getElementById('hojaFormatoMovimientos');
+        const btn = document.getElementById('btnDescargarPdfResp');
+        if (!elemento) return;
+
+        const serie = (itemResponsivaActual && itemResponsivaActual.s) ? itemResponsivaActual.s.replace(/[^a-zA-Z0-9_-]/g, '_') : 'IEEM';
+        const fecha = obtenerFechaFormatoExcel();
+        const nombreArchivo = `Responsiva_${serie}_${fecha}.pdf`;
+
+        btn.disabled = true;
+        btn.textContent = 'Generando PDF...';
+
+        try {
+            const opciones = {
+                margin: [4, 4, 4, 4],
+                filename: nombreArchivo,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+            };
+            await html2pdf().set(opciones).from(elemento).save();
+        } catch (err) {
+            console.error('Error al generar PDF:', err);
+            alert('No se pudo descargar el PDF directamente. Usa el botón Imprimir y selecciona "Guardar como PDF".');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '📥 Descargar PDF';
+        }
+    }
+
+    function ampliarImagen(url) {
+        if (!url) return;
+        let modal = document.getElementById('imagenModal');
+        let img = document.getElementById('imgAmpliada');
+        if (modal && img) {
+            modal.style.display = "flex";
+            img.src = url;
+        }
+    }
+
+    function cerrarModal() {
+        let modal = document.getElementById('imagenModal');
+        if (modal) modal.style.display = "none";
+    }
+
+    function filtrarTablaCruda() {
+        let input = document.getElementById('buscador-crudo');
+        let btnLimpiar = document.getElementById('btn-limpiar');
+        if (!input) return;
+        
+        let textoBusqueda = input.value.toLowerCase();
+        let filas = document.querySelectorAll('#raw-body tr');
+        
+        if (btnLimpiar) btnLimpiar.style.display = textoBusqueda.length > 0 ? "block" : "none";
+        
+        let elementosVisibles = 0;
+        filas.forEach((fila) => {
+            let textoCeldas = fila.textContent.toLowerCase();
+            if (textoCeldas.includes(textoBusqueda)) {
+                fila.style.display = "";
+                elementosVisibles++;
+            } else {
+                fila.style.display = "none";
+            }
+        });
+
+        let contenedorContador = document.getElementById('total-elementos-crudos');
+        if (contenedorContador) contenedorContador.innerText = elementosVisibles;
+    }
+
+    function limpiarBuscador() {
+        let input = document.getElementById('buscador-crudo');
+        if (input) {
+            input.value = '';
+            filtrarTablaCruda();
+        }
+    }
+
+    function calcularYRenderizarMetricas() {
+        let totalItems = db.length;
+        let totalSI = db.filter(item => String(item.tap || '').toUpperCase() === 'SI').length;
+        let totalNO = db.filter(item => String(item.tap || '').toUpperCase() === 'NO').length;
+        let totalAsignados = db.filter(item => String(item.est || '').toUpperCase() === 'ASIGNADAS').length;
+        let totalEntrada = db.filter(item => String(item.est || '').toUpperCase() === 'ENTRADA').length;
+
+        if(document.getElementById('kpi-total')) document.getElementById('kpi-total').innerText = totalItems;
+        if(document.getElementById('kpi-asignados')) document.getElementById('kpi-asignados').innerText = totalAsignados;
+        if(document.getElementById('kpi-entrada')) document.getElementById('kpi-entrada').innerText = totalEntrada;
+        if(document.getElementById('kpi-si')) document.getElementById('kpi-si').innerText = totalSI;
+        if(document.getElementById('kpi-no')) document.getElementById('kpi-no').innerText = totalNO;
+
+        let resumen = {};
+        db.forEach(item => {
+            if (!resumen[item.m]) {
+                resumen[item.m] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0 ,entrada: 0};
+            }
+            if (item.tap === 'NO') resumen[item.m].no++;
+            if (item.tap === 'SI') resumen[item.m].si++;
+            if (item.est === 'ALMACEN') resumen[item.m].almacen++;
+            if (item.est === 'ASIGNADAS') resumen[item.m].asignadas++;
+            if (item.est === 'ENTRADA') resumen[item.m].entrada++;
+            resumen[item.m].total++;
+        });
+
+        let summaryBody = document.getElementById('summary-body');
+        if(summaryBody) {
+            summaryBody.innerHTML = '';
+            let tNo = 0, tSi = 0, tTot = 0, tAlm = 0, tAsig = 0, tEnt = 0;
+
+            for (let modelo in resumen) {
+                let data = resumen[modelo];
+                tNo += data.no; tSi += data.si; tTot += data.total;
+                tAlm += data.almacen; tAsig += data.asignadas; tEnt += data.entrada;
+
+                summaryBody.innerHTML += `
+                    <tr>
+                        <td style="text-align:left; font-weight:bold;">${modelo}</td>
+                        <td>${data.no}</td>
+                        <td>${data.si}</td>
+                        <td style="font-weight:bold;">${data.total}</td>
+                        <td>${data.almacen}</td>
+                        <td>${data.asignadas}</td>
+                        <td>${data.entrada}</td>
+                    </tr>
+                `;
+            }
 
             summaryBody.innerHTML += `
-                <tr>
-                    <td style="text-align:left; font-weight:bold;">${modelo}</td>
-                    <td>${data.no}</td>
-                    <td>${data.si}</td>
-                    <td style="font-weight:bold;">${data.total}</td>
-                    <td>${data.almacen}</td>
-                    <td>${data.asignadas}</td>
-                    <td>${data.entrada}</td>
+                <tr class="total-row">
+                    <td style="text-align:left; font-weight:bold;">TOTAL</td>
+                    <td>${tNo}</td>
+                    <td>${tSi}</td>
+                    <td>${tTot}</td>
+                    <td>${tAlm}</td>
+                    <td>${tAsig}</td>
+                    <td>${tEnt}</td>
                 </tr>
             `;
         }
 
-        summaryBody.innerHTML += `
-            <tr class="total-row">
-                <td style="text-align:left; font-weight:bold;">TOTAL</td>
-                <td>${tNo}</td>
-                <td>${tSi}</td>
-                <td>${tTot}</td>
-                <td>${tAlm}</td>
-                <td>${tAsig}</td>
-                <td>${tEnt}</td>
-            </tr>
-        `;
-    }
-
-    let chartBody = document.getElementById('chart-body');
-    if(chartBody) {
-        chartBody.innerHTML = '';
-        for (let modelo in resumen) {
-            let data = resumen[modelo];
-            let porcentaje = totalItems > 0 ? (data.total / totalItems) * 100 : 0;
-            chartBody.innerHTML += `
-                <div class="bar-group">
-                    <div class="bar-label">${modelo} (${data.total})</div>
-                    <div class="bar-bg">
-                        <div class="bar-fill" style="width: ${porcentaje}%"></div>
+        let chartBody = document.getElementById('chart-body');
+        if(chartBody) {
+            chartBody.innerHTML = '';
+            for (let modelo in resumen) {
+                let data = resumen[modelo];
+                let porcentaje = totalItems > 0 ? (data.total / totalItems) * 100 : 0;
+                chartBody.innerHTML += `
+                    <div class="bar-group">
+                        <div class="bar-label">${modelo} (${data.total})</div>
+                        <div class="bar-bg">
+                            <div class="bar-fill" style="width: ${porcentaje}%"></div>
+                        </div>
                     </div>
-                </div>
-            `;
-        }
-    }
-}
-
-async function descargarExcel() {
-    if (!db || db.length === 0) {
-        alert("No hay registros en la base de datos para exportar.");
-        return;
-    }
-
-    const datosExcel = db.map(item => ({
-        "ID": item.id,
-        "SERIE": item.s,
-        "MODELO": item.m,
-        "GRUPO": item.g,
-        "TARIMA": item.t,
-        "TAPIZADA": item.tap,
-        "ESTATUS": item.est,
-        "ÁREA": item.area || "",
-        "DEPARTAMENTO": item.departamento || "",
-        "ASIGNADO A": item.asignado || "",
-        "CAMBIO DE PISTÓN": item.piston || "",
-        "FECHA CAMBIO PISTÓN": item.fechaPiston || "",
-        "F. ENTRADA": item.fEntrada || "",
-        "F. SALIDA": item.fSalida || "",
-        "OBSERVACIONES": item.observaciones || "",
-        "ARCHIVOS": (archivosPorItem[item.id] || []).map(f => f.file_name).join(" | ") || "SIN ARCHIVOS"
-    }));
-
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Inventario Crudo");
-
-    // Título de la tabla
-    worksheet.mergeCells("A1:P1");
-    const titulo = worksheet.getCell("A1");
-    titulo.value = "DASHBOARD DE INVENTARIO";
-    titulo.font = {
-        name: "Arial",
-        size: 16,
-        bold: true,
-        color: { argb: "FFFFFFFF" }
-    };
-    titulo.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FF17365D" }
-    };
-    titulo.alignment = {
-        horizontal: "center",
-        vertical: "middle"
-    };
-    worksheet.getRow(1).height = 35;
-
-    // Encabezados
-    const encabezados = Object.keys(datosExcel[0]);
-    worksheet.addRow(encabezados);
-
-    const filaEncabezado = worksheet.getRow(2);
-
-    filaEncabezado.height = 30;
-
-    filaEncabezado.eachCell(cell => {
-        cell.font = {
-            name: "Arial",
-            size: 10,
-            bold: true,
-            color: { argb: "FFFFFFFF" }
-        };
-
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FF2874A6" }
-        };
-
-        cell.alignment = {
-            horizontal: "center",
-            vertical: "middle",
-            wrapText: true
-        };
-
-        cell.border = {
-            top: { style: "thin", color: { argb: "FF17365D" } },
-            bottom: { style: "medium", color: { argb: "FF17365D" } },
-            left: { style: "thin", color: { argb: "FFFFFFFF" } },
-            right: { style: "thin", color: { argb: "FFFFFFFF" } }
-        };
-    });
-
-    // Agregar registros
-    datosExcel.forEach((item, index) => {
-        const fila = worksheet.addRow(Object.values(item));
-
-        fila.height = 23;
-
-        fila.eachCell(cell => {
-            cell.font = {
-                name: "Arial",
-                size: 10,
-                color: { argb: "FF333333" }
-            };
-
-            cell.alignment = {
-                vertical: "middle",
-                horizontal: "center",
-                wrapText: true
-            };
-
-            cell.border = {
-                top: { style: "thin", color: { argb: "FFD9E2F3" } },
-                bottom: { style: "thin", color: { argb: "FFD9E2F3" } },
-                left: { style: "thin", color: { argb: "FFD9E2F3" } },
-                right: { style: "thin", color: { argb: "FFD9E2F3" } }
-            };
-
-            // Filas alternadas
-            if (index % 2 === 0) {
-                cell.fill = {
-                    type: "pattern",
-                    pattern: "solid",
-                    fgColor: { argb: "FFEDF4FA" }
-                };
+                `;
             }
+        }
+    }
+
+    async function descargarExcel() {
+        if (!db || db.length === 0) {
+            alert("No hay registros en la base de datos para exportar.");
+            return;
+        }
+
+        const datosExcel = db.map(item => ({
+            "ID": item.id,
+            "SERIE": item.s,
+            "MODELO": item.m,
+            "GRUPO": item.g,
+            "TARIMA": item.t,
+            "TAPIZADA": item.tap,
+            "ESTATUS": item.est,
+            "ÁREA": item.area || "",
+            "DEPARTAMENTO": item.departamento || "",
+            "ASIGNADO A": item.asignado || "",
+            "CAMBIO DE PISTÓN": item.piston || "",
+            "FECHA CAMBIO PISTÓN": item.fechaPiston || "",
+            "F. ENTRADA": item.fEntrada || "",
+            "F. SALIDA": item.fSalida || "",
+            "OBSERVACIONES": item.observaciones || "",
+            "ARCHIVOS": (archivosPorItem[item.id] || []).map(f => f.file_name).join(" | ") || "SIN ARCHIVOS"
+        }));
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Inventario Crudo");
+
+        worksheet.mergeCells("A1:P1");
+        const titulo = worksheet.getCell("A1");
+        titulo.value = "DASHBOARD DE INVENTARIO";
+        titulo.font = { name: "Arial", size: 16, bold: true, color: { argb: "FFFFFFFF" } };
+        titulo.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF17365D" } };
+        titulo.alignment = { horizontal: "center", vertical: "middle" };
+        worksheet.getRow(1).height = 35;
+
+        const encabezados = Object.keys(datosExcel[0]);
+        worksheet.addRow(encabezados);
+
+        const filaEncabezado = worksheet.getRow(2);
+        filaEncabezado.height = 30;
+        filaEncabezado.eachCell(cell => {
+            cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF2874A6" } };
+            cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+            cell.border = {
+                top: { style: "thin", color: { argb: "FF17365D" } },
+                bottom: { style: "medium", color: { argb: "FF17365D" } },
+                left: { style: "thin", color: { argb: "FFFFFFFF" } },
+                right: { style: "thin", color: { argb: "FFFFFFFF" } }
+            };
         });
+
+        datosExcel.forEach((item, index) => {
+            const fila = worksheet.addRow(Object.values(item));
+            fila.height = 23;
+            fila.eachCell(cell => {
+                cell.font = { name: "Arial", size: 10, color: { argb: "FF333333" } };
+                cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+                cell.border = {
+                    top: { style: "thin", color: { argb: "FFD9E2F3" } },
+                    bottom: { style: "thin", color: { argb: "FFD9E2F3" } },
+                    left: { style: "thin", color: { argb: "FFD9E2F3" } },
+                    right: { style: "thin", color: { argb: "FFD9E2F3" } }
+                };
+                if (index % 2 === 0) {
+                    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFEDF4FA" } };
+                }
+            });
+        });
+
+        worksheet.columns = [
+            { width: 10 }, { width: 18 }, { width: 30 }, { width: 12 },
+            { width: 12 }, { width: 12 }, { width: 16 }, { width: 26 },
+            { width: 24 }, { width: 22 }, { width: 16 }, { width: 16 },
+            { width: 42 }, { width: 45 }, { width: 22 }, { width: 24 }
+        ];
+
+        worksheet.autoFilter = { from: "A2", to: "P2" };
+        worksheet.views = [{ state: "frozen", ySplit: 2 }];
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "Dashboard_Inventario.xlsx";
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    const URL_CATALOGO_IEEM = 'https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0';
+    function irCatalogo() { window.open(URL_CATALOGO_IEEM, '_blank', 'noopener'); toggleMenuMovil(false); }
+    function toggleMenuMovil(forzar) {
+        const sidebar = document.getElementById('appSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (!sidebar || !backdrop) return;
+        const abrir = typeof forzar === 'boolean' ? forzar : !sidebar.classList.contains('menu-open');
+        sidebar.classList.toggle('menu-open', abrir);
+        backdrop.classList.toggle('visible', abrir);
+    }
+    function obtenerSubpaginas() {
+        try { return JSON.parse(localStorage.getItem('ieem_subpaginas') || '[]'); } catch (_) { return []; }
+    }
+    function renderizarSubpaginas() {
+        const nav = document.getElementById('sidebarPages');
+        if (!nav) return;
+        nav.innerHTML = obtenerSubpaginas().map((p) =>
+            `<a class="sidebar-page-link" href="${escaparHTML(p.url)}" target="_blank" rel="noopener">▸ ${escaparHTML(p.nombre)}</a>`
+        ).join('');
+        const boton = document.getElementById('addSidebarPage');
+        if (boton) boton.style.display = esDirAdmin ? 'flex' : 'none';
+    }
+    function agregarSubpagina() {
+        if (!esDirAdmin) return;
+        const nombre = prompt('Nombre de la subpágina:');
+        if (!nombre || !nombre.trim()) return;
+        const url = prompt('Pega la dirección web de la subpágina:');
+        if (!url || !/^https:\/\/\S+$/i.test(url.trim())) { alert('Ingresa una dirección HTTPS válida.'); return; }
+        const paginas = obtenerSubpaginas();
+        paginas.push({nombre:nombre.trim(), url:url.trim()});
+        localStorage.setItem('ieem_subpaginas', JSON.stringify(paginas));
+        renderizarSubpaginas();
+    }
+    async function seleccionarFotoInventario(id) {
+        if (!esDirAdmin) { alert('Solo el administrador puede cargar fotografías.'); return; }
+        if (!id || !sb || !usuarioActual) return;
+        const selector = document.createElement('input');
+        selector.type = 'file'; selector.accept = 'image/jpeg,image/png,image/webp'; selector.setAttribute('capture','environment');
+        selector.style.display = 'none';
+        selector.onchange = async () => {
+            const archivo = selector.files && selector.files[0];
+            if (!archivo) { selector.remove(); return; }
+            if (!['image/jpeg','image/png','image/webp'].includes(archivo.type)) { alert('Selecciona una imagen JPG, PNG o WEBP.'); selector.remove(); return; }
+            if (archivo.size > 8 * 1024 * 1024) { alert('La imagen no debe superar 8 MB.'); selector.remove(); return; }
+            const boton = document.getElementById('btnSubirFoto');
+            try {
+                boton.disabled = true; boton.textContent = 'Cargando fotografía...';
+                const ext = archivo.type === 'image/jpeg' ? 'jpg' : archivo.type.split('/')[1];
+                const ruta = `fotografias/${id}/${(window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now()}.${ext}`;
+                const {error: uploadError} = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {upsert:false, contentType:archivo.type, cacheControl:'3600'});
+                if (uploadError) throw uploadError;
+                const {data: signed, error: signedError} = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(ruta, 60 * 60 * 24);
+                if (signedError) throw signedError;
+                const {error:updateError} = await sb.from('inventario').update({imagen_url:ruta}).eq('id',id);
+                if (updateError) throw updateError;
+                const item = db.find(r => r.id === id);
+                if (item) item.imgId = signed.signedUrl;
+                const foto = document.getElementById('editFotoRegistro');
+                foto.src = signed.signedUrl; foto.style.display = 'block';
+                renderizarTablaCruda();
+                alert('Fotografía actualizada correctamente.');
+            } catch (error) {
+                console.error(error);
+                alert('No se pudo cargar la fotografía: ' + (error.message || ''));
+            } finally {
+                boton.disabled = false; boton.textContent = '📷 Cargar / cambiar fotografía';
+                selector.remove();
+            }
+        };
+        document.body.appendChild(selector); selector.click();
+    }
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('modalEdicion');
+            if (modal && modal.style.display === 'flex') cerrarEdicion();
+            const modalResp = document.getElementById('modalResponsiva');
+            if (modalResp && modalResp.style.display === 'flex') cerrarResponsivaModal();
+        }
     });
 
-    // Ancho de columnas
-    worksheet.columns = [
-        { width: 10 }, { width: 18 }, { width: 30 }, { width: 12 },
-        { width: 12 }, { width: 12 }, { width: 16 }, { width: 26 },
-        { width: 24 }, { width: 22 }, { width: 16 }, { width: 16 },
-        { width: 42 }, { width: 45 }, { width: 22 }, { width: 24 }
-    ];
-
-    // Filtros y encabezados fijos
-    worksheet.autoFilter = {
-        from: "A2",
-        to: "P2"
-    };
-
-    worksheet.views = [
-        {
-            state: "frozen",
-            ySplit: 2
-        }
-    ];
-
-    // Descargar archivo
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    const blob = new Blob(
-        [buffer],
-        {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "Dashboard_Inventario.xlsx";
-    link.click();
-
-    URL.revokeObjectURL(url);
-}
-
-
-const URL_CATALOGO_IEEM = 'https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0';
-function irCatalogo() { window.open(URL_CATALOGO_IEEM, '_blank', 'noopener'); toggleMenuMovil(false); }
-function toggleMenuMovil(forzar) {
-    const sidebar = document.getElementById('appSidebar');
-    const backdrop = document.getElementById('sidebarBackdrop');
-    if (!sidebar || !backdrop) return;
-    const abrir = typeof forzar === 'boolean' ? forzar : !sidebar.classList.contains('menu-open');
-    sidebar.classList.toggle('menu-open', abrir);
-    backdrop.classList.toggle('visible', abrir);
-}
-function obtenerSubpaginas() {
-    try { return JSON.parse(localStorage.getItem('ieem_subpaginas') || '[]'); } catch (_) { return []; }
-}
-function renderizarSubpaginas() {
-    const nav = document.getElementById('sidebarPages');
-    if (!nav) return;
-    nav.innerHTML = obtenerSubpaginas().map((p,i) =>
-        `<a class="sidebar-page-link" href="${escaparHTML(p.url)}" target="_blank" rel="noopener">▸ ${escaparHTML(p.nombre)}</a>`
-    ).join('');
-    const boton = document.getElementById('addSidebarPage');
-    if (boton) boton.style.display = esDirAdmin ? 'flex' : 'none';
-}
-function agregarSubpagina() {
-    if (!esDirAdmin) return;
-    const nombre = prompt('Nombre de la subpágina:');
-    if (!nombre || !nombre.trim()) return;
-    const url = prompt('Pega la dirección web de la subpágina:');
-    if (!url || !/^https:\/\/\S+$/i.test(url.trim())) { alert('Ingresa una dirección HTTPS válida.'); return; }
-    const paginas = obtenerSubpaginas();
-    paginas.push({nombre:nombre.trim(), url:url.trim()});
-    localStorage.setItem('ieem_subpaginas', JSON.stringify(paginas));
-    renderizarSubpaginas();
-}
-async function seleccionarFotoInventario(id) {
-    if (!esDirAdmin) { alert('Solo el administrador puede cargar fotografías.'); return; }
-    if (!id || !sb || !usuarioActual) return;
-    const selector = document.createElement('input');
-    selector.type = 'file'; selector.accept = 'image/jpeg,image/png,image/webp'; selector.setAttribute('capture','environment');
-    selector.style.display = 'none';
-    selector.onchange = async () => {
-        const archivo = selector.files && selector.files[0];
-        if (!archivo) { selector.remove(); return; }
-        if (!['image/jpeg','image/png','image/webp'].includes(archivo.type)) { alert('Selecciona una imagen JPG, PNG o WEBP.'); selector.remove(); return; }
-        if (archivo.size > 8 * 1024 * 1024) { alert('La imagen no debe superar 8 MB.'); selector.remove(); return; }
-        const boton = document.getElementById('btnSubirFoto');
-        try {
-            boton.disabled = true; boton.textContent = 'Cargando fotografía...';
-            const ext = archivo.type === 'image/jpeg' ? 'jpg' : archivo.type.split('/')[1];
-            const ruta = `fotografias/${id}/${(window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Date.now()}.${ext}`;
-            const {error: uploadError} = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {upsert:false, contentType:archivo.type, cacheControl:'3600'});
-            if (uploadError) throw uploadError;
-            const {data: signed, error: signedError} = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(ruta, 60 * 60 * 24);
-            if (signedError) throw signedError;
-            const {error:updateError} = await sb.from('inventario').update({imagen_url:ruta}).eq('id',id);
-            if (updateError) throw updateError;
-            const item = db.find(r => r.id === id);
-            if (item) item.imgId = signed.signedUrl;
-            const foto = document.getElementById('editFotoRegistro');
-            foto.src = signed.signedUrl; foto.style.display = 'block';
-            renderizarTablaCruda();
-            alert('Fotografía actualizada correctamente.');
-        } catch (error) {
-            console.error(error);
-            alert('No se pudo cargar la fotografía: ' + (error.message || 'Verifica el almacenamiento de Supabase.'));
-        } finally {
-            boton.disabled = false; boton.textContent = '📷 Cargar / cambiar fotografía';
-            selector.remove();
-        }
-    };
-    document.body.appendChild(selector); selector.click();
-}
-
-document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-        const modal = document.getElementById('modalEdicion');
-        if (modal && modal.style.display === 'flex') cerrarEdicion();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', iniciarApp);
+    document.addEventListener('DOMContentLoaded', iniciarApp);
 </script>
 
 </body>
 </html>
-
