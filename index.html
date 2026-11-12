@@ -107,13 +107,13 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Firmas perfectamente centradas y balanceadas abajo */
-        .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 25px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
+        /* Firmas perfectamente espaciadas y sin encimarse */
+        .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 30px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
         .ieem-firma-col { width: 44%; text-align: center; position: relative; }
-        .ieem-firma-titulo { font-weight: bold; margin-bottom: 55px; }
-        .ieem-firma-img-auth { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); max-height: 55px; max-width: 170px; object-fit: contain; pointer-events: none; }
-        .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 3px; min-height: 20px; font-size: 9.5pt; text-transform: uppercase; font-weight: bold; }
-        .ieem-firma-pie { font-weight: bold; padding-top: 4px; font-size: 9.5pt; }
+        .ieem-firma-titulo { font-weight: bold; margin-bottom: 70px; }
+        .ieem-firma-img-auth { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); max-height: 60px; max-width: 180px; object-fit: contain; pointer-events: none; }
+        .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 4px; min-height: 22px; font-size: 9.5pt; text-transform: uppercase; font-weight: bold; }
+        .ieem-firma-pie { font-weight: bold; padding-top: 5px; font-size: 9.5pt; }
 
         @media print {
             body * { visibility: hidden; }
@@ -446,7 +446,7 @@
             </table>
         </div>
 
-        <!-- Firmas perfectamente centradas y estables abajo -->
+        <!-- Firmas perfectamente centradas, sin encimar y con opción de checkbox para editar -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
@@ -454,10 +454,15 @@
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
             <div class="ieem-firma-col">
-                <div class="ieem-firma-titulo">Entrega / Recibe</div>
+                <div class="ieem-firma-titulo" style="display:flex; justify-content:center; align-items:center; gap:6px; margin-bottom:5px;">
+                    <span>Entrega / Recibe</span>
+                    <label style="font-size:10px; font-weight:normal; cursor:pointer;" title="Habilitar edición de nombre y firma">
+                        <input type="checkbox" id="checkHabilitarFirma" onchange="toggleEdicionNombreEntrega(this.checked)"> Editar
+                    </label>
+                </div>
                 <img src="firmaautorizacion.jpg" alt="Firma" class="ieem-firma-img-auth" onerror="this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg'">
                 <div id="lblEntregaNombre" class="ieem-firma-nombre" style="border:none; padding:0;">LAZARO SEGURA MUCIÑO</div>
-                <div id="editEntregaContainer" style="margin-top:2px;"></div>
+                <div id="editEntregaContainer" style="margin-top:2px; display:none;"></div>
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
         </div>
@@ -633,7 +638,6 @@
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('appShell').style.display = 'flex';
             
-            // Configurar columnas por defecto según el rol antes de renderizar
             configurarColumnasPorDefecto();
 
             renderizarSubpaginas();
@@ -648,10 +652,10 @@
         checkboxes.forEach(chk => {
             const col = chk.getAttribute('data-col');
             if (esDirAdmin || esSupAdmin) {
-                // Admin y SupAdmin: Todas activas por defecto
+                // Admin y SupAdmin: Todas las columnas visibles por defecto
                 chk.checked = true;
             } else {
-                // Consulta: Ocultar activo y grupo por defecto, las demás activas
+                // Consulta: Ocultar activo y grupo por defecto
                 if (col === 'activo' || col === 'grupo') {
                     chk.checked = false;
                 } else {
@@ -673,7 +677,6 @@
     }
 
     function registroAUpdateNube(item) {
-        // Objeto base sin 'activo' por si la columna no existe en la base de datos de Supabase
         const payload = {
             estatus: item.est || 'ALMACEN',
             tapizada: item.tap || 'NO',
@@ -686,7 +689,6 @@
             observaciones: item.observaciones || null,
             updated_at: new Date().toISOString()
         };
-        // Intentar incluir activo si está presente
         if (item.activo !== undefined) {
             payload.activo = item.activo || 'GENERAL';
         }
@@ -850,7 +852,7 @@
     }
 
     // =========================================================================
-    // CONTROL DINÁMICO DE COLUMNAS (TABLA Y MODAL)
+    // CONTROL DINÁMICO DE COLUMNAS
     // =========================================================================
     function toggleMenuColumnas(e) {
         e.stopPropagation();
@@ -880,7 +882,7 @@
     }
 
     // =========================================================================
-    // CARTA RESPONSIVA: ENTRADA / SALIDA AUTOMÁTICA CON X
+    // CARTA RESPONSIVA: ENTRADA / SALIDA AUTOMÁTICA Y CHECKBOX DE EDICIÓN DE FIRMA
     // =========================================================================
     function abrirModalResponsiva(id) {
         const item = db.find(r => r.id === id);
@@ -933,17 +935,27 @@
 
         document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
 
-        const edCont = document.getElementById('editEntregaContainer');
+        // Resetear checkbox y contenedor de nombre de entrega
+        document.getElementById('checkHabilitarFirma').checked = false;
         const nombreEntregaEl = document.getElementById('lblEntregaNombre');
-        if (esDirAdmin) {
-            nombreEntregaEl.style.display = 'none';
-            edCont.innerHTML = `<input type="text" id="inputNombreEntrega" value="LAZARO SEGURA MUCIÑO" style="width:90%; padding:3px; text-align:center; font-weight:bold; font-size:9.5pt; border:1px solid #999;">`;
-        } else {
-            nombreEntregaEl.style.display = 'block';
-            edCont.innerHTML = '';
-        }
+        const edCont = document.getElementById('editEntregaContainer');
+        nombreEntregaEl.style.display = 'block';
+        edCont.style.display = 'none';
+        edCont.innerHTML = `<input type="text" id="inputNombreEntrega" value="LAZARO SEGURA MUCIÑO" style="width:90%; padding:3px; text-align:center; font-weight:bold; font-size:9.5pt; border:1px solid #999;">`;
 
         document.getElementById('modalResponsiva').style.display = 'flex';
+    }
+
+    function toggleEdicionNombreEntrega(activar) {
+        const nombreEntregaEl = document.getElementById('lblEntregaNombre');
+        const edCont = document.getElementById('editEntregaContainer');
+        if (activar) {
+            nombreEntregaEl.style.display = 'none';
+            edCont.style.display = 'block';
+        } else {
+            nombreEntregaEl.style.display = 'block';
+            edCont.style.display = 'none';
+        }
     }
 
     function cerrarResponsivaModal() {
@@ -1038,7 +1050,6 @@
             const payload = registroAUpdateNube(item);
             let { error } = await sb.from('inventario').update(payload).eq('id', item.id);
             
-            // Si la columna 'activo' no existe en Supabase, reintentamos sin ella para evitar el error
             if (error && error.message && error.message.includes("activo")) {
                 delete payload.activo;
                 const res2 = await sb.from('inventario').update(payload).eq('id', item.id);
@@ -1048,7 +1059,6 @@
 
             await registrarMovimientoBitacora('EDITAR_REGISTRO', `Modificó el registro ID ${item.id} (Serie: ${item.s})`);
             
-            // Cerrar modal y recargar tabla de inmediato
             cerrarEdicion();
             await cargarInventarioNube();
             alert('Cambios guardados correctamente.');
