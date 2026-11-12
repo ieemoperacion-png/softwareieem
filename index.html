@@ -130,8 +130,37 @@
         .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 3px; min-height: 20px; font-size: 9pt; text-transform: uppercase; font-weight: bold; }
         .ieem-firma-pie { font-weight: bold; padding-top: 4px; font-size: 9pt; }
 
-        /* La impresión se realiza en una ventana independiente; el modal no se imprime. */
-        @media print { body { background:#fff !important; margin:0 !important; padding:0 !important; } }
+        /* REGLA DE IMPRESIÓN FORZADA A 1 SOLA PÁGINA CARTA */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 5mm;
+            }
+            body * { visibility: hidden; }
+            #modalResponsiva, #modalResponsiva * { visibility: visible; }
+            #modalResponsiva { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                height: 100%;
+                background: #fff !important; 
+                padding: 0 !important; 
+                overflow: hidden !important; 
+            }
+            .modal-botones-barra { display: none !important; }
+            .hoja-excel-ieem { 
+                box-shadow: none !important; 
+                margin: 0 auto !important; 
+                width: 100% !important; 
+                max-width: 100% !important;
+                height: 268mm !important;
+                max-height: 268mm !important; 
+                padding: 0 !important; 
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+        }
 
         /* Modal Edición */
         .modal-edicion { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,.65); align-items: center; justify-content: center; padding: 15px; }
@@ -179,52 +208,26 @@
         .btn-salir { border:1px solid #ccd2dc; border-radius:4px; background:#fff; color:#334; padding:8px 11px; cursor:pointer; }
         .etiqueta-rol { font-weight:bold; color:#002060; }
 
-        /* Estructura adaptable y menú lateral plegable */
+        /* Estilo Adaptable Móvil */
         #appShell { width:100%; min-height:100vh; margin:0; padding:0; display:none; align-items:stretch; background:#f3f4f8; }
-        .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; padding:22px 14px; background:#dedfe2; border-right:1px solid #c8cbd0; box-sizing:border-box; transition:width .25s ease, flex-basis .25s ease, padding .25s ease; overflow:hidden; }
+        .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; padding:22px 14px; background:#dedfe2; border-right:1px solid #c8cbd0; }
         .sidebar-brand { font-size:20px; font-weight:800; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
         .sidebar-logo { display:block; width:112px; max-height:58px; object-fit:contain; margin:0 0 12px; }
         .sidebar-link, .sidebar-page-link, .sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
         .sidebar-link:hover { background:#c9ccd1; }
         .app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
-        .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 0 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; }
-        .hamburger { flex:0 0 auto; border:0; background:transparent; color:#263238; font-size:26px; line-height:1; cursor:pointer; padding:4px 8px; }
-        .sidebar-backdrop { display:none; }
-        #appShell.sidebar-collapsed .app-sidebar { width:0; flex-basis:0; padding-left:0; padding-right:0; border:0; }
-        .table-responsive { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
-        .inventory-list-section { min-width:0; }
-        .search-container { max-width:100%; }
+        .mobile-topbar { display:none; }
 
         @media(max-width:700px) {
             #appShell { display:block; }
-            .app-main { padding:0 10px 12px; }
-            .mobile-topbar { margin:0 -10px 12px; }
-            .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); min-height:100dvh; transform:translateX(-105%); transition:transform .25s ease; box-shadow:3px 0 18px rgba(0,0,0,.18); }
+            .app-main { padding:10px; }
+            .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 -10px 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; }
+            .hamburger { border:0; background:transparent; font-size:25px; cursor:pointer; }
+            .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); transform:translateX(-105%); transition:transform .25s ease; }
             .app-sidebar.menu-open { transform:translateX(0); }
-            .sidebar-backdrop.show { display:block; position:fixed; inset:0; z-index:1400; background:rgba(0,0,0,.42); }
-            .kpi-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-            .kpi-card { min-width:0; padding:10px; }
-            .kpi-card h3 { font-size:21px; }
-            .main-grid, .btn-excel { display:none !important; }
-            .filtros-superiores { gap:8px; padding:10px; }
-            .filtro-grupo { min-width:100%; }
-            .inventory-list-section > div:first-child { align-items:stretch !important; }
-            .search-container { display:block; width:100%; }
-            .search-container input { width:100%; min-height:42px; font-size:15px; }
-            .table-responsive { overflow-x:hidden; border-radius:10px; }
-            .table-responsive table:not(#tabla-resumen) { width:100% !important; min-width:0 !important; table-layout:fixed; font-size:12px; }
-            .table-responsive table:not(#tabla-resumen) th,
-            .table-responsive table:not(#tabla-resumen) td { padding:8px 4px; white-space:normal; overflow-wrap:anywhere; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="foto"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] { width:15%; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="serie"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="serie"] { width:10%; font-size:11px; font-weight:bold; word-break:break-all; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="modelo"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="modelo"] { width:29%; text-align:left; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="estatus"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="estatus"] { width:18%; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="acciones"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="acciones"] { width:28%; }
+            .kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            .main-grid, .btn-excel { display: none !important; }
+
             th[data-col="id"], td[data-col="id"],
             th[data-col="activo"], td[data-col="activo"],
             th[data-col="grupo"], td[data-col="grupo"],
@@ -233,37 +236,10 @@
             th[data-col="area"], td[data-col="area"],
             th[data-col="departamento"], td[data-col="departamento"],
             th[data-col="asignado"], td[data-col="asignado"],
-            th[data-col="archivos"], td[data-col="archivos"],
-            th[data-col="responsiva"], td[data-col="responsiva"] { display:none !important; }
-            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] img { width:100% !important; max-width:76px; height:64px !important; object-fit:cover; }
-            .btn-ver, .btn-editar { width:100%; min-width:0; height:38px; border-radius:10px; padding:0 8px; }
-            .acciones-inventario { display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:7px; min-width:0; }
-            .btn-imprimir-movil { display:flex; align-items:center; justify-content:center; gap:5px; width:100%; min-height:34px; padding:5px 3px; border:0; border-radius:8px; background:#002060; color:#fff; font-size:11px; font-weight:700; cursor:pointer; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="acciones"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="acciones"] { width:25%; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="foto"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] { width:15%; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="serie"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="serie"] { width:16%; word-break:normal; overflow-wrap:anywhere; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="modelo"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="modelo"] { width:27%; }
-            .table-responsive table:not(#tabla-resumen) th[data-col="estatus"],
-            .table-responsive table:not(#tabla-resumen) td[data-col="estatus"] { width:17%; }
-        }
-        .acciones-inventario { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
-        .btn-imprimir-movil { display:none; }
-
-        /* Vista previa: escala visual adaptable sin alterar las dimensiones de impresión. */
-        .modal-responsiva { align-items:flex-start; padding:68px 12px 20px; }
-        .hoja-excel-ieem { width:190mm; max-width:100%; min-height:258mm; margin:0 auto; }
-        @media(max-width:700px) {
-            .btn-imprimir-movil { display:flex !important; }
-            .modal-responsiva { align-items:flex-start; padding:64px 6px 12px; }
-            .modal-botones-barra { padding:8px; justify-content:center; }
-            .modal-botones-barra > div:first-child { display:none; }
-            .modal-botones-grupo { justify-content:center; gap:6px; }
-            .btn-accion-pdf, .btn-accion-imprimir, .btn-accion-cerrar { padding:8px 10px; font-size:12px; }
-            .hoja-excel-ieem { width:100%; max-width:100%; min-height:0; padding:5mm; transform:none; margin:0 auto; }
+            th[data-col="archivos"], td[data-col="archivos"] {
+                display: none !important;
+            }
+            table { min-width: 100% !important; }
         }
     </style>
 </head>
@@ -752,13 +728,15 @@
         checkboxes.forEach(chk => {
             const col = chk.getAttribute('data-col');
             if (esDirAdmin || esSupAdmin) {
-                // DIRADMIN y SUPADMIN inician con todas las columnas habilitadas en escritorio.
-                chk.checked = true;
+                chk.checked = true; // Predeterminado completas para administradores
             } else {
-                chk.checked = !(col === 'activo' || col === 'grupo');
+                if (col === 'activo' || col === 'grupo') {
+                    chk.checked = false;
+                } else {
+                    chk.checked = true;
+                }
             }
         });
-        actualizarVisibilidadColumnas();
     }
 
     function filaNubeARegistro(row) {
@@ -804,6 +782,7 @@
         await cargarArchivosNube();
         poblarFiltrosSuperiores();
         aplicarFiltrosTabla();
+        calcularYRenderizarMetricas();
     }
 
     async function cargarArchivosNube() {
@@ -900,7 +879,6 @@
         });
 
         renderizarTablaCruda(datosFiltradosActuales);
-        calcularYRenderizarMetricas(datosFiltradosActuales);
     }
 
     function renderizarTablaCruda(lista) {
@@ -939,10 +917,7 @@
                         <button class="btn-imprimir-responsiva" title="Generar Carta Responsiva" onclick="abrirModalResponsiva(${item.id})">🖨️</button>
                     </td>
                     <td data-col="acciones">
-                        <div class="acciones-inventario">
-                            <button class="${puedeModificar ? 'btn-editar' : 'btn-ver'}" title="${puedeModificar ? 'Editar' : 'Consultar'}" onclick="abrirEdicion(${item.id})">${puedeModificar ? '✎' : '👁'}</button>
-                            <button class="btn-imprimir-movil" title="Imprimir carta responsiva" aria-label="Imprimir carta responsiva" onclick="abrirModalResponsiva(${item.id})">🖨️ Imprimir</button>
-                        </div>
+                        <button class="${puedeModificar ? 'btn-editar' : 'btn-ver'}" title="${puedeModificar ? 'Editar' : 'Consultar'}" onclick="abrirEdicion(${item.id})">${puedeModificar ? '✎' : '👁'}</button>
                     </td>
                 </tr>`;
         });
@@ -1073,88 +1048,22 @@
         document.getElementById('modalResponsiva').style.display = 'none';
     }
 
-    function crearHojaParaSalida() {
-        const original = document.getElementById('hojaFormatoMovimientos');
-        const hoja = original.cloneNode(true);
-        hoja.removeAttribute('id');
-        hoja.style.cssText = 'box-sizing:border-box;width:200mm;height:263mm;min-height:263mm;max-height:263mm;padding:6mm 7mm;margin:0;background:#fff;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;font-family:Arial,Helvetica,sans-serif;color:#000;';
-        hoja.querySelectorAll('.ieem-excel-grid th,.ieem-excel-grid td').forEach(celda => {
-            celda.style.fontSize = '7.5pt';
-            celda.style.padding = '1px 3px';
-            celda.style.height = '12px';
-        });
-        return hoja;
-    }
-
-    function imprimirResponsiva() {
-        const ventana = window.open('', '_blank', 'width=1000,height=800');
-        if (!ventana) {
-            alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes para este sitio e inténtalo de nuevo.');
-            return;
-        }
-        const hoja = crearHojaParaSalida();
-        const estilos = Array.from(document.querySelectorAll('style')).map(st => st.innerHTML).join('\n');
-        ventana.addEventListener('load', async () => {
-            const printSheet = ventana.document.querySelector('.hoja-excel-ieem');
-            if (!printSheet) { ventana.close(); return; }
-            const imgs = Array.from(ventana.document.images);
-            await Promise.all(imgs.map(img => img.decode ? img.decode().catch(() => {}) : Promise.resolve()));
-            // Encoge proporcionalmente solo si el contenido excede el área imprimible.
-            const anchoDisponible = 200 * 96 / 25.4;
-            const altoDisponible = 263 * 96 / 25.4;
-            const escala = Math.min(1, anchoDisponible / Math.max(printSheet.scrollWidth, 1), altoDisponible / Math.max(printSheet.scrollHeight, 1));
-            printSheet.style.transform = `scale(${escala})`;
-            printSheet.style.transformOrigin = 'center center';
-            setTimeout(() => { ventana.focus(); ventana.print(); }, 350);
-        }, { once:true });
-        ventana.document.open();
-        ventana.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Carta responsiva IEEM</title><style>${estilos}
-            @page { size: letter portrait; margin: 8mm; }
-            html,body { width:100%; height:100%; margin:0!important; padding:0!important; background:#fff!important; }
-            body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-            .print-page { width:100%; height:263mm; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-            .print-page .hoja-excel-ieem { flex:none!important; box-shadow:none!important; page-break-inside:avoid!important; break-inside:avoid!important; }
-            @media print { html,body { overflow:hidden!important; } .print-page { page-break-after:avoid!important; break-after:avoid!important; } }
-        </style></head><body><main class="print-page" id="printPage"></main></body></html>`);
-        ventana.document.close();
-        ventana.document.getElementById('printPage').appendChild(ventana.document.importNode(hoja, true));
-    }
+    function imprimirResponsiva() { window.print(); }
 
     async function descargarResponsivaPDF() {
+        const elemento = document.getElementById('hojaFormatoMovimientos');
         const btn = document.getElementById('btnDescargarPdfResp');
         btn.disabled = true; btn.textContent = 'Generando...';
-        let temporal;
         try {
-            temporal = document.createElement('div');
-            temporal.style.cssText = 'position:fixed;left:-10000px;top:0;width:200mm;height:263mm;overflow:hidden;background:#fff;z-index:-1;';
-            const hoja = crearHojaParaSalida();
-            temporal.appendChild(hoja);
-            document.body.appendChild(temporal);
-            await Promise.all(Array.from(hoja.querySelectorAll('img')).map(img => img.decode ? img.decode().catch(() => {}) : Promise.resolve()));
-            const anchoDisponible = 200 * 96 / 25.4;
-            const altoDisponible = 263 * 96 / 25.4;
-            const escala = Math.min(1, anchoDisponible / Math.max(hoja.scrollWidth, 1), altoDisponible / Math.max(hoja.scrollHeight, 1));
-            hoja.style.transform = `scale(${escala})`;
-            hoja.style.transformOrigin = 'top left';
             await html2pdf().set({
-                margin: 0,
+                margin: [4, 4, 4, 4],
                 filename: `Responsiva_${itemResponsivaActual?.s || 'IEEM'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: anchoDisponible, height: altoDisponible, windowWidth: anchoDisponible },
-                pagebreak: { mode: [] },
-                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true }
-            }).from(hoja).toPdf().get('pdf').then(pdf => {
-                // Garantiza un único folio carta aunque el motor detecte desbordamiento residual.
-                while (pdf.internal.getNumberOfPages() > 1) pdf.deletePage(pdf.internal.getNumberOfPages());
-                return pdf.save(`Responsiva_${itemResponsivaActual?.s || 'IEEM'}.pdf`);
-            });
-        } catch(e) {
-            console.error('Error generando PDF de responsiva:', e);
-            alert('No fue posible generar el PDF. Revisa que el navegador permita descargar archivos.');
-        } finally {
-            if (temporal?.parentNode) temporal.parentNode.removeChild(temporal);
-            btn.disabled = false; btn.textContent = '📥 Descargar PDF';
-        }
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+            }).from(elemento).save();
+        } catch(e) { alert('Error al descargar PDF'); }
+        finally { btn.disabled = false; btn.textContent = '📥 Descargar PDF'; }
     }
 
     function abrirEdicion(id) {
@@ -1335,14 +1244,12 @@
         a.click();
     }
 
-    function calcularYRenderizarMetricas(registros = datosFiltradosActuales) {
-        // La tabla resumen, las tarjetas y la gráfica responden a los mismos filtros activos.
-        const conjunto = Array.isArray(registros) ? registros : [];
-        let totalItems = conjunto.length;
-        let totalSI = conjunto.filter(i => String(i.tap).toUpperCase() === 'SI').length;
-        let totalNO = conjunto.filter(i => String(i.tap).toUpperCase() === 'NO').length;
-        let totalAsig = conjunto.filter(i => String(i.est).toUpperCase() === 'ASIGNADAS').length;
-        let totalEnt = conjunto.filter(i => String(i.est).toUpperCase() === 'ENTRADA').length;
+    function calcularYRenderizarMetricas() {
+        let totalItems = db.length;
+        let totalSI = db.filter(i => String(i.tap).toUpperCase() === 'SI').length;
+        let totalNO = db.filter(i => String(i.tap).toUpperCase() === 'NO').length;
+        let totalAsig = db.filter(i => String(i.est).toUpperCase() === 'ASIGNADAS').length;
+        let totalEnt = db.filter(i => String(i.est).toUpperCase() === 'ENTRADA').length;
 
         document.getElementById('kpi-total').innerText = totalItems;
         document.getElementById('kpi-asignados').innerText = totalAsig;
@@ -1351,15 +1258,14 @@
         document.getElementById('kpi-no').innerText = totalNO;
 
         let resumen = {};
-        conjunto.forEach(item => {
-            const modelo = item.m || 'SIN MODELO';
-            if (!resumen[modelo]) resumen[modelo] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0, entrada: 0 };
-            if (item.tap === 'NO') resumen[modelo].no++;
-            if (item.tap === 'SI') resumen[modelo].si++;
-            if (item.est === 'ALMACEN') resumen[modelo].almacen++;
-            if (item.est === 'ASIGNADAS') resumen[modelo].asignadas++;
-            if (item.est === 'ENTRADA') resumen[modelo].entrada++;
-            resumen[modelo].total++;
+        db.forEach(item => {
+            if (!resumen[item.m]) resumen[item.m] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0, entrada: 0 };
+            if (item.tap === 'NO') resumen[item.m].no++;
+            if (item.tap === 'SI') resumen[item.m].si++;
+            if (item.est === 'ALMACEN') resumen[item.m].almacen++;
+            if (item.est === 'ASIGNADAS') resumen[item.m].asignadas++;
+            if (item.est === 'ENTRADA') resumen[item.m].entrada++;
+            resumen[item.m].total++;
         });
 
         const sbBody = document.getElementById('summary-body');
@@ -1393,19 +1299,8 @@
     function limpiarBuscador() { document.getElementById('buscador-crudo').value = ''; aplicarFiltrosTabla(); }
     function irCatalogo() { window.open('https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0', '_blank'); }
     function toggleMenuMovil(forzar) {
-        const shell = document.getElementById('appShell');
         const sb = document.getElementById('appSidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const esMovil = window.matchMedia('(max-width: 700px)').matches;
-        if (esMovil) {
-            const abrir = typeof forzar === 'boolean' ? forzar : !sb.classList.contains('menu-open');
-            sb.classList.toggle('menu-open', abrir);
-            if (backdrop) backdrop.classList.toggle('show', abrir);
-            document.body.style.overflow = abrir ? 'hidden' : '';
-        } else {
-            const plegar = typeof forzar === 'boolean' ? !forzar : !shell.classList.contains('sidebar-collapsed');
-            shell.classList.toggle('sidebar-collapsed', plegar);
-        }
+        sb.classList.toggle('menu-open', typeof forzar === 'boolean' ? forzar : !sb.classList.contains('menu-open'));
     }
     function renderizarSubpaginas() {}
     function agregarSubpagina() {}
