@@ -76,7 +76,7 @@
         .btn-documento { border: 0; border-radius: 4px; min-width: 30px; min-height: 28px; padding: 4px 6px; color: #fff; background: rgba(0,0,0,.22); cursor: pointer; font-size: 14px; }
 
         /* =========================================================================
-           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL
+           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL (FIRMAS PERFECTAMENTE CENTRADAS)
            ========================================================================= */
         .modal-responsiva { display: none; position: fixed; z-index: 4500; inset: 0; background-color: rgba(0, 0, 0, 0.72); overflow-y: auto; justify-content: center; align-items: flex-start; padding: 65px 15px 30px; box-sizing: border-box; }
         .modal-botones-barra { position: fixed; top: 0; left: 0; right: 0; z-index: 4600; background: #1b263b; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
@@ -85,7 +85,7 @@
         .btn-accion-imprimir { background-color: #198754; color: white; border: none; padding: 9px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-accion-cerrar { background-color: #6c757d; color: white; border: none; padding: 9px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 13px; }
 
-        .hoja-excel-ieem { background-color: #ffffff; width: 215.9mm; min-height: 279.4mm; padding: 10mm 12mm; margin: 0 auto; box-shadow: 0 6px 25px rgba(0,0,0,0.45); box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; color: #000000; }
+        .hoja-excel-ieem { background-color: #ffffff; width: 215.9mm; min-height: 279.4mm; padding: 10mm 12mm; margin: 0 auto; box-shadow: 0 6px 25px rgba(0,0,0,0.45); box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; color: #000000; display: flex; flex-direction: column; justify-content: space-between; }
         .ieem-excel-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
         .ieem-excel-logo { width: 155px; height: auto; object-fit: contain; }
         .ieem-excel-org { text-align: right; font-weight: bold; font-size: 11pt; line-height: 1.35; }
@@ -107,8 +107,9 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .ieem-excel-firmas { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; padding: 0 18px; font-size: 9.5pt; }
-        .ieem-firma-col { width: 42%; text-align: center; position: relative; }
+        /* Firmas perfectamente centradas y balanceadas abajo */
+        .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 25px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
+        .ieem-firma-col { width: 44%; text-align: center; position: relative; }
         .ieem-firma-titulo { font-weight: bold; margin-bottom: 55px; }
         .ieem-firma-img-auth { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); max-height: 55px; max-width: 170px; object-fit: contain; pointer-events: none; }
         .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 3px; min-height: 20px; font-size: 9.5pt; text-transform: uppercase; font-weight: bold; }
@@ -396,53 +397,56 @@
     </div>
 
     <div id="hojaFormatoMovimientos" class="hoja-excel-ieem">
-        <div class="ieem-excel-top">
-            <img src="ieemlogo.png" alt="IEEM" class="ieem-excel-logo" onerror="this.src='https://ieemoperacion-png.github.io/softwareieem/ieemlogo.png'">
-            <div style="flex: 1;">
-                <div class="ieem-excel-org">
-                    Dirección de Administración<br>
-                    Subdirección de Recursos Materiales<br>
-                    Departamento de Control Patrimonial
+        <div>
+            <div class="ieem-excel-top">
+                <img src="ieemlogo.png" alt="IEEM" class="ieem-excel-logo" onerror="this.src='https://ieemoperacion-png.github.io/softwareieem/ieemlogo.png'">
+                <div style="flex: 1;">
+                    <div class="ieem-excel-org">
+                        Dirección de Administración<br>
+                        Subdirección de Recursos Materiales<br>
+                        Departamento de Control Patrimonial
+                    </div>
+                    <div class="ieem-excel-fecha-row">
+                        <span>Fecha:</span>
+                        <span id="lblFechaActual" class="ieem-excel-fecha-val">--/--/----</span>
+                    </div>
+                    <div class="ieem-excel-linea-sep"></div>
                 </div>
-                <div class="ieem-excel-fecha-row">
-                    <span>Fecha:</span>
-                    <span id="lblFechaActual" class="ieem-excel-fecha-val">--/--/----</span>
-                </div>
-                <div class="ieem-excel-linea-sep"></div>
             </div>
+
+            <div class="ieem-excel-banner">Movimientos de Bienes Muebles</div>
+
+            <table class="ieem-excel-meta">
+                <tr><td class="meta-label">Área</td><td class="meta-valor" id="lblRespArea"></td></tr>
+                <tr><td class="meta-label">Departamento</td><td class="meta-valor" id="lblRespDepto"></td></tr>
+            </table>
+
+            <div class="ieem-excel-mov-row">
+                <div class="ieem-mov-opcion">
+                    <span>Entrada a Bodega</span>
+                    <span id="chkEntradaBodega" class="ieem-mov-cuadro"></span>
+                </div>
+                <div class="ieem-mov-opcion">
+                    <span>Salida por asignación</span>
+                    <span id="chkSalidaAsignacion" class="ieem-mov-cuadro"></span>
+                </div>
+            </div>
+
+            <table class="ieem-excel-grid">
+                <thead>
+                    <tr>
+                        <th style="width: 7%;">N.P.</th>
+                        <th style="width: 39%;">Descripción</th>
+                        <th style="width: 19%;">Estatus</th>
+                        <th style="width: 17%;">Número de Serie</th>
+                        <th style="width: 18%;">Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyFormatoExcel"></tbody>
+            </table>
         </div>
 
-        <div class="ieem-excel-banner">Movimientos de Bienes Muebles</div>
-
-        <table class="ieem-excel-meta">
-            <tr><td class="meta-label">Área</td><td class="meta-valor" id="lblRespArea"></td></tr>
-            <tr><td class="meta-label">Departamento</td><td class="meta-valor" id="lblRespDepto"></td></tr>
-        </table>
-
-        <div class="ieem-excel-mov-row">
-            <div class="ieem-mov-opcion">
-                <span>Entrada a Bodega</span>
-                <span id="chkEntradaBodega" class="ieem-mov-cuadro"></span>
-            </div>
-            <div class="ieem-mov-opcion">
-                <span>Salida por asignación</span>
-                <span id="chkSalidaAsignacion" class="ieem-mov-cuadro"></span>
-            </div>
-        </div>
-
-        <table class="ieem-excel-grid">
-            <thead>
-                <tr>
-                    <th style="width: 7%;">N.P.</th>
-                    <th style="width: 39%;">Descripción</th>
-                    <th style="width: 19%;">Estatus</th>
-                    <th style="width: 17%;">Número de Serie</th>
-                    <th style="width: 18%;">Observaciones</th>
-                </tr>
-            </thead>
-            <tbody id="tbodyFormatoExcel"></tbody>
-        </table>
-
+        <!-- Firmas perfectamente centradas y estables abajo -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
@@ -628,11 +632,33 @@
                 `${escaparHTML(nombreUsuarioLogueado)} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('appShell').style.display = 'flex';
+            
+            // Configurar columnas por defecto según el rol antes de renderizar
+            configurarColumnasPorDefecto();
+
             renderizarSubpaginas();
             await cargarInventarioNube();
         } catch (err) {
             mostrarMensajeAcceso('No se pudo inicializar el perfil: ' + err.message);
         }
+    }
+
+    function configurarColumnasPorDefecto() {
+        const checkboxes = document.querySelectorAll('#columnDropdown input[type="checkbox"]');
+        checkboxes.forEach(chk => {
+            const col = chk.getAttribute('data-col');
+            if (esDirAdmin || esSupAdmin) {
+                // Admin y SupAdmin: Todas activas por defecto
+                chk.checked = true;
+            } else {
+                // Consulta: Ocultar activo y grupo por defecto, las demás activas
+                if (col === 'activo' || col === 'grupo') {
+                    chk.checked = false;
+                } else {
+                    chk.checked = true;
+                }
+            }
+        });
     }
 
     function filaNubeARegistro(row) {
@@ -647,13 +673,24 @@
     }
 
     function registroAUpdateNube(item) {
-        return {
-            estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
-            area: item.area || null, departamento: item.departamento || null,
-            asignado: item.asignado || null, fecha_entrada: item.fEntrada || null,
-            fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
-            activo: item.activo || 'GENERAL', updated_at: new Date().toISOString()
+        // Objeto base sin 'activo' por si la columna no existe en la base de datos de Supabase
+        const payload = {
+            estatus: item.est || 'ALMACEN',
+            tapizada: item.tap || 'NO',
+            tarima: item.t ?? null,
+            area: item.area || null,
+            departamento: item.departamento || null,
+            asignado: item.asignado || null,
+            fecha_entrada: item.fEntrada || null,
+            fecha_salida: item.fSalida || null,
+            observaciones: item.observaciones || null,
+            updated_at: new Date().toISOString()
         };
+        // Intentar incluir activo si está presente
+        if (item.activo !== undefined) {
+            payload.activo = item.activo || 'GENERAL';
+        }
+        return payload;
     }
 
     async function cargarInventarioNube() {
@@ -809,7 +846,7 @@
                 </tr>`;
         });
         document.getElementById('total-elementos-crudos').innerText = lista.length;
-        actualizarVisibilidadColumnas(); // Aplicar estado de columnas seleccionadas
+        actualizarVisibilidadColumnas();
     }
 
     // =========================================================================
@@ -832,12 +869,10 @@
             const colName = chk.getAttribute('data-col');
             const mostrar = chk.checked;
             
-            // Ocultar/Mostrar en la Tabla Principal
             document.querySelectorAll(`[data-col="${colName}"]`).forEach(el => {
                 el.style.display = mostrar ? '' : 'none';
             });
 
-            // Ocultar/Mostrar campos equivalentes en el Modal de Edición
             document.querySelectorAll(`[data-campo-modal="${colName}"]`).forEach(el => {
                 el.style.display = mostrar ? '' : 'none';
             });
@@ -969,7 +1004,7 @@
         document.getElementById('btnSubirFoto').style.display = soloLectura ? 'none' : 'block';
 
         actualizarResponsivaEnModal(item);
-        actualizarVisibilidadColumnas(); // Asegurar sincronización con el modal de edición
+        actualizarVisibilidadColumnas();
         document.getElementById('modalEdicion').style.display = 'flex';
     }
 
@@ -1001,10 +1036,19 @@
 
         try {
             const payload = registroAUpdateNube(item);
-            const { error } = await sb.from('inventario').update(payload).eq('id', item.id);
+            let { error } = await sb.from('inventario').update(payload).eq('id', item.id);
+            
+            // Si la columna 'activo' no existe en Supabase, reintentamos sin ella para evitar el error
+            if (error && error.message && error.message.includes("activo")) {
+                delete payload.activo;
+                const res2 = await sb.from('inventario').update(payload).eq('id', item.id);
+                error = res2.error;
+            }
             if (error) throw error;
 
             await registrarMovimientoBitacora('EDITAR_REGISTRO', `Modificó el registro ID ${item.id} (Serie: ${item.s})`);
+            
+            // Cerrar modal y recargar tabla de inmediato
             cerrarEdicion();
             await cargarInventarioNube();
             alert('Cambios guardados correctamente.');
