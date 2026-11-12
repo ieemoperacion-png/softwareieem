@@ -76,7 +76,7 @@
         .btn-documento { border: 0; border-radius: 4px; min-width: 30px; min-height: 28px; padding: 4px 6px; color: #fff; background: rgba(0,0,0,.22); cursor: pointer; font-size: 14px; }
 
         /* =========================================================================
-           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL (FIRMAS PERFECTAMENTE CENTRADAS)
+           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL (FIRMAS PERFECTAMENTE SEPARADAS)
            ========================================================================= */
         .modal-responsiva { display: none; position: fixed; z-index: 4500; inset: 0; background-color: rgba(0, 0, 0, 0.72); overflow-y: auto; justify-content: center; align-items: flex-start; padding: 65px 15px 30px; box-sizing: border-box; }
         .modal-botones-barra { position: fixed; top: 0; left: 0; right: 0; z-index: 4600; background: #1b263b; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
@@ -107,11 +107,12 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Firmas perfectamente espaciadas y sin encimarse */
-        .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 30px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
-        .ieem-firma-col { width: 44%; text-align: center; position: relative; }
-        .ieem-firma-titulo { font-weight: bold; margin-bottom: 70px; }
-        .ieem-firma-img-auth { position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%); max-height: 60px; max-width: 180px; object-fit: contain; pointer-events: none; }
+        /* Bloque de firmas con separación estricta para evitar solapamiento */
+        .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 25px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
+        .ieem-firma-col { width: 44%; text-align: center; }
+        .ieem-firma-titulo { font-weight: bold; margin-bottom: 10px; min-height: 24px; display: flex; align-items: center; justify-content: center; }
+        .ieem-firma-espacio-img { height: 62px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+        .ieem-firma-img-auth { max-height: 58px; max-width: 170px; object-fit: contain; pointer-events: none; }
         .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 4px; min-height: 22px; font-size: 9.5pt; text-transform: uppercase; font-weight: bold; }
         .ieem-firma-pie { font-weight: bold; padding-top: 5px; font-size: 9.5pt; }
 
@@ -446,22 +447,26 @@
             </table>
         </div>
 
-        <!-- Firmas perfectamente centradas, sin encimar y con opción de checkbox para editar -->
+        <!-- Bloque de Firmas sin solapamiento y con opción de activación exclusiva para DIRADMIN / SUPADMIN -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
+                <div class="ieem-firma-espacio-img"></div>
                 <div id="lblSolicitanteNombre" class="ieem-firma-nombre"></div>
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
             <div class="ieem-firma-col">
-                <div class="ieem-firma-titulo" style="display:flex; justify-content:center; align-items:center; gap:6px; margin-bottom:5px;">
-                    <span>Entrega / Recibe</span>
-                    <label style="font-size:10px; font-weight:normal; cursor:pointer;" title="Habilitar edición de nombre y firma">
-                        <input type="checkbox" id="checkHabilitarFirma" onchange="toggleEdicionNombreEntrega(this.checked)"> Editar
+                <div class="ieem-firma-titulo">
+                    <span id="tituloEntregaTexto">Entrega / Recibe</span>
+                    <!-- Checkbox de activación de firma/persona exclusiva para Admins -->
+                    <label id="wrapCheckAdminFirma" style="display:none; font-size:10px; font-weight:normal; cursor:pointer; margin-left:6px;" title="Incluir o quitar firma/persona">
+                        <input type="checkbox" id="checkHabilitarFirma" onchange="toggleFirmaEntregaAdmin(this.checked)"> Incluir
                     </label>
                 </div>
-                <img src="firmaautorizacion.jpg" alt="Firma" class="ieem-firma-img-auth" onerror="this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg'">
-                <div id="lblEntregaNombre" class="ieem-firma-nombre" style="border:none; padding:0;">LAZARO SEGURA MUCIÑO</div>
+                <div class="ieem-firma-espacio-img" id="contenedorFirmaGrafica">
+                    <img src="firmaautorizacion.jpg" alt="Firma" class="ieem-firma-img-auth" onerror="this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg'">
+                </div>
+                <div id="lblEntregaNombre" class="ieem-firma-nombre">LAZARO SEGURA MUCIÑO</div>
                 <div id="editEntregaContainer" style="margin-top:2px; display:none;"></div>
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
@@ -526,6 +531,23 @@
                         <label for="editFSalida">Fecha de Salida</label>
                         <input type="date" id="editFSalida">
                     </div>
+                    
+                    <!-- NUEVOS CAMPOS EXCLUSIVOS EN MODAL PARA DIRADMIN / SUPADMIN (IMAGEN 2) -->
+                    <div class="campo-edicion campo-completo" id="bloqueConfigPersonaEntrega" style="display:none; background:#f1f4f9; padding:12px; border-radius:6px; border:1px solid #cbd5e1;">
+                        <label style="color:#002060; font-size:13px; margin-bottom:6px; display:block;">⚙️ Configuración Persona que Entrega (Carta Responsiva)</label>
+                        <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;">
+                            <div>
+                                <label for="inputPersonaEntregaModal" style="font-size:11px;">Nombre de la persona que entrega:</label>
+                                <input type="text" id="inputPersonaEntregaModal" value="LAZARO SEGURA MUCIÑO" placeholder="Nombre completo">
+                            </div>
+                            <div style="padding-top:16px;">
+                                <label style="font-size:12px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px;">
+                                    <input type="checkbox" id="checkMostrarEntregaModal" checked onchange="toggleEstadoEntregaModal(this.checked)"> Mostrar firma/persona
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="campo-edicion campo-completo" data-campo-modal="observaciones">
                         <label for="editObservaciones">Observaciones</label>
                         <textarea id="editObservaciones" placeholder="Observaciones..."></textarea>
@@ -561,6 +583,12 @@
     let archivosPorItem = {};
     let filtroKpiActivo = 'TODOS';
     let datosFiltradosActuales = [];
+
+    // Estado global de configuración de entrega para cartas responsivas
+    let configEntregaGlobal = {
+        nombre: 'LAZARO SEGURA MUCIÑO',
+        mostrar: true
+    };
 
     const BUCKET_DOCUMENTOS = 'inventario-documentos';
 
@@ -652,10 +680,8 @@
         checkboxes.forEach(chk => {
             const col = chk.getAttribute('data-col');
             if (esDirAdmin || esSupAdmin) {
-                // Admin y SupAdmin: Todas las columnas visibles por defecto
                 chk.checked = true;
             } else {
-                // Consulta: Ocultar activo y grupo por defecto
                 if (col === 'activo' || col === 'grupo') {
                     chk.checked = false;
                 } else {
@@ -882,7 +908,7 @@
     }
 
     // =========================================================================
-    // CARTA RESPONSIVA: ENTRADA / SALIDA AUTOMÁTICA Y CHECKBOX DE EDICIÓN DE FIRMA
+    // CARTA RESPONSIVA: GESTIÓN DE FIRMA Y CONFIGURACIÓN ADMIN / SUPADMIN
     // =========================================================================
     function abrirModalResponsiva(id) {
         const item = db.find(r => r.id === id);
@@ -935,27 +961,46 @@
 
         document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
 
-        // Resetear checkbox y contenedor de nombre de entrega
-        document.getElementById('checkHabilitarFirma').checked = false;
+        // Aplicar estado de visibilidad y nombre configurado para Entrega (para DirAdmin / SupAdmin)
+        const wrapCheck = document.getElementById('wrapCheckAdminFirma');
+        const checkHabilitar = document.getElementById('checkHabilitarFirma');
+        const contenedorFirma = document.getElementById('contenedorFirmaGrafica');
         const nombreEntregaEl = document.getElementById('lblEntregaNombre');
-        const edCont = document.getElementById('editEntregaContainer');
-        nombreEntregaEl.style.display = 'block';
-        edCont.style.display = 'none';
-        edCont.innerHTML = `<input type="text" id="inputNombreEntrega" value="LAZARO SEGURA MUCIÑO" style="width:90%; padding:3px; text-align:center; font-weight:bold; font-size:9.5pt; border:1px solid #999;">`;
+
+        if (esDirAdmin || esSupAdmin) {
+            wrapCheck.style.display = 'inline-block';
+            checkHabilitar.checked = configEntregaGlobal.mostrar;
+        } else {
+            wrapCheck.style.display = 'none';
+        }
+
+        nombreEntregaEl.textContent = configEntregaGlobal.nombre;
+        if (configEntregaGlobal.mostrar) {
+            contenedorFirma.style.display = 'flex';
+            nombreEntregaEl.style.display = 'block';
+        } else {
+            contenedorFirma.style.display = 'none';
+            nombreEntregaEl.style.display = 'none';
+        }
 
         document.getElementById('modalResponsiva').style.display = 'flex';
     }
 
-    function toggleEdicionNombreEntrega(activar) {
+    function toggleFirmaEntregaAdmin(mostrar) {
+        configEntregaGlobal.mostrar = mostrar;
+        const contenedorFirma = document.getElementById('contenedorFirmaGrafica');
         const nombreEntregaEl = document.getElementById('lblEntregaNombre');
-        const edCont = document.getElementById('editEntregaContainer');
-        if (activar) {
-            nombreEntregaEl.style.display = 'none';
-            edCont.style.display = 'block';
-        } else {
+        if (mostrar) {
+            contenedorFirma.style.display = 'flex';
             nombreEntregaEl.style.display = 'block';
-            edCont.style.display = 'none';
+        } else {
+            contenedorFirma.style.display = 'none';
+            nombreEntregaEl.style.display = 'none';
         }
+    }
+
+    function toggleEstadoEntregaModal(mostrar) {
+        configEntregaGlobal.mostrar = mostrar;
     }
 
     function cerrarResponsivaModal() {
@@ -1010,6 +1055,16 @@
         document.getElementById('editFSalida').value = item.fSalida || '';
         document.getElementById('editObservaciones').value = item.observaciones || '';
 
+        // Mostrar bloque exclusivo de configuración de persona que entrega para DIRADMIN y SUPADMIN (Imagen 2)
+        const bloqueConfig = document.getElementById('bloqueConfigPersonaEntrega');
+        if (esDirAdmin || esSupAdmin) {
+            bloqueConfig.style.display = 'block';
+            document.getElementById('inputPersonaEntregaModal').value = configEntregaGlobal.nombre;
+            document.getElementById('checkMostrarEntregaModal').checked = configEntregaGlobal.mostrar;
+        } else {
+            bloqueConfig.style.display = 'none';
+        }
+
         ['editEstatus','editActivo','editArea','editDepartamento','editTapizada','editTarima','editAsignado','editFEntrada','editFSalida','editObservaciones']
             .forEach(idC => document.getElementById(idC).disabled = soloLectura);
         document.querySelector('.btn-guardar').style.display = soloLectura ? 'none' : '';
@@ -1045,6 +1100,14 @@
         item.fEntrada = document.getElementById('editFEntrada').value;
         item.fSalida = document.getElementById('editFSalida').value;
         item.observaciones = document.getElementById('editObservaciones').value.trim();
+
+        // Guardar configuración de la persona que entrega si es admin
+        const inputEntrega = document.getElementById('inputPersonaEntregaModal');
+        const checkMostrar = document.getElementById('checkMostrarEntregaModal');
+        if (inputEntrega) {
+            configEntregaGlobal.nombre = inputEntrega.value.trim() || 'LAZARO SEGURA MUCIÑO';
+            configEntregaGlobal.mostrar = checkMostrar.checked;
+        }
 
         try {
             const payload = registroAUpdateNube(item);
