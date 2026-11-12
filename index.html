@@ -138,28 +138,27 @@
             }
             body * { visibility: hidden; }
             #modalResponsiva, #modalResponsiva * { visibility: visible; }
-            #modalResponsiva { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                height: 100%;
-                background: #fff !important; 
-                padding: 0 !important; 
-                overflow: hidden !important; 
+            html, body { width:  letter !important; height:  279.4mm !important; margin:0 !important; padding:0 !important; overflow:hidden !important; }
+            #modalResponsiva {
+                display:flex !important; position:fixed !important; inset:0 !important;
+                width:100% !important; height:100% !important; min-height:0 !important;
+                align-items:center !important; justify-content:center !important;
+                background:#fff !important; padding:0 !important; overflow:hidden !important;
             }
-            .modal-botones-barra { display: none !important; }
-            .hoja-excel-ieem { 
-                box-shadow: none !important; 
-                margin: 0 auto !important; 
-                width: 100% !important; 
-                max-width: 100% !important;
-                height: 268mm !important;
-                max-height: 268mm !important; 
-                padding: 0 !important; 
-                page-break-after: avoid;
-                page-break-inside: avoid;
+            .modal-botones-barra { display:none !important; }
+            .hoja-excel-ieem {
+                display:flex !important; position:absolute !important; left:50% !important; top:50% !important;
+                transform:translate(-50%,-50%) !important; transform-origin:center center !important;
+                box-shadow:none !important; margin:0 !important;
+                width:190mm !important; max-width:190mm !important;
+                height:258mm !important; min-height:258mm !important; max-height:258mm !important;
+                padding:5mm 7mm !important; overflow:hidden !important;
+                page-break-before:avoid !important; page-break-after:avoid !important; page-break-inside:avoid !important;
+                break-inside:avoid !important;
             }
+            .ieem-excel-grid { font-size:7.5pt !important; }
+            .ieem-excel-grid th, .ieem-excel-grid td { font-size:7.5pt !important; padding:1px 3px !important; height:13px !important; }
+            .ieem-excel-firmas { margin-top:8px !important; }
         }
 
         /* Modal Edición */
@@ -208,26 +207,52 @@
         .btn-salir { border:1px solid #ccd2dc; border-radius:4px; background:#fff; color:#334; padding:8px 11px; cursor:pointer; }
         .etiqueta-rol { font-weight:bold; color:#002060; }
 
-        /* Estilo Adaptable Móvil */
+        /* Estructura adaptable y menú lateral plegable */
         #appShell { width:100%; min-height:100vh; margin:0; padding:0; display:none; align-items:stretch; background:#f3f4f8; }
-        .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; padding:22px 14px; background:#dedfe2; border-right:1px solid #c8cbd0; }
+        .app-sidebar { width:238px; flex:0 0 238px; min-height:100vh; padding:22px 14px; background:#dedfe2; border-right:1px solid #c8cbd0; box-sizing:border-box; transition:width .25s ease, flex-basis .25s ease, padding .25s ease; overflow:hidden; }
         .sidebar-brand { font-size:20px; font-weight:800; color:#343a40; padding:8px 12px 26px; border-bottom:1px solid #c3c6ca; margin-bottom:18px; }
         .sidebar-logo { display:block; width:112px; max-height:58px; object-fit:contain; margin:0 0 12px; }
         .sidebar-link, .sidebar-page-link, .sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
         .sidebar-link:hover { background:#c9ccd1; }
         .app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
-        .mobile-topbar { display:none; }
+        .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 0 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; }
+        .hamburger { flex:0 0 auto; border:0; background:transparent; color:#263238; font-size:26px; line-height:1; cursor:pointer; padding:4px 8px; }
+        .sidebar-backdrop { display:none; }
+        #appShell.sidebar-collapsed .app-sidebar { width:0; flex-basis:0; padding-left:0; padding-right:0; border:0; }
+        .table-responsive { max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .inventory-list-section { min-width:0; }
+        .search-container { max-width:100%; }
 
         @media(max-width:700px) {
             #appShell { display:block; }
-            .app-main { padding:10px; }
-            .mobile-topbar { display:flex; position:sticky; top:0; z-index:1200; align-items:center; gap:12px; margin:0 -10px 12px; padding:10px 12px; background:#dedfe2; border-bottom:1px solid #c8cbd0; }
-            .hamburger { border:0; background:transparent; font-size:25px; cursor:pointer; }
-            .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); transform:translateX(-105%); transition:transform .25s ease; }
+            .app-main { padding:0 10px 12px; }
+            .mobile-topbar { margin:0 -10px 12px; }
+            .app-sidebar { position:fixed; z-index:1500; top:0; bottom:0; left:0; width:min(82vw,290px); min-height:100dvh; transform:translateX(-105%); transition:transform .25s ease; box-shadow:3px 0 18px rgba(0,0,0,.18); }
             .app-sidebar.menu-open { transform:translateX(0); }
-            .kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
-            .main-grid, .btn-excel { display: none !important; }
-
+            .sidebar-backdrop.show { display:block; position:fixed; inset:0; z-index:1400; background:rgba(0,0,0,.42); }
+            .kpi-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+            .kpi-card { min-width:0; padding:10px; }
+            .kpi-card h3 { font-size:21px; }
+            .main-grid, .btn-excel { display:none !important; }
+            .filtros-superiores { gap:8px; padding:10px; }
+            .filtro-grupo { min-width:100%; }
+            .inventory-list-section > div:first-child { align-items:stretch !important; }
+            .search-container { display:block; width:100%; }
+            .search-container input { width:100%; min-height:42px; font-size:15px; }
+            .table-responsive { overflow-x:hidden; border-radius:10px; }
+            .table-responsive table:not(#tabla-resumen) { width:100% !important; min-width:0 !important; table-layout:fixed; font-size:12px; }
+            .table-responsive table:not(#tabla-resumen) th,
+            .table-responsive table:not(#tabla-resumen) td { padding:8px 4px; white-space:normal; overflow-wrap:anywhere; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="foto"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] { width:15%; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="serie"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="serie"] { width:10%; font-size:11px; font-weight:bold; word-break:break-all; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="modelo"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="modelo"] { width:29%; text-align:left; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="estatus"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="estatus"] { width:18%; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="acciones"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="acciones"] { width:28%; }
             th[data-col="id"], td[data-col="id"],
             th[data-col="activo"], td[data-col="activo"],
             th[data-col="grupo"], td[data-col="grupo"],
@@ -236,10 +261,22 @@
             th[data-col="area"], td[data-col="area"],
             th[data-col="departamento"], td[data-col="departamento"],
             th[data-col="asignado"], td[data-col="asignado"],
-            th[data-col="archivos"], td[data-col="archivos"] {
-                display: none !important;
-            }
-            table { min-width: 100% !important; }
+            th[data-col="archivos"], td[data-col="archivos"],
+            th[data-col="responsiva"], td[data-col="responsiva"] { display:none !important; }
+            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] img { width:100% !important; max-width:76px; height:64px !important; object-fit:cover; }
+            .btn-ver, .btn-editar { width:auto; min-width:68px; height:38px; border-radius:10px; padding:0 10px; }
+        }
+
+        /* Vista previa centrada y formato carta */
+        .modal-responsiva { align-items:center; padding:68px 12px 16px; }
+        .hoja-excel-ieem { width:190mm; max-width:calc(100vw - 24px); min-height:258mm; margin:0 auto; }
+        @media(max-width:700px) {
+            .modal-responsiva { align-items:flex-start; padding:64px 8px 12px; }
+            .modal-botones-barra { padding:8px; justify-content:center; }
+            .modal-botones-barra > div:first-child { display:none; }
+            .modal-botones-grupo { justify-content:center; gap:6px; }
+            .btn-accion-pdf, .btn-accion-imprimir, .btn-accion-cerrar { padding:8px 10px; font-size:12px; }
+            .hoja-excel-ieem { width:190mm; max-width:none; min-height:258mm; padding:6mm 7mm; transform:scale(.48); transform-origin:top center; margin-bottom:-135mm; }
         }
     </style>
 </head>
@@ -1056,11 +1093,12 @@
         btn.disabled = true; btn.textContent = 'Generando...';
         try {
             await html2pdf().set({
-                margin: [4, 4, 4, 4],
+                margin: [5, 5, 5, 5],
                 filename: `Responsiva_${itemResponsivaActual?.s || 'IEEM'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                pagebreak: { mode: ['avoid-all'] },
+                jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true }
             }).from(elemento).save();
         } catch(e) { alert('Error al descargar PDF'); }
         finally { btn.disabled = false; btn.textContent = '📥 Descargar PDF'; }
@@ -1299,8 +1337,19 @@
     function limpiarBuscador() { document.getElementById('buscador-crudo').value = ''; aplicarFiltrosTabla(); }
     function irCatalogo() { window.open('https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0', '_blank'); }
     function toggleMenuMovil(forzar) {
+        const shell = document.getElementById('appShell');
         const sb = document.getElementById('appSidebar');
-        sb.classList.toggle('menu-open', typeof forzar === 'boolean' ? forzar : !sb.classList.contains('menu-open'));
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const esMovil = window.matchMedia('(max-width: 700px)').matches;
+        if (esMovil) {
+            const abrir = typeof forzar === 'boolean' ? forzar : !sb.classList.contains('menu-open');
+            sb.classList.toggle('menu-open', abrir);
+            if (backdrop) backdrop.classList.toggle('show', abrir);
+            document.body.style.overflow = abrir ? 'hidden' : '';
+        } else {
+            const plegar = typeof forzar === 'boolean' ? !forzar : !shell.classList.contains('sidebar-collapsed');
+            shell.classList.toggle('sidebar-collapsed', plegar);
+        }
     }
     function renderizarSubpaginas() {}
     function agregarSubpagina() {}
