@@ -130,36 +130,8 @@
         .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 3px; min-height: 20px; font-size: 9pt; text-transform: uppercase; font-weight: bold; }
         .ieem-firma-pie { font-weight: bold; padding-top: 4px; font-size: 9pt; }
 
-        /* REGLA DE IMPRESIÓN FORZADA A 1 SOLA PÁGINA CARTA */
-        @media print {
-            @page {
-                size: letter portrait;
-                margin: 5mm;
-            }
-            body * { visibility: hidden; }
-            #modalResponsiva, #modalResponsiva * { visibility: visible; }
-            html, body { width:  letter !important; height:  279.4mm !important; margin:0 !important; padding:0 !important; overflow:hidden !important; }
-            #modalResponsiva {
-                display:flex !important; position:fixed !important; inset:0 !important;
-                width:100% !important; height:100% !important; min-height:0 !important;
-                align-items:center !important; justify-content:center !important;
-                background:#fff !important; padding:0 !important; overflow:hidden !important;
-            }
-            .modal-botones-barra { display:none !important; }
-            .hoja-excel-ieem {
-                display:flex !important; position:absolute !important; left:50% !important; top:50% !important;
-                transform:translate(-50%,-50%) !important; transform-origin:center center !important;
-                box-shadow:none !important; margin:0 !important;
-                width:190mm !important; max-width:190mm !important;
-                height:258mm !important; min-height:258mm !important; max-height:258mm !important;
-                padding:5mm 7mm !important; overflow:hidden !important;
-                page-break-before:avoid !important; page-break-after:avoid !important; page-break-inside:avoid !important;
-                break-inside:avoid !important;
-            }
-            .ieem-excel-grid { font-size:7.5pt !important; }
-            .ieem-excel-grid th, .ieem-excel-grid td { font-size:7.5pt !important; padding:1px 3px !important; height:13px !important; }
-            .ieem-excel-firmas { margin-top:8px !important; }
-        }
+        /* La impresión se realiza en una ventana independiente; el modal no se imprime. */
+        @media print { body { background:#fff !important; margin:0 !important; padding:0 !important; } }
 
         /* Modal Edición */
         .modal-edicion { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,.65); align-items: center; justify-content: center; padding: 15px; }
@@ -264,19 +236,34 @@
             th[data-col="archivos"], td[data-col="archivos"],
             th[data-col="responsiva"], td[data-col="responsiva"] { display:none !important; }
             .table-responsive table:not(#tabla-resumen) td[data-col="foto"] img { width:100% !important; max-width:76px; height:64px !important; object-fit:cover; }
-            .btn-ver, .btn-editar { width:auto; min-width:68px; height:38px; border-radius:10px; padding:0 10px; }
+            .btn-ver, .btn-editar { width:100%; min-width:0; height:38px; border-radius:10px; padding:0 8px; }
+            .acciones-inventario { display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:7px; min-width:0; }
+            .btn-imprimir-movil { display:flex; align-items:center; justify-content:center; gap:5px; width:100%; min-height:34px; padding:5px 3px; border:0; border-radius:8px; background:#002060; color:#fff; font-size:11px; font-weight:700; cursor:pointer; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="acciones"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="acciones"] { width:25%; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="foto"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="foto"] { width:15%; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="serie"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="serie"] { width:16%; word-break:normal; overflow-wrap:anywhere; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="modelo"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="modelo"] { width:27%; }
+            .table-responsive table:not(#tabla-resumen) th[data-col="estatus"],
+            .table-responsive table:not(#tabla-resumen) td[data-col="estatus"] { width:17%; }
         }
+        .acciones-inventario { display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+        .btn-imprimir-movil { display:none; }
 
-        /* Vista previa centrada y formato carta */
-        .modal-responsiva { align-items:center; padding:68px 12px 16px; }
-        .hoja-excel-ieem { width:190mm; max-width:calc(100vw - 24px); min-height:258mm; margin:0 auto; }
+        /* Vista previa: escala visual adaptable sin alterar las dimensiones de impresión. */
+        .modal-responsiva { align-items:flex-start; padding:68px 12px 20px; }
+        .hoja-excel-ieem { width:190mm; max-width:100%; min-height:258mm; margin:0 auto; }
         @media(max-width:700px) {
-            .modal-responsiva { align-items:flex-start; padding:64px 8px 12px; }
+            .btn-imprimir-movil { display:flex !important; }
+            .modal-responsiva { align-items:flex-start; padding:64px 6px 12px; }
             .modal-botones-barra { padding:8px; justify-content:center; }
             .modal-botones-barra > div:first-child { display:none; }
             .modal-botones-grupo { justify-content:center; gap:6px; }
             .btn-accion-pdf, .btn-accion-imprimir, .btn-accion-cerrar { padding:8px 10px; font-size:12px; }
-            .hoja-excel-ieem { width:190mm; max-width:none; min-height:258mm; padding:6mm 7mm; transform:scale(.48); transform-origin:top center; margin-bottom:-135mm; }
+            .hoja-excel-ieem { width:100%; max-width:100%; min-height:0; padding:5mm; transform:none; margin:0 auto; }
         }
     </style>
 </head>
@@ -765,15 +752,13 @@
         checkboxes.forEach(chk => {
             const col = chk.getAttribute('data-col');
             if (esDirAdmin || esSupAdmin) {
-                chk.checked = true; // Predeterminado completas para administradores
+                // DIRADMIN y SUPADMIN inician con todas las columnas habilitadas en escritorio.
+                chk.checked = true;
             } else {
-                if (col === 'activo' || col === 'grupo') {
-                    chk.checked = false;
-                } else {
-                    chk.checked = true;
-                }
+                chk.checked = !(col === 'activo' || col === 'grupo');
             }
         });
+        actualizarVisibilidadColumnas();
     }
 
     function filaNubeARegistro(row) {
@@ -819,7 +804,6 @@
         await cargarArchivosNube();
         poblarFiltrosSuperiores();
         aplicarFiltrosTabla();
-        calcularYRenderizarMetricas();
     }
 
     async function cargarArchivosNube() {
@@ -916,6 +900,7 @@
         });
 
         renderizarTablaCruda(datosFiltradosActuales);
+        calcularYRenderizarMetricas(datosFiltradosActuales);
     }
 
     function renderizarTablaCruda(lista) {
@@ -954,7 +939,10 @@
                         <button class="btn-imprimir-responsiva" title="Generar Carta Responsiva" onclick="abrirModalResponsiva(${item.id})">🖨️</button>
                     </td>
                     <td data-col="acciones">
-                        <button class="${puedeModificar ? 'btn-editar' : 'btn-ver'}" title="${puedeModificar ? 'Editar' : 'Consultar'}" onclick="abrirEdicion(${item.id})">${puedeModificar ? '✎' : '👁'}</button>
+                        <div class="acciones-inventario">
+                            <button class="${puedeModificar ? 'btn-editar' : 'btn-ver'}" title="${puedeModificar ? 'Editar' : 'Consultar'}" onclick="abrirEdicion(${item.id})">${puedeModificar ? '✎' : '👁'}</button>
+                            <button class="btn-imprimir-movil" title="Imprimir carta responsiva" aria-label="Imprimir carta responsiva" onclick="abrirModalResponsiva(${item.id})">🖨️ Imprimir</button>
+                        </div>
                     </td>
                 </tr>`;
         });
@@ -1085,23 +1073,88 @@
         document.getElementById('modalResponsiva').style.display = 'none';
     }
 
-    function imprimirResponsiva() { window.print(); }
+    function crearHojaParaSalida() {
+        const original = document.getElementById('hojaFormatoMovimientos');
+        const hoja = original.cloneNode(true);
+        hoja.removeAttribute('id');
+        hoja.style.cssText = 'box-sizing:border-box;width:200mm;height:263mm;min-height:263mm;max-height:263mm;padding:6mm 7mm;margin:0;background:#fff;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;font-family:Arial,Helvetica,sans-serif;color:#000;';
+        hoja.querySelectorAll('.ieem-excel-grid th,.ieem-excel-grid td').forEach(celda => {
+            celda.style.fontSize = '7.5pt';
+            celda.style.padding = '1px 3px';
+            celda.style.height = '12px';
+        });
+        return hoja;
+    }
+
+    function imprimirResponsiva() {
+        const ventana = window.open('', '_blank', 'width=1000,height=800');
+        if (!ventana) {
+            alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes para este sitio e inténtalo de nuevo.');
+            return;
+        }
+        const hoja = crearHojaParaSalida();
+        const estilos = Array.from(document.querySelectorAll('style')).map(st => st.innerHTML).join('\n');
+        ventana.addEventListener('load', async () => {
+            const printSheet = ventana.document.querySelector('.hoja-excel-ieem');
+            if (!printSheet) { ventana.close(); return; }
+            const imgs = Array.from(ventana.document.images);
+            await Promise.all(imgs.map(img => img.decode ? img.decode().catch(() => {}) : Promise.resolve()));
+            // Encoge proporcionalmente solo si el contenido excede el área imprimible.
+            const anchoDisponible = 200 * 96 / 25.4;
+            const altoDisponible = 263 * 96 / 25.4;
+            const escala = Math.min(1, anchoDisponible / Math.max(printSheet.scrollWidth, 1), altoDisponible / Math.max(printSheet.scrollHeight, 1));
+            printSheet.style.transform = `scale(${escala})`;
+            printSheet.style.transformOrigin = 'center center';
+            setTimeout(() => { ventana.focus(); ventana.print(); }, 350);
+        }, { once:true });
+        ventana.document.open();
+        ventana.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Carta responsiva IEEM</title><style>${estilos}
+            @page { size: letter portrait; margin: 8mm; }
+            html,body { width:100%; height:100%; margin:0!important; padding:0!important; background:#fff!important; }
+            body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            .print-page { width:100%; height:263mm; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+            .print-page .hoja-excel-ieem { flex:none!important; box-shadow:none!important; page-break-inside:avoid!important; break-inside:avoid!important; }
+            @media print { html,body { overflow:hidden!important; } .print-page { page-break-after:avoid!important; break-after:avoid!important; } }
+        </style></head><body><main class="print-page" id="printPage"></main></body></html>`);
+        ventana.document.close();
+        ventana.document.getElementById('printPage').appendChild(ventana.document.importNode(hoja, true));
+    }
 
     async function descargarResponsivaPDF() {
-        const elemento = document.getElementById('hojaFormatoMovimientos');
         const btn = document.getElementById('btnDescargarPdfResp');
         btn.disabled = true; btn.textContent = 'Generando...';
+        let temporal;
         try {
+            temporal = document.createElement('div');
+            temporal.style.cssText = 'position:fixed;left:-10000px;top:0;width:200mm;height:263mm;overflow:hidden;background:#fff;z-index:-1;';
+            const hoja = crearHojaParaSalida();
+            temporal.appendChild(hoja);
+            document.body.appendChild(temporal);
+            await Promise.all(Array.from(hoja.querySelectorAll('img')).map(img => img.decode ? img.decode().catch(() => {}) : Promise.resolve()));
+            const anchoDisponible = 200 * 96 / 25.4;
+            const altoDisponible = 263 * 96 / 25.4;
+            const escala = Math.min(1, anchoDisponible / Math.max(hoja.scrollWidth, 1), altoDisponible / Math.max(hoja.scrollHeight, 1));
+            hoja.style.transform = `scale(${escala})`;
+            hoja.style.transformOrigin = 'top left';
             await html2pdf().set({
-                margin: [5, 5, 5, 5],
+                margin: 0,
                 filename: `Responsiva_${itemResponsivaActual?.s || 'IEEM'}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-                pagebreak: { mode: ['avoid-all'] },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', width: anchoDisponible, height: altoDisponible, windowWidth: anchoDisponible },
+                pagebreak: { mode: [] },
                 jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait', compress: true }
-            }).from(elemento).save();
-        } catch(e) { alert('Error al descargar PDF'); }
-        finally { btn.disabled = false; btn.textContent = '📥 Descargar PDF'; }
+            }).from(hoja).toPdf().get('pdf').then(pdf => {
+                // Garantiza un único folio carta aunque el motor detecte desbordamiento residual.
+                while (pdf.internal.getNumberOfPages() > 1) pdf.deletePage(pdf.internal.getNumberOfPages());
+                return pdf.save(`Responsiva_${itemResponsivaActual?.s || 'IEEM'}.pdf`);
+            });
+        } catch(e) {
+            console.error('Error generando PDF de responsiva:', e);
+            alert('No fue posible generar el PDF. Revisa que el navegador permita descargar archivos.');
+        } finally {
+            if (temporal?.parentNode) temporal.parentNode.removeChild(temporal);
+            btn.disabled = false; btn.textContent = '📥 Descargar PDF';
+        }
     }
 
     function abrirEdicion(id) {
@@ -1282,12 +1335,14 @@
         a.click();
     }
 
-    function calcularYRenderizarMetricas() {
-        let totalItems = db.length;
-        let totalSI = db.filter(i => String(i.tap).toUpperCase() === 'SI').length;
-        let totalNO = db.filter(i => String(i.tap).toUpperCase() === 'NO').length;
-        let totalAsig = db.filter(i => String(i.est).toUpperCase() === 'ASIGNADAS').length;
-        let totalEnt = db.filter(i => String(i.est).toUpperCase() === 'ENTRADA').length;
+    function calcularYRenderizarMetricas(registros = datosFiltradosActuales) {
+        // La tabla resumen, las tarjetas y la gráfica responden a los mismos filtros activos.
+        const conjunto = Array.isArray(registros) ? registros : [];
+        let totalItems = conjunto.length;
+        let totalSI = conjunto.filter(i => String(i.tap).toUpperCase() === 'SI').length;
+        let totalNO = conjunto.filter(i => String(i.tap).toUpperCase() === 'NO').length;
+        let totalAsig = conjunto.filter(i => String(i.est).toUpperCase() === 'ASIGNADAS').length;
+        let totalEnt = conjunto.filter(i => String(i.est).toUpperCase() === 'ENTRADA').length;
 
         document.getElementById('kpi-total').innerText = totalItems;
         document.getElementById('kpi-asignados').innerText = totalAsig;
@@ -1296,14 +1351,15 @@
         document.getElementById('kpi-no').innerText = totalNO;
 
         let resumen = {};
-        db.forEach(item => {
-            if (!resumen[item.m]) resumen[item.m] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0, entrada: 0 };
-            if (item.tap === 'NO') resumen[item.m].no++;
-            if (item.tap === 'SI') resumen[item.m].si++;
-            if (item.est === 'ALMACEN') resumen[item.m].almacen++;
-            if (item.est === 'ASIGNADAS') resumen[item.m].asignadas++;
-            if (item.est === 'ENTRADA') resumen[item.m].entrada++;
-            resumen[item.m].total++;
+        conjunto.forEach(item => {
+            const modelo = item.m || 'SIN MODELO';
+            if (!resumen[modelo]) resumen[modelo] = { no: 0, si: 0, total: 0, almacen: 0, asignadas: 0, entrada: 0 };
+            if (item.tap === 'NO') resumen[modelo].no++;
+            if (item.tap === 'SI') resumen[modelo].si++;
+            if (item.est === 'ALMACEN') resumen[modelo].almacen++;
+            if (item.est === 'ASIGNADAS') resumen[modelo].asignadas++;
+            if (item.est === 'ENTRADA') resumen[modelo].entrada++;
+            resumen[modelo].total++;
         });
 
         const sbBody = document.getElementById('summary-body');
