@@ -10,10 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; background: #f8f9fa; margin: 0; padding: 15px; color: #333; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f8f9fa; margin: 0; padding: 15px; color: #333; box-sizing: border-box; }
         
-        /* CORRECCIÓN: Se amplía el ancho máximo para aprovechar toda la pantalla */
-        .container { max-width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .container { max-width: 100%; width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
         
         .header { border-bottom: 2px solid #002060; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .header h2 { color: #002060; margin: 0; font-size: 22px; }
@@ -34,7 +33,7 @@
         .filtros-superiores { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; background: #f1f4f9; padding: 14px; border-radius: 6px; align-items: center; border: 1px solid #e2e8f0; }
         .filtro-grupo { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 190px; }
         .filtro-grupo label { font-size: 11px; font-weight: bold; color: #444; text-transform: uppercase; }
-        .filtro-grupo select { width: 100%; padding: 7px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; background: #fff; }
+        .filtro-grupo select { width: 100%; padding: 7px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; background: #fff; box-sizing: border-box; }
 
         .main-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; }
         .panel-left { flex: 1.3; min-width: 320px; }
@@ -42,14 +41,11 @@
         
         .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 15px; }
         
-        /* CORRECCIÓN: Se añade min-width para evitar el amontonamiento y forzar el scroll horizontal limpio */
         table { width: 100%; min-width: 1150px; border-collapse: collapse; text-align: center; font-size: 12px; table-layout: auto; }
         
-        /* CORRECCIÓN: Celdas limpias sin cortes bruscos de palabras */
         th, td { padding: 8px 10px; border: 1px solid #dee2e6; vertical-align: middle; white-space: nowrap; }
         th { background: #002060; color: white; font-size: 11px; }
         
-        /* Excepción para columnas de texto largo (permiten salto natural de palabra) */
         td[data-col="modelo"],
         td[data-col="area"],
         td[data-col="departamento"],
@@ -96,7 +92,7 @@
         .btn-documento { border: 0; border-radius: 4px; min-width: 30px; min-height: 28px; padding: 4px 6px; color: #fff; background: rgba(0,0,0,.22); cursor: pointer; font-size: 14px; }
 
         /* =========================================================================
-           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL (FIRMAS PERFECTAMENTE SEPARADAS)
+           CARTA RESPONSIVA FORMATO MOVIMIENTOS EXCEL
            ========================================================================= */
         .modal-responsiva { display: none; position: fixed; z-index: 4500; inset: 0; background-color: rgba(0, 0, 0, 0.72); overflow-y: auto; justify-content: center; align-items: flex-start; padding: 65px 15px 30px; box-sizing: border-box; }
         .modal-botones-barra { position: fixed; top: 0; left: 0; right: 0; z-index: 4600; background: #1b263b; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
@@ -127,7 +123,6 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Bloque de firmas con separación estricta para evitar solapamiento */
         .ieem-excel-firmas { display: flex; justify-content: space-around; align-items: flex-end; margin-top: 25px; margin-bottom: 10px; padding: 0 10px; font-size: 9.5pt; width: 100%; box-sizing: border-box; }
         .ieem-firma-col { width: 44%; text-align: center; }
         .ieem-firma-titulo { font-weight: bold; margin-bottom: 10px; min-height: 24px; display: flex; align-items: center; justify-content: center; }
@@ -136,12 +131,35 @@
         .ieem-firma-nombre { border-bottom: 2px solid #000; padding-bottom: 4px; min-height: 22px; font-size: 9.5pt; text-transform: uppercase; font-weight: bold; }
         .ieem-firma-pie { font-weight: bold; padding-top: 5px; font-size: 9.5pt; }
 
+        /* CONFIGURACIÓN DE IMPRESIÓN (HOJA CARTA PERFECTA) */
         @media print {
+            @page {
+                size: letter portrait;
+                margin: 10mm;
+            }
             body * { visibility: hidden; }
             #modalResponsiva, #modalResponsiva * { visibility: visible; }
-            #modalResponsiva { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; padding: 0 !important; overflow: visible !important; }
+            #modalResponsiva { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                height: 100%;
+                background: #fff !important; 
+                padding: 0 !important; 
+                overflow: visible !important; 
+            }
             .modal-botones-barra { display: none !important; }
-            .hoja-excel-ieem { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; padding: 6mm 8mm !important; }
+            .hoja-excel-ieem { 
+                box-shadow: none !important; 
+                margin: 0 auto !important; 
+                width: 100% !important; 
+                max-width: 100% !important;
+                min-height: 259mm !important; 
+                padding: 0 !important; 
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
         }
 
         /* Modal Edición */
@@ -200,6 +218,10 @@
         .app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
         .mobile-topbar { display:none; }
 
+        /* =========================================================================
+           MODO CELULAR SIMPLIFICADO: Solo muestra FOTO, SERIE, MODELO, ESTATUS,
+           IMPRESIÓN (RESPONSIVA) Y VER / EDITAR (ACCIONES).
+           ========================================================================= */
         @media(max-width:700px) {
             #appShell { display:block; }
             .app-main { padding:10px; }
@@ -209,6 +231,23 @@
             .app-sidebar.menu-open { transform:translateX(0); }
             .kpi-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
             .main-grid, .btn-excel { display: none !important; }
+
+            /* Ocultar columnas no esenciales en celular */
+            th[data-col="id"], td[data-col="id"],
+            th[data-col="activo"], td[data-col="activo"],
+            th[data-col="grupo"], td[data-col="grupo"],
+            th[data-col="tarima"], td[data-col="tarima"],
+            th[data-col="tapizada"], td[data-col="tapizada"],
+            th[data-col="area"], td[data-col="area"],
+            th[data-col="departamento"], td[data-col="departamento"],
+            th[data-col="asignado"], td[data-col="asignado"],
+            th[data-col="archivos"], td[data-col="archivos"] {
+                display: none !important;
+            }
+
+            table {
+                min-width: 100% !important;
+            }
         }
     </style>
 </head>
@@ -467,7 +506,7 @@
             </table>
         </div>
 
-        <!-- Bloque de Firmas sin solapamiento y con opción de activación exclusiva para DIRADMIN / SUPADMIN -->
+        <!-- Bloque de Firmas -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
@@ -478,7 +517,6 @@
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">
                     <span id="tituloEntregaTexto">Entrega / Recibe</span>
-                    <!-- Checkbox de activación de firma/persona exclusiva para Admins -->
                     <label id="wrapCheckAdminFirma" style="display:none; font-size:10px; font-weight:normal; cursor:pointer; margin-left:6px;" title="Incluir o quitar firma/persona">
                         <input type="checkbox" id="checkHabilitarFirma" onchange="toggleFirmaEntregaAdmin(this.checked)"> Incluir
                     </label>
@@ -552,7 +590,6 @@
                         <input type="date" id="editFSalida">
                     </div>
                     
-                    <!-- NUEVOS CAMPOS EXCLUSIVOS EN MODAL PARA DIRADMIN / SUPADMIN -->
                     <div class="campo-edicion campo-completo" id="bloqueConfigPersonaEntrega" style="display:none; background:#f1f4f9; padding:12px; border-radius:6px; border:1px solid #cbd5e1;">
                         <label style="color:#002060; font-size:13px; margin-bottom:6px; display:block;">⚙️ Configuración Persona que Entrega (Carta Responsiva)</label>
                         <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;">
@@ -896,9 +933,6 @@
         actualizarVisibilidadColumnas();
     }
 
-    // =========================================================================
-    // CONTROL DINÁMICO DE COLUMNAS
-    // =========================================================================
     function toggleMenuColumnas(e) {
         e.stopPropagation();
         const drop = document.getElementById('columnDropdown');
@@ -926,9 +960,6 @@
         });
     }
 
-    // =========================================================================
-    // CARTA RESPONSIVA: GESTIÓN DE FIRMA Y CONFIGURACIÓN ADMIN / SUPADMIN
-    // =========================================================================
     function abrirModalResponsiva(id) {
         const item = db.find(r => r.id === id);
         if (!item) return;
@@ -1043,9 +1074,6 @@
         finally { btn.disabled = false; btn.textContent = '📥 Descargar PDF'; }
     }
 
-    // =========================================================================
-    // EDICIÓN Y GUARDADO
-    // =========================================================================
     function abrirEdicion(id) {
         const item = db.find(r => r.id === id);
         if (!item) return;
