@@ -24,21 +24,20 @@
         .kpi-card.no { border-left-color: #ffc107; }
         .kpi-card.asignados { border-left-color: #6f42c1; }
         .kpi-card.entrada { border-left-color: #fd7e14; }
-        .kpi-card.activo-card { border-left-color: #17a2b8; }
         .kpi-card h6 { margin: 0 0 5px 0; color: #666; font-size: 11px; text-transform: uppercase; }
         .kpi-card h3 { margin: 0; font-size: 24px; }
 
-        /* Panel de Filtros Superiores */
-        .filtros-superiores { display: flex; gap: 12px; margin-bottom: 15px; flex-wrap: wrap; background: #f1f4f9; padding: 12px; border-radius: 6px; align-items: center; }
-        .filtro-grupo { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 180px; }
+        /* Panel de Filtros Superiores ubicado en medio */
+        .filtros-superiores { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; background: #f1f4f9; padding: 14px; border-radius: 6px; align-items: center; border: 1px solid #e2e8f0; }
+        .filtro-grupo { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 190px; }
         .filtro-grupo label { font-size: 11px; font-weight: bold; color: #444; text-transform: uppercase; }
-        .filtro-grupo select { width: 100%; padding: 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; background: #fff; }
+        .filtro-grupo select { width: 100%; padding: 7px; border-radius: 4px; border: 1px solid #ccc; font-size: 12px; background: #fff; }
 
-        .main-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 25px; }
+        .main-grid { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; }
         .panel-left { flex: 1.3; min-width: 320px; }
         .panel-right { flex: 0.7; min-width: 280px; }
         
-        /* Tabla con ajuste automático responsivo sin desbordes */
+        /* Tabla responsiva adaptada */
         .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 15px; }
         table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; table-layout: auto; }
         th, td { padding: 7px 5px; border: 1px solid #dee2e6; vertical-align: middle; word-break: break-word; }
@@ -68,7 +67,6 @@
         .responsiva-no { background: #dc3545 !important; }
         .responsiva-acciones { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
         .btn-documento { border: 0; border-radius: 4px; min-width: 30px; min-height: 28px; padding: 4px 6px; color: #fff; background: rgba(0,0,0,.22); cursor: pointer; font-size: 14px; }
-        .nombre-documento { display: block; width: 100%; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 2px auto 0; font-size: 9px; font-weight: normal; }
 
         /* =========================================================================
            FORMATO DE MOVIMIENTOS DE BIENES MUEBLES (CARTA RESPONSIVA)
@@ -102,7 +100,7 @@
         .ieem-excel-grid th { background: #ffffff !important; color: #000000 !important; border: 1px solid #000 !important; font-weight: bold; text-align: center; padding: 6px 4px; font-size: 9pt; }
         .ieem-excel-grid td { border: 1px solid #000 !important; padding: 2.5px 5px; height: 17px; color: #000; background: #fff; font-size: 9pt; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        /* Ajuste de firmas: Firma centrada y nombre abajo claramente visible */
+        /* Firmas centradas y nombre abajo visible */
         .ieem-excel-firmas { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; padding: 0 18px; font-size: 9.5pt; }
         .ieem-firma-col { width: 42%; text-align: center; position: relative; }
         .ieem-firma-titulo { font-weight: bold; margin-bottom: 55px; }
@@ -118,7 +116,7 @@
             .hoja-excel-ieem { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; padding: 6mm 8mm !important; }
         }
 
-        /* Ventana emergente de edición */
+        /* Modal Edición */
         .modal-edicion { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,.65); align-items: center; justify-content: center; padding: 15px; }
         .modal-edicion-contenido { background: white; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,.3); }
         .modal-edicion-header { background: #858585; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -143,7 +141,7 @@
         .ficha-campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
         .ficha-campos .campo-completo { grid-column: 1 / -1; }
 
-        /* Login Institucional */
+        /* Login */
         .auth-overlay { position: fixed; inset: 0; z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 15px; background-color: #f3f3f9; }
         .auth-card { width: 100%; max-width: 375px; padding: 20px; background: #fff; border: 1px solid #e3e3e3; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
         .auth-logo-wrap { text-align: center; margin-bottom: 20px; }
@@ -221,36 +219,13 @@
             <strong>Permisos:</strong> DIRADMIN administra y edita todo. SUPADMIN consulta todo de forma global. Usuarios estándar visualizan únicamente los bienes asignados a su persona.
         </div>
 
-        <!-- KPI Cards con funcionalidad de clic para filtrado rápido -->
+        <!-- KPI Cards con funcionalidad de clic -->
         <div class="kpi-row">
             <div class="kpi-card" onclick="filtrarPorKpi('TODOS')"><h6>Stock</h6><h3 id="kpi-total">0</h3></div>
             <div class="kpi-card asignados" onclick="filtrarPorKpi('ASIGNADAS')"><h6>Asignados</h6><h3 id="kpi-asignados">0</h3></div>
             <div class="kpi-card entrada" onclick="filtrarPorKpi('ENTRADA')"><h6>Entrada</h6><h3 id="kpi-entrada">0</h3></div>
             <div class="kpi-card si" onclick="filtrarPorKpi('TAP_SI')"><h6>Sillas Tapizadas</h6><h3 style="color:#28a745;" id="kpi-si">0</h3></div>
             <div class="kpi-card no" onclick="filtrarPorKpi('TAP_NO')"><h6>Sillas Sin Tapizar</h6><h3 style="color:#d39e00;" id="kpi-no">0</h3></div>
-        </div>
-
-        <!-- Filtros superiores solicitados -->
-        <div class="filtros-superiores">
-            <div class="filtro-grupo">
-                <label for="filtroAreaSup">Área</label>
-                <select id="filtroAreaSup" onchange="aplicarFiltrosTabla()"><option value="">TODAS LAS ÁREAS</option></select>
-            </div>
-            <div class="filtro-grupo">
-                <label for="filtroDeptoSup">Departamento</label>
-                <select id="filtroDeptoSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS LOS DEPARTAMENTOS</option></select>
-            </div>
-            <div class="filtro-grupo">
-                <label for="filtroAsignadoSup">Persona Asignada</label>
-                <select id="filtroAsignadoSup" onchange="aplicarFiltrosTabla()"><option value="">TODAS LAS PERSONAS</option></select>
-            </div>
-            <div class="filtro-grupo">
-                <label for="filtroActivoSup">Activo / Clasificación</label>
-                <select id="filtroActivoSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS LOS ACTIVOS</option></select>
-            </div>
-            <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
-                <button type="button" class="btn-excel" style="padding: 6px 12px; font-size:11px;" onclick="limpiarFiltrosSuperiores()">Limpiar Filtros</button>
-            </div>
         </div>
 
         <div class="main-grid">
@@ -277,6 +252,29 @@
                     <h4 style="margin:0 0 15px 0; font-size:14px; color:#495057;">Distribución del Total Físico</h4>
                     <div id="chart-body"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- FILTROS SUPERIORES UBICADOS EN MEDIO DE LAS 2 TABLAS -->
+        <div class="filtros-superiores">
+            <div class="filtro-grupo">
+                <label for="filtroAreaSup">Área</label>
+                <select id="filtroAreaSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS</option></select>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroDeptoSup">Departamento</label>
+                <select id="filtroDeptoSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS</option></select>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroAsignadoSup">Persona Asignada</label>
+                <select id="filtroAsignadoSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS</option></select>
+            </div>
+            <div class="filtro-grupo">
+                <label for="filtroActivoSup">Activo / Clasificación</label>
+                <select id="filtroActivoSup" onchange="aplicarFiltrosTabla()"><option value="">TODOS</option></select>
+            </div>
+            <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
+                <button type="button" class="btn-excel" style="padding: 6px 12px; font-size:11px;" onclick="limpiarFiltrosSuperiores()">Limpiar Filtros</button>
             </div>
         </div>
 
@@ -390,7 +388,7 @@
             <tr><td class="meta-label">Departamento</td><td class="meta-valor" id="lblRespDepto"></td></tr>
         </table>
 
-        <!-- Casillas Entrada / Salida automáticas según fechas -->
+        <!-- Casillas Entrada / Salida automáticas -->
         <div class="ieem-excel-mov-row">
             <div class="ieem-mov-opcion">
                 <span>Entrada a Bodega</span>
@@ -415,7 +413,7 @@
             <tbody id="tbodyFormatoExcel"></tbody>
         </table>
 
-        <!-- Firmas ajustadas: Firma centrada, nombre de Lázaro visible abajo -->
+        <!-- Firmas: Firma centrada y nombre de Lázaro visible abajo -->
         <div class="ieem-excel-firmas">
             <div class="ieem-firma-col">
                 <div class="ieem-firma-titulo">Solicitante</div>
@@ -527,7 +525,6 @@
     let datosFiltradosActuales = [];
 
     const BUCKET_DOCUMENTOS = 'inventario-documentos';
-    const MAX_ARCHIVO_BYTES = 10 * 1024 * 1024;
 
     function mostrarMensajeAcceso(msg, err = true) {
         const el = document.getElementById('auth-message');
@@ -584,12 +581,20 @@
 
     async function prepararSesion(session) {
         usuarioActual = session.user;
+        const correoUser = (usuarioActual.email || '').trim().toLowerCase();
+
         try {
             const { data: roleRow } = await sb.from('user_roles').select('role, nombre').eq('user_id', usuarioActual.id).maybeSingle();
             rolActual = roleRow?.role || 'CONSULTA';
-            nombreUsuarioLogueado = roleRow?.nombre || usuarioActual.email.split('@')[0];
-            esDirAdmin = rolActual === 'DIRADMIN';
-            esSupAdmin = rolActual === 'SUPADMIN';
+            nombreUsuarioLogueado = roleRow?.nombre || correoUser.split('@')[0];
+
+            // CORRECCIÓN AUTOMÁTICA DE ROL PARA tu correo DIRADMIN
+            if (correoUser === 'ieemoperacion@gmail.com') {
+                rolActual = 'DIRADMIN';
+            }
+
+            esDirAdmin = (rolActual === 'DIRADMIN');
+            esSupAdmin = (rolActual === 'SUPADMIN');
 
             document.getElementById('session-label').innerHTML =
                 `${escaparHTML(nombreUsuarioLogueado)} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
@@ -709,26 +714,23 @@
 
         if(btnLimpiar) btnLimpiar.style.display = textoBusqueda ? 'block' : 'none';
 
-        // Restricción para usuarios estándar: solo ven lo asignado a su nombre
         let datasetBase = db;
+        // Si no es DIRADMIN ni SUPADMIN, solo visualiza lo asignado a su nombre
         if (!esDirAdmin && !esSupAdmin) {
             datasetBase = db.filter(item => String(item.asignado || '').trim().toUpperCase() === nombreUsuarioLogueado.trim().toUpperCase());
         }
 
         datosFiltradosActuales = datasetBase.filter(item => {
-            // Filtro KPI
             if (filtroKpiActivo === 'ASIGNADAS' && String(item.est).toUpperCase() !== 'ASIGNADAS') return false;
             if (filtroKpiActivo === 'ENTRADA' && String(item.est).toUpperCase() !== 'ENTRADA') return false;
             if (filtroKpiActivo === 'TAP_SI' && String(item.tap).toUpperCase() !== 'SI') return false;
             if (filtroKpiActivo === 'TAP_NO' && String(item.tap).toUpperCase() !== 'NO') return false;
 
-            // Filtros Superiores
             if (areaVal && String(item.area || '').toUpperCase() !== areaVal) return false;
             if (deptoVal && String(item.departamento || '').toUpperCase() !== deptoVal) return false;
             if (asigVal && String(item.asignado || '').toUpperCase() !== asigVal) return false;
             if (activoVal && String(item.activo || '').toUpperCase() !== activoVal) return false;
 
-            // Buscador general
             if (textoBusqueda) {
                 const combo = `${item.s} ${item.m} ${item.g} ${item.est} ${item.area} ${item.departamento} ${item.asignado} ${item.activo}`.toLowerCase();
                 if (!combo.includes(textoBusqueda)) return false;
@@ -799,7 +801,6 @@
         document.getElementById('lblRespArea').textContent = item.area || 'DIRECCIÓN DE ADMINISTRACIÓN';
         document.getElementById('lblRespDepto').textContent = item.departamento || 'CONTROL PATRIMONIAL';
 
-        // Regla 2: Marcar X en entrada si tiene fecha de entrada o estatus entrada, de lo contrario salida
         const chkEntrada = document.getElementById('chkEntradaBodega');
         const chkSalida = document.getElementById('chkSalidaAsignacion');
         if (item.fEntrada && !item.fSalida) {
@@ -827,7 +828,6 @@
 
         document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
 
-        // Regla 3: Solo el administrador puede editar el nombre de quien entrega / recibe
         const edCont = document.getElementById('editEntregaContainer');
         const nombreEntregaEl = document.getElementById('lblEntregaNombre');
         if (esDirAdmin) {
@@ -864,7 +864,7 @@
     }
 
     // =========================================================================
-    // EDICIÓN Y GESTIÓN DE REGISTROS
+    // EDICIÓN
     // =========================================================================
     function abrirEdicion(id) {
         const item = db.find(r => r.id === id);
@@ -999,7 +999,6 @@
         input.click();
     }
 
-    // Descarga de Excel respetando el filtro actual (Regla 5 y 8)
     async function descargarExcelFiltrado() {
         if (!datosFiltradosActuales.length) { alert('No hay registros para exportar.'); return; }
         const workbook = new ExcelJS.Workbook();
