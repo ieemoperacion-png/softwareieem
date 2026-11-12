@@ -11,7 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; background: #f8f9fa; margin: 0; padding: 15px; color: #333; }
-        .container { max-width: 1240px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* CORRECCIÓN: Se amplía el ancho máximo para aprovechar toda la pantalla */
+        .container { max-width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
         .header { border-bottom: 2px solid #002060; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .header h2 { color: #002060; margin: 0; font-size: 22px; }
         .btn-excel { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -38,9 +41,26 @@
         .panel-right { flex: 0.7; min-width: 280px; }
         
         .table-responsive { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 4px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; table-layout: auto; }
-        th, td { padding: 7px 5px; border: 1px solid #dee2e6; vertical-align: middle; word-break: break-word; }
-        th { background: #002060; color: white; white-space: nowrap; font-size: 11px; }
+        
+        /* CORRECCIÓN: Se añade min-width para evitar el amontonamiento y forzar el scroll horizontal limpio */
+        table { width: 100%; min-width: 1150px; border-collapse: collapse; text-align: center; font-size: 12px; table-layout: auto; }
+        
+        /* CORRECCIÓN: Celdas limpias sin cortes bruscos de palabras */
+        th, td { padding: 8px 10px; border: 1px solid #dee2e6; vertical-align: middle; white-space: nowrap; }
+        th { background: #002060; color: white; font-size: 11px; }
+        
+        /* Excepción para columnas de texto largo (permiten salto natural de palabra) */
+        td[data-col="modelo"],
+        td[data-col="area"],
+        td[data-col="departamento"],
+        td[data-col="asignado"] {
+            white-space: normal;
+            min-width: 160px;
+            word-break: normal;
+        }
+
+        #tabla-resumen { min-width: 100%; }
+        
         .total-row td { background: #002060; color: white; font-weight: bold; }
         
         .search-container { position: relative; display: inline-block; width: 300px; }
@@ -532,7 +552,7 @@
                         <input type="date" id="editFSalida">
                     </div>
                     
-                    <!-- NUEVOS CAMPOS EXCLUSIVOS EN MODAL PARA DIRADMIN / SUPADMIN (IMAGEN 2) -->
+                    <!-- NUEVOS CAMPOS EXCLUSIVOS EN MODAL PARA DIRADMIN / SUPADMIN -->
                     <div class="campo-edicion campo-completo" id="bloqueConfigPersonaEntrega" style="display:none; background:#f1f4f9; padding:12px; border-radius:6px; border:1px solid #cbd5e1;">
                         <label style="color:#002060; font-size:13px; margin-bottom:6px; display:block;">⚙️ Configuración Persona que Entrega (Carta Responsiva)</label>
                         <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;">
@@ -584,7 +604,6 @@
     let filtroKpiActivo = 'TODOS';
     let datosFiltradosActuales = [];
 
-    // Estado global de configuración de entrega para cartas responsivas
     let configEntregaGlobal = {
         nombre: 'LAZARO SEGURA MUCIÑO',
         mostrar: true
@@ -961,7 +980,6 @@
 
         document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
 
-        // Aplicar estado de visibilidad y nombre configurado para Entrega (para DirAdmin / SupAdmin)
         const wrapCheck = document.getElementById('wrapCheckAdminFirma');
         const checkHabilitar = document.getElementById('checkHabilitarFirma');
         const contenedorFirma = document.getElementById('contenedorFirmaGrafica');
@@ -1055,7 +1073,6 @@
         document.getElementById('editFSalida').value = item.fSalida || '';
         document.getElementById('editObservaciones').value = item.observaciones || '';
 
-        // Mostrar bloque exclusivo de configuración de persona que entrega para DIRADMIN y SUPADMIN (Imagen 2)
         const bloqueConfig = document.getElementById('bloqueConfigPersonaEntrega');
         if (esDirAdmin || esSupAdmin) {
             bloqueConfig.style.display = 'block';
@@ -1101,7 +1118,6 @@
         item.fSalida = document.getElementById('editFSalida').value;
         item.observaciones = document.getElementById('editObservaciones').value.trim();
 
-        // Guardar configuración de la persona que entrega si es admin
         const inputEntrega = document.getElementById('inputPersonaEntregaModal');
         const checkMostrar = document.getElementById('checkMostrarEntregaModal');
         if (inputEntrega) {
