@@ -777,18 +777,24 @@
 
             .inventory-list-section tbody tr {
                 display: grid !important;
-                grid-template-columns: 58px minmax(0, 1fr) 74px !important;
-                grid-template-rows: repeat(3, minmax(22px, auto)) !important;
+                grid-template-columns: 64px minmax(0, 1fr) 74px !important;
+                grid-template-rows: repeat(8, minmax(23px, auto)) !important;
                 grid-template-areas:
-                    "photo serie print"
+                    "photo numero print"
+                    "photo serie action"
                     "photo modelo action"
-                    "photo estatus action" !important;
+                    "photo grupo action"
+                    "photo tarima action"
+                    "photo tapizada action"
+                    "photo estatus action"
+                    "photo responsiva action" !important;
                 align-items: center !important;
                 column-gap: 9px !important;
+                row-gap: 1px !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
                 margin: 0 0 10px !important;
-                padding: 8px !important;
+                padding: 9px !important;
                 background: #fff !important;
                 border: 1px solid #dce1e8 !important;
                 border-radius: 10px !important;
@@ -806,20 +812,36 @@
                 text-align: left !important;
             }
 
-            .inventory-list-section tbody td:nth-child(1) { grid-area: photo !important; justify-content: center !important; }
+            .inventory-list-section tbody td:nth-child(1) { grid-area: photo !important; justify-content: center !important; grid-row: 1 / 9 !important; }
             .inventory-list-section tbody td:nth-child(1) img,
-            .inventory-list-section tbody td:nth-child(1) .sin-foto-box { width: 54px !important; height: 54px !important; border-radius: 6px !important; }
+            .inventory-list-section tbody td:nth-child(1) .sin-foto-box { width: 58px !important; height: 58px !important; border-radius: 6px !important; }
+            .inventory-list-section tbody td:nth-child(2) { grid-area: numero !important; color: #68717d !important; font-size: 10px !important; }
+            .inventory-list-section tbody td:nth-child(2)::before { content: '# '; font-weight: 700; }
+            .inventory-list-section tbody td:nth-child(3)::before { content: 'Serie: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(4)::before { content: 'Modelo: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(5)::before { content: 'Grupo: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(6)::before { content: 'Tarima: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(7)::before { content: 'Tapizada: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(8)::before { content: 'Estatus: '; font-weight: 500; color: #68717d; }
+            .inventory-list-section tbody td:nth-child(12)::before { content: 'Carta: '; font-weight: 700; color: #fff; }
             .inventory-list-section tbody td:nth-child(3) { grid-area: serie !important; font-weight: 700 !important; color: #17365d !important; }
             .inventory-list-section tbody td:nth-child(4) { grid-area: modelo !important; font-size: 10px !important; color: #4b5563 !important; }
+            .inventory-list-section tbody td:nth-child(5) { grid-area: grupo !important; }
+            .inventory-list-section tbody td:nth-child(6) { grid-area: tarima !important; }
+            .inventory-list-section tbody td:nth-child(7) { grid-area: tapizada !important; }
             .inventory-list-section tbody td:nth-child(8) { grid-area: estatus !important; font-size: 10px !important; color: #59636e !important; }
             .inventory-list-section tbody td:nth-child(12) { grid-area: print !important; justify-content: center !important; }
             .inventory-list-section tbody td:nth-child(13) { grid-area: action !important; justify-content: center !important; }
+            .inventory-list-section tbody td:nth-child(9),
+            .inventory-list-section tbody td:nth-child(10),
+            .inventory-list-section tbody td:nth-child(11) { display: none !important; }
 
             .inventory-list-section tbody td:nth-child(12) button {
                 width: 68px !important;
-                height: 30px !important;
+                min-height: 38px !important;
                 border-radius: 7px !important;
-                font-size: 13px !important;
+                font-size: 15px !important;
+                touch-action: manipulation;
             }
 
             .inventory-list-section tbody td:nth-child(13) button {
@@ -828,21 +850,53 @@
                 justify-content: center !important;
                 gap: 3px !important;
                 width: 68px !important;
-                height: 32px !important;
+                min-height: 42px !important;
                 border-radius: 7px !important;
-                font-size: 10px !important;
+                font-size: 11px !important;
+                touch-action: manipulation;
             }
 
-            .inventory-list-section tbody td:nth-child(2),
-            .inventory-list-section tbody td:nth-child(5),
-            .inventory-list-section tbody td:nth-child(6),
-            .inventory-list-section tbody td:nth-child(7),
-            .inventory-list-section tbody td:nth-child(9),
-            .inventory-list-section tbody td:nth-child(10),
-            .inventory-list-section tbody td:nth-child(11) {
-                display: none !important;
+            /* El modal de edición conserva todos los campos y controles en pantallas táctiles. */
+            .modal-edicion {
+                padding: 8px !important;
+                align-items: center !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
             }
-
+            .modal-edicion-contenido {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: calc(100dvh - 16px) !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 10px !important;
+            }
+            .modal-edicion-header {
+                position: sticky;
+                top: 0;
+                z-index: 5;
+                padding: 12px 14px !important;
+            }
+            .modal-edicion-body { padding: 14px !important; }
+            .modal-edicion-footer {
+                position: sticky;
+                bottom: 0;
+                z-index: 5;
+                background: #fff;
+                padding: 12px 14px !important;
+            }
+            .modal-edicion-footer button {
+                min-height: 44px;
+                flex: 1;
+                touch-action: manipulation;
+            }
+            .campo-edicion input,
+            .campo-edicion select,
+            .campo-edicion textarea {
+                min-height: 42px;
+                font-size: 16px !important;
+            }
+            .campo-edicion textarea { min-height: 100px; }
             .ficha-edicion-superior, .ficha-campos { grid-template-columns: 1fr; }
             .ficha-campos .campo-completo { grid-column: auto; }
         }
