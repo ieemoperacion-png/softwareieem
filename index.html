@@ -381,7 +381,7 @@
 
         .ieem-firma-titulo {
             font-weight: bold;
-            margin-bottom: 42px;
+            margin-bottom: 30px;
         }
 
         .ieem-firma-img-auth {
@@ -409,32 +409,46 @@
             font-size: 9.5pt;
         }
 
+        @page { size: letter portrait; margin: 0; }
         @media print {
-            body * {
-                visibility: hidden;
+            html, body {
+                width: 215.9mm !important; height: 279.4mm !important;
+                margin: 0 !important; padding: 0 !important;
+                overflow: hidden !important; background: #fff !important;
             }
-            #modalResponsiva, #modalResponsiva * {
-                visibility: visible;
-            }
+            body * { visibility: hidden !important; }
+            #modalResponsiva, #modalResponsiva * { visibility: visible !important; }
             #modalResponsiva {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
+                display: block !important; position: absolute !important;
+                inset: 0 !important; width: 215.9mm !important; height: 279.4mm !important;
+                margin: 0 !important; padding: 0 !important; overflow: hidden !important;
                 background: #fff !important;
-                padding: 0 !important;
-                overflow: visible !important;
             }
-            .modal-botones-barra {
-                display: none !important;
+            .modal-botones-barra { display: none !important; }
+            #hojaFormatoMovimientos {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                width: 215.9mm !important; height: 279.4mm !important;
+                min-height: 279.4mm !important; max-height: 279.4mm !important;
+                margin: 0 !important; padding: 7mm 9mm !important;
+                box-sizing: border-box !important; box-shadow: none !important;
+                overflow: hidden !important; page-break-after: avoid !important;
+                break-after: avoid-page !important; page-break-inside: avoid !important;
+                break-inside: avoid-page !important;
             }
-            .hoja-excel-ieem {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 100% !important;
-                min-height: auto !important;
-                padding: 6mm 8mm !important;
-            }
+            .ieem-excel-top { margin-bottom: 2px !important; }
+            .ieem-excel-logo { width: 125px !important; max-height: 55px !important; }
+            .ieem-excel-org { font-size: 9pt !important; line-height: 1.15 !important; }
+            .ieem-excel-banner { font-size: 10pt !important; padding: 3px 0 !important; }
+            .ieem-excel-meta { font-size: 8.5pt !important; }
+            .ieem-excel-meta td { padding: 2px 6px !important; }
+            .ieem-excel-mov-row { margin: 4px 0 5px !important; font-size: 8.5pt !important; }
+            .ieem-excel-grid th { padding: 3px !important; font-size: 7.5pt !important; }
+            .ieem-excel-grid td { height: 13px !important; padding: 1px 3px !important; font-size: 7.5pt !important; }
+            .ieem-excel-firmas { margin-top: 12px !important; padding: 0 12px !important; align-items: flex-end !important; break-inside: avoid !important; }
+            .ieem-firma-titulo { margin-bottom: 28px !important; }
+            .ieem-firma-img-auth { max-height: 42px !important; bottom: 22px !important; }
+            .ieem-firma-nombre { min-height: 16px !important; font-size: 8.5pt !important; padding-bottom: 2px !important; }
+            .ieem-firma-pie { font-size: 8.5pt !important; padding-top: 2px !important; }
         }
 
         /* Ventana emergente de edición */
@@ -1239,6 +1253,27 @@
                         <label for="editObservaciones">Observaciones</label>
                         <textarea id="editObservaciones" placeholder="Escribe aquí las observaciones del artículo..."></textarea>
                     </div>
+                    <div class="campo-edicion">
+                        <label for="editTipoMovimiento">Movimiento para impresión</label>
+                        <select id="editTipoMovimiento">
+                            <option value="ENTRADA">Entrada a Bodega</option>
+                            <option value="SALIDA">Salida por asignación</option>
+                        </select>
+                    </div>
+                    <div class="campo-edicion">
+                        <label for="editNombreFirma">Nombre para firma (impresión)</label>
+                        <input type="text" id="editNombreFirma" placeholder="Nombre que aparecerá en la responsiva">
+                        <button type="button" class="btn-cancelar" style="margin-top:6px;" onclick="document.getElementById('editNombreFirma').value=''">Quitar nombre</button>
+                    </div>
+                    <div class="campo-edicion campo-completo">
+                        <label for="editFirmaArchivo">Firma para impresión (imagen)</label>
+                        <input type="file" id="editFirmaArchivo" accept="image/png,image/jpeg,image/webp">
+                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                            <img id="editFirmaPreview" alt="Vista previa de firma" style="display:none;max-width:220px;max-height:75px;object-fit:contain;border:1px solid #ddd;padding:5px;background:#fff;">
+                            <button type="button" class="btn-cancelar" onclick="quitarFirmaRegistro()">Quitar firma</button>
+                        </div>
+                        <small style="color:#68717d;">La firma y el nombre se usan únicamente en la responsiva impresa.</small>
+                    </div>
                 </section>
             </div>
         </div>
@@ -1645,7 +1680,12 @@
         document.getElementById('editFEntrada').value = item.fEntrada || '';
         document.getElementById('editFSalida').value = item.fSalida || '';
         document.getElementById('editObservaciones').value = item.observaciones || '';
-        ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones']
+        const datosImpresion = obtenerDatosImpresion(item.id);
+        document.getElementById('editTipoMovimiento').value = datosImpresion.tipo || ((['ENTRADA','ALMACEN'].includes(String(item.est || '').toUpperCase())) ? 'ENTRADA' : 'SALIDA');
+        document.getElementById('editNombreFirma').value = datosImpresion.nombre || item.asignado || '';
+        document.getElementById('editFirmaArchivo').value = '';
+        mostrarVistaFirmaEdicion(datosImpresion.firma || '');
+        ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones','editTipoMovimiento','editNombreFirma','editFirmaArchivo']
             .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
         document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
         document.getElementById('editEstatus').disabled = soloLectura;
@@ -1676,6 +1716,18 @@
         item.fEntrada = document.getElementById('editFEntrada').value;
         item.fSalida = document.getElementById('editFSalida').value;
         item.observaciones = document.getElementById('editObservaciones').value.trim();
+        const datosImpresion = obtenerDatosImpresion(item.id);
+        datosImpresion.tipo = document.getElementById('editTipoMovimiento').value;
+        datosImpresion.nombre = document.getElementById('editNombreFirma').value.trim();
+        const archivoFirma = document.getElementById('editFirmaArchivo').files[0];
+        if (archivoFirma) {
+            if (!archivoFirma.type.startsWith('image/') || archivoFirma.size > 1024 * 1024) {
+                alert('Selecciona una imagen válida de máximo 1 MB.'); return;
+            }
+            datosImpresion.firma = await leerArchivoComoDataURL(archivoFirma);
+            datosImpresion.firmaEliminada = false;
+        }
+        guardarDatosImpresion(item.id, datosImpresion);
         const boton = document.querySelector('.btn-guardar'); boton.disabled = true; boton.textContent = 'Guardando...';
         try {
             const { error } = await sb.from('inventario').update(registroAUpdateNube(item)).eq('id', item.id);
@@ -1758,6 +1810,51 @@
         }
     }
 
+    // Preferencias locales por registro para nombre, firma y tipo de movimiento de la impresión.
+    function obtenerDatosImpresion(id) {
+        try { return JSON.parse(localStorage.getItem('ieem_impresion_' + id) || '{}'); }
+        catch (_) { return {}; }
+    }
+    function guardarDatosImpresion(id, datos) {
+        try { localStorage.setItem('ieem_impresion_' + id, JSON.stringify(datos)); }
+        catch (error) { console.error('No se pudieron guardar los datos de impresión:', error); }
+    }
+    function mostrarVistaFirmaEdicion(src) {
+        const img = document.getElementById('editFirmaPreview');
+        img.src = src || ''; img.style.display = src ? 'block' : 'none';
+    }
+    function leerArchivoComoDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    document.addEventListener('change', event => {
+        if (event.target && event.target.id === 'editFirmaArchivo') {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/') || file.size > 1024 * 1024) {
+                alert('Selecciona una imagen válida de máximo 1 MB.');
+                event.target.value = ''; return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => mostrarVistaFirmaEdicion(reader.result);
+            reader.readAsDataURL(file);
+        }
+    });
+    function quitarFirmaRegistro() {
+        mostrarVistaFirmaEdicion('');
+        const input = document.getElementById('editFirmaArchivo');
+        if (input) input.value = '';
+        if (registroEnEdicionId !== null) {
+            const datos = obtenerDatosImpresion(registroEnEdicionId);
+            datos.firma = '';
+            guardarDatosImpresion(registroEnEdicionId, datos);
+        }
+    }
+
     function abrirModalResponsiva(id) {
         const item = db.find(r => r.id === id);
         if (!item) return;
@@ -1770,15 +1867,13 @@
         document.getElementById('lblRespArea').textContent = item.area || 'DIRECCIÓN DE ADMINISTRACIÓN';
         document.getElementById('lblRespDepto').textContent = item.departamento || 'CONTROL PATRIMONIAL';
 
-        // Tipo de movimiento según estatus actual del registro
+        // Respeta el tipo de movimiento seleccionado en Editar.
+        const datosImpresion = obtenerDatosImpresion(item.id);
         const estatusUpper = String(item.est || '').toUpperCase();
-        if (estatusUpper === 'ENTRADA' || estatusUpper === 'ALMACEN') {
-            seleccionarTipoMovimiento('ENTRADA');
-        } else {
-            seleccionarTipoMovimiento('SALIDA');
-        }
+        const tipoMovimiento = datosImpresion.tipo || ((estatusUpper === 'ENTRADA' || estatusUpper === 'ALMACEN') ? 'ENTRADA' : 'SALIDA');
+        seleccionarTipoMovimiento(tipoMovimiento);
 
-        // Construir las 22 filas de la tabla igual que en formato de movimientosweb.xlsx
+        // Construir 13 filas de la tabla igual que en formato de movimientosweb.xlsx
         const tbody = document.getElementById('tbodyFormatoExcel');
         const descripcion = `${item.m || ''}${item.g ? ' - GRUPO ' + item.g : ''}${item.tap ? ' (TAPIZADA: ' + item.tap + ')' : ''}`.trim();
         const numInv = item.numInventario || `ID-${item.id}`;
@@ -1795,8 +1890,8 @@
             </tr>
         `;
 
-        // Rellenar las 21 filas vacías restantes para conservar la altura exacta del formato Excel
-        for (let i = 2; i <= 22; i++) {
+        // Rellenar las 12 filas vacías restantes para conservar la altura exacta del formato Excel
+        for (let i = 2; i <= 13; i++) {
             filasHtml += `
                 <tr>
                     <td>&nbsp;</td>
@@ -1809,8 +1904,22 @@
         }
         tbody.innerHTML = filasHtml;
 
-        // Nombre del solicitante / persona asignada
-        document.getElementById('lblSolicitanteNombre').textContent = item.asignado || '';
+        // Nombre y firma configurados en Editar; solo se reflejan en la responsiva.
+        document.getElementById('lblSolicitanteNombre').textContent = Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : (item.asignado || '');
+        const firmaGuardada = datosImpresion.firma || '';
+        const firmaAuth = document.querySelector('.ieem-firma-img-auth');
+        if (firmaAuth) {
+            if (firmaGuardada) {
+                firmaAuth.src = firmaGuardada;
+                firmaAuth.style.display = 'block';
+            } else if (datosImpresion.firmaEliminada) {
+                firmaAuth.removeAttribute('src');
+                firmaAuth.style.display = 'none';
+            } else {
+                firmaAuth.src = 'firmaautorizacion.jpg';
+                firmaAuth.style.display = 'block';
+            }
+        }
 
         document.getElementById('modalResponsiva').style.display = 'flex';
     }
