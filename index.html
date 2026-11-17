@@ -900,6 +900,18 @@
             .ficha-edicion-superior, .ficha-campos { grid-template-columns: 1fr; }
             .ficha-campos .campo-completo { grid-column: auto; }
         }
+
+        .superficie-accion { border:0;border-radius:5px;padding:7px 9px;cursor:pointer;background:#e9eef7;color:#17365d;font-weight:600; }
+        .superficie-accion:disabled { opacity:.45;cursor:not-allowed; }
+        #paginaSuperficies .table-responsive td { vertical-align:middle;text-align:center;font-size:12px; }
+        #paginaSuperficies .table-responsive th { white-space:nowrap; }
+        @media print {
+          html, body { height:auto !important; overflow:visible !important; }
+          #modalResponsiva { position:static !important; width:auto !important;height:auto !important;overflow:visible !important; }
+          #hojaFormatoMovimientos { position:relative !important;height:auto !important;max-height:none !important;min-height:279mm !important;overflow:visible !important;page-break-after:auto !important;break-after:auto !important;page-break-inside:auto !important;break-inside:auto !important; }
+          .ieem-excel-grid { page-break-inside:auto !important; }
+          .ieem-excel-grid tr { page-break-inside:avoid !important;break-inside:avoid !important; }
+        }
     </style>
 </head>
 <body>
@@ -914,6 +926,7 @@
         </div>
         <button type="button" class="sidebar-link active" id="navInicio" onclick="mostrarPagina('inicio')">⌂ <span>Inicio</span></button>
         <button type="button" class="sidebar-link" id="navInventario" onclick="mostrarPagina('inventario')">▤ <span>Inventario de sillas</span></button>
+        <button type="button" class="sidebar-link" id="navSuperficies" onclick="mostrarPagina('superficies')">▧ <span>Superficies</span></button>
         <button type="button" class="sidebar-link" onclick="irCatalogo()">☷ <span>Catálogo</span></button>
         <div class="sidebar-pages-title">Otras páginas</div>
         <nav id="sidebarPages"></nav>
@@ -1032,8 +1045,44 @@
         </div>
     </div>
     </section>
+
+    <section id="paginaSuperficies" class="page-view" hidden>
+      <div class="header">
+        <div><h2>Superficies</h2><p style="margin:5px 0 0;color:#666;font-size:13px;">Inventario institucional de superficies</p></div>
+        <div class="session-actions"><div id="session-label-superficies" class="session-label"></div><button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button></div>
+      </div>
+      <div style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">DIRADMIN puede editar y gestionar responsivas. SUPADMIN puede consultar todas las superficies. CONSULTA únicamente puede consultar las superficies que tiene asignadas.</div>
+      <div class="panel" style="background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 5px #0001;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <strong>Inventario de superficies (<span id="superficies-total">0</span>)</strong>
+          <input id="buscar-superficies" type="search" placeholder="Buscar por inventario, descripción, material..." oninput="renderizarSuperficies()" style="max-width:360px;width:100%;padding:10px;border:1px solid #ccd2da;border-radius:6px;">
+        </div>
+        <div class="table-responsive" style="max-height:55vh;">
+          <table style="min-width:1120px;width:100%;"><thead><tr><th>FOTO</th><th>#</th><th>NÚMERO DE INVENTARIO</th><th>DESCRIPCIÓN DEL MUEBLE</th><th>MEDIDAS</th><th>MATERIAL</th><th>COLOR</th><th>ESTADO DE USO</th><th>OBSERVACIONES</th><th>ESTATUS</th><th>EDITAR</th><th>AGREGAR AL CARRITO</th></tr></thead><tbody id="superficies-body"></tbody></table>
+        </div>
+      </div>
+      <div id="panelCarritoSuperficies" style="position:sticky;bottom:8px;margin-top:14px;padding:14px;background:#fff;border:1px solid #d9dee7;border-radius:9px;box-shadow:0 3px 14px #0002;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;z-index:5;">
+        <div><strong>Carrito de responsiva: <span id="superficies-carrito-total">0</span> artículos</strong><div id="superficies-carrito-resumen" style="font-size:12px;color:#666;margin-top:3px;">Agrega las superficies que deseas incluir.</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn-salir" onclick="vaciarCarritoSuperficies()">Vaciar carrito</button><button type="button" class="btn-excel" onclick="generarResponsivaSuperficies()">🖨️ Generar carta responsiva</button></div>
+      </div>
+    </section>
     </main>
 </div>
+
+
+<div id="modalEdicionSuperficie" class="modal-edicion" onclick="if(event.target.id==='modalEdicionSuperficie') cerrarEdicionSuperficie()">
+ <div class="modal-edicion-contenido"><div class="modal-edicion-header"><h3 id="tituloEdicionSuperficie">Editar superficie</h3><button type="button" onclick="cerrarEdicionSuperficie()">×</button></div>
+ <div class="modal-edicion-body"><input type="hidden" id="sup-edit-id"><div class="ficha-campos" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+  <label class="campo-edicion">Número de inventario<input id="sup-edit-numero" class="form-control" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Descripción del mueble<input id="sup-edit-descripcion" class="form-control" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Medidas<input id="sup-edit-medidas" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Material<input id="sup-edit-material" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Color<input id="sup-edit-color" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Estado de uso<input id="sup-edit-estado" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion">Estatus<select id="sup-edit-estatus" style="width:100%;padding:10px;"><option value="stock">Stock</option><option value="ASIGNADA">ASIGNADA</option><option value="BAJA">BAJA</option></select></label>
+  <label class="campo-edicion">Asignado a (correo o ID)<input id="sup-edit-asignado" style="width:100%;padding:10px;"></label>
+  <label class="campo-edicion" style="grid-column:1/-1;">Observaciones<textarea id="sup-edit-observaciones" style="width:100%;padding:10px;min-height:85px;"></textarea></label>
+ </div></div><div class="modal-edicion-footer" style="display:flex;justify-content:flex-end;gap:10px;"><button type="button" class="btn-salir" onclick="cerrarEdicionSuperficie()">Cancelar</button><button type="button" class="btn-guardar" onclick="guardarEdicionSuperficie()">Guardar cambios</button></div></div></div>
 
 <!-- Inicio de sesión institucional -->
 <div id="authOverlay" class="auth-overlay">
@@ -1130,8 +1179,8 @@
             Vista Previa — Movimientos de Bienes Muebles (IEEM)
         </div>
         <div class="modal-botones-grupo">
-            <button type="button" class="btn-accion-pdf" id="btnDescargarPdfResp" onclick="descargarResponsivaPDF()">📥 Descargar PDF</button>
-            <button type="button" class="btn-accion-imprimir" onclick="imprimirResponsiva()">🖨️ Imprimir</button>
+            <button type="button" class="btn-accion-pdf" id="btnDescargarPdfResp" onclick="responsivaSuperficiesPendiente ? confirmarAsignacionYPDF() : descargarResponsivaPDF()">📥 Descargar PDF</button>
+            <button type="button" class="btn-accion-imprimir" onclick="responsivaSuperficiesPendiente ? confirmarAsignacionEImprimir() : imprimirResponsiva()">🖨️ Imprimir</button>
             <button type="button" class="btn-accion-cerrar" onclick="cerrarResponsivaModal()">✖ Cerrar</button>
         </div>
     </div>
@@ -1342,6 +1391,12 @@
     let usuarioActual = null;
     let rolActual = 'CONSULTA';
     let esDirAdmin = false;
+    let superficies = [];
+    let carritoSuperficies = [];
+    let superficieEdicionId = null;
+    let responsivaSuperficiesPendiente = false;
+    let asignacionSuperficiesConfirmada = false;
+    const esAdminSuperficies = () => String(rolActual || '').toUpperCase() === 'DIRADMIN';
     let registroEnEdicionId = null;
     let itemResponsivaActual = null;
     let archivosPorItem = {};
@@ -1531,6 +1586,8 @@
             if (roleError) throw roleError;
             rolActual = roleRow?.role || 'CONSULTA';
             esDirAdmin = rolActual === 'DIRADMIN';
+            const labelSup = document.getElementById('session-label-superficies');
+            if (labelSup) labelSup.innerHTML = `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
             document.getElementById('session-label').innerHTML =
                 `${escaparHTML(usuarioActual.email || '')} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
             document.getElementById('authOverlay').style.display = 'none';
@@ -1538,6 +1595,7 @@
             renderizarSubpaginas();
             mostrarPagina('inicio');
             await cargarInventarioNube();
+            await cargarSuperficiesNube();
         } catch (error) {
             document.getElementById('appShell').style.display = 'none';
             document.getElementById('authOverlay').style.display = 'flex';
@@ -1902,7 +1960,111 @@
         }
     }
 
+    // ===================== INVENTARIO DE SUPERFICIES =====================
+    // Solo DIRADMIN puede editar o gestionar asignaciones. SUPADMIN consulta todo.
+    // CONSULTA consulta exclusivamente las superficies asignadas a su cuenta.
+    function esConsultaSuperficies() { return String(rolActual || '').trim().toUpperCase() === 'CONSULTA'; }
+    function superficieVisibleParaUsuario(row) {
+        if (!esConsultaSuperficies()) return true;
+        const asignado = String(row.asignado_a || '').trim().toLowerCase();
+        return !!asignado && (asignado === String(usuarioActual?.id || '').trim().toLowerCase() || asignado === String(usuarioActual?.email || '').trim().toLowerCase());
+    }
+    async function cargarSuperficiesNube() {
+        const { data, error } = await sb.from('superficies').select('*').order('id');
+        if (error) throw error;
+        superficies = (data || []).filter(superficieVisibleParaUsuario);
+        for (const row of superficies) {
+            const foto = String(row.foto ?? '').trim();
+            if (foto && !/^https?:\/\//i.test(foto) && !foto.startsWith('data:') && !/^\d+$/.test(foto)) {
+                const { data: signed } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(foto, 86400);
+                if (signed?.signedUrl) row._fotoUrl = signed.signedUrl;
+            } else if (/^https?:\/\//i.test(foto) || foto.startsWith('data:')) row._fotoUrl = foto;
+        }
+        carritoSuperficies = carritoSuperficies.filter(id => superficies.some(r => String(r.id) === String(id)));
+        renderizarSuperficies();
+    }
+    function renderizarSuperficies() {
+        const tbody = document.getElementById('superficies-body'); if (!tbody) return;
+        const panelCarrito = document.getElementById('panelCarritoSuperficies'); if (panelCarrito) panelCarrito.style.display = esAdminSuperficies() ? 'flex' : 'none';
+        const q = (document.getElementById('buscar-superficies')?.value || '').trim().toLowerCase();
+        const lista = superficies.filter(r => [r.numero_inventario,r.descripcion_del_mueble,r.medidas,r.material,r.color,r.estado_de_uso,r.observaciones,r.estatus,r.asignado_a].some(v => String(v ?? '').toLowerCase().includes(q)));
+        document.getElementById('superficies-total').textContent = lista.length;
+        tbody.innerHTML = lista.map(r => {
+            const foto = r._fotoUrl ? `<img src="${escaparHTML(r._fotoUrl)}" alt="Foto" onclick="ampliarImagen('${escaparHTML(r._fotoUrl)}')" style="width:44px;height:44px;object-fit:cover;border-radius:5px;cursor:pointer;">` : '<span style="color:#888;">SIN FOTO</span>';
+            const agregado = carritoSuperficies.some(id => String(id) === String(r.id));
+            const accionesEdicion = esAdminSuperficies() ? `<button class="superficie-accion" onclick="abrirEdicionSuperficie(${JSON.stringify(r.id)})">✎ Editar</button>` : '<span style="color:#888;">Solo consulta</span>';
+            const accionCarrito = esAdminSuperficies() ? `<button class="superficie-accion" onclick="alternarCarritoSuperficie(${JSON.stringify(r.id)})">${agregado ? '✓ Agregado' : '＋ Agregar'}</button>` : '<span style="color:#888;">—</span>';
+            return `<tr><td>${foto}</td><td>${escaparHTML(r.id)}</td><td>${escaparHTML(r.numero_inventario)}</td><td style="text-align:left;">${escaparHTML(r.descripcion_del_mueble)}</td><td>${escaparHTML(r.medidas)}</td><td>${escaparHTML(r.material)}</td><td>${escaparHTML(r.color)}</td><td>${escaparHTML(r.estado_de_uso)}</td><td style="text-align:left;">${escaparHTML(r.observaciones)}</td><td>${escaparHTML(r.estatus)}</td><td>${accionesEdicion}</td><td>${accionCarrito}</td></tr>`;
+        }).join('') || '<tr><td colspan="12" style="padding:20px;color:#777;">No hay superficies que coincidan con la búsqueda.</td></tr>';
+        document.getElementById('superficies-carrito-total').textContent = carritoSuperficies.length;
+        document.getElementById('superficies-carrito-resumen').textContent = carritoSuperficies.length ? carritoSuperficies.map(id => superficies.find(r => String(r.id) === String(id))?.numero_inventario || id).join(' · ') : 'Agrega las superficies que deseas incluir.';
+    }
+    function alternarCarritoSuperficie(id) {
+        if (!esAdminSuperficies()) { alert('Solo DIRADMIN puede gestionar el carrito de responsivas.'); return; }
+        const registro = superficies.find(r => String(r.id) === String(id));
+        if (registro && String(registro.estatus || '').toUpperCase() === 'ASIGNADA' && !carritoSuperficies.some(x => String(x) === String(id))) { alert('Esta superficie ya está asignada.'); return; }
+        if (carritoSuperficies.some(x => String(x) === String(id))) carritoSuperficies = carritoSuperficies.filter(x => String(x) !== String(id));
+        else carritoSuperficies.push(id);
+        renderizarSuperficies();
+    }
+    function vaciarCarritoSuperficies() { if (!esAdminSuperficies()) return; carritoSuperficies = []; renderizarSuperficies(); }
+    function abrirEdicionSuperficie(id) {
+        if (!esAdminSuperficies()) { alert('Solo DIRADMIN tiene permiso para editar superficies.'); return; }
+        const r = superficies.find(x => String(x.id) === String(id)); if (!r) return;
+        superficieEdicionId = r.id;
+        const campos = { 'sup-edit-id':r.id, 'sup-edit-numero':r.numero_inventario, 'sup-edit-descripcion':r.descripcion_del_mueble, 'sup-edit-medidas':r.medidas, 'sup-edit-material':r.material, 'sup-edit-color':r.color, 'sup-edit-estado':r.estado_de_uso, 'sup-edit-estatus':String(r.estatus || 'stock'), 'sup-edit-asignado':r.asignado_a, 'sup-edit-observaciones':r.observaciones };
+        Object.entries(campos).forEach(([id,v]) => { const el=document.getElementById(id); if(el) el.value=v ?? ''; });
+        document.getElementById('modalEdicionSuperficie').style.display='flex';
+    }
+    function cerrarEdicionSuperficie() { document.getElementById('modalEdicionSuperficie').style.display='none'; superficieEdicionId=null; }
+    async function guardarEdicionSuperficie() {
+        if (!esAdminSuperficies() || superficieEdicionId === null) return;
+        const payload = { numero_inventario:document.getElementById('sup-edit-numero').value.trim() || null, descripcion_del_mueble:document.getElementById('sup-edit-descripcion').value.trim() || null, medidas:document.getElementById('sup-edit-medidas').value.trim() || null, material:document.getElementById('sup-edit-material').value.trim() || null, color:document.getElementById('sup-edit-color').value.trim() || null, estado_de_uso:document.getElementById('sup-edit-estado').value.trim() || null, estatus:document.getElementById('sup-edit-estatus').value, asignado_a:document.getElementById('sup-edit-asignado').value.trim() || null, observaciones:document.getElementById('sup-edit-observaciones').value.trim() || null };
+        const { error } = await sb.from('superficies').update(payload).eq('id',superficieEdicionId);
+        if (error) { alert('No se pudieron guardar los cambios: '+error.message); return; }
+        cerrarEdicionSuperficie(); await cargarSuperficiesNube(); alert('Superficie actualizada correctamente.');
+    }
+    function generarResponsivaSuperficies() {
+        if (!esAdminSuperficies()) { alert('Solo DIRADMIN puede generar responsivas y asignar superficies.'); return; }
+        const seleccion = carritoSuperficies.map(id => superficies.find(r => String(r.id) === String(id))).filter(Boolean);
+        if (!seleccion.length) { alert('Agrega al carrito al menos una superficie.'); return; }
+        responsivaSuperficiesPendiente = true; asignacionSuperficiesConfirmada = false;
+        document.getElementById('lblFechaActual').textContent = obtenerFechaFormatoExcel();
+        document.getElementById('lblRespArea').textContent = 'DIRECCIÓN DE ADMINISTRACIÓN';
+        document.getElementById('lblRespDepto').textContent = 'CONTROL PATRIMONIAL';
+        seleccionarTipoMovimiento('SALIDA');
+        const tbody = document.getElementById('tbodyFormatoExcel');
+        tbody.innerHTML = seleccion.map((r,i) => `<tr><td style="text-align:center;">${i+1}</td><td style="text-align:left;">${escaparHTML([r.descripcion_del_mueble,r.medidas ? 'Medidas: '+r.medidas : '',r.material ? 'Material: '+r.material : '',r.color ? 'Color: '+r.color : '',r.estado_de_uso ? 'Estado: '+r.estado_de_uso : ''].filter(Boolean).join(' | '))}</td><td style="text-align:center;">${escaparHTML(r.numero_inventario || '')}</td><td style="text-align:center;">—</td><td style="text-align:left;">${escaparHTML(r.observaciones || '')}</td></tr>`).join('');
+        const incluirFirmaNombre = true;
+        document.getElementById('lblSolicitanteNombre').textContent = '';
+        const datos = obtenerDatosImpresion('superficies');
+        document.getElementById('lblEntregaRecibeNombre').textContent = Object.prototype.hasOwnProperty.call(datos,'nombre') ? datos.nombre : 'LAZARO SEGURA MUCIÑO';
+        const firma = document.querySelector('.ieem-firma-img-auth');
+        if (firma) { firma.src = datos.firma || 'firmaautorizacion.jpg'; firma.style.display = 'block'; }
+        document.getElementById('modalResponsiva').style.display='flex';
+    }
+    async function confirmarAsignacionSuperficies() {
+        if (!esAdminSuperficies()) throw new Error('Solo DIRADMIN puede asignar superficies.');
+        if (!responsivaSuperficiesPendiente || asignacionSuperficiesConfirmada) return;
+        const ids = carritoSuperficies.slice();
+        if (!ids.length) throw new Error('El carrito está vacío.');
+        const { error } = await sb.from('superficies').update({ estatus:'ASIGNADA' }).in('id',ids);
+        if (error) throw error;
+        asignacionSuperficiesConfirmada = true; responsivaSuperficiesPendiente = false;
+        carritoSuperficies = [];
+        await cargarSuperficiesNube();
+    }
+    async function confirmarAsignacionEImprimir() {
+        try { await confirmarAsignacionSuperficies(); window.print(); }
+        catch (e) { alert('No se pudo completar la asignación: '+e.message); }
+    }
+    async function confirmarAsignacionYPDF() {
+        try { await confirmarAsignacionSuperficies(); await descargarResponsivaPDF(); }
+        catch (e) { alert('No se pudo completar la asignación: '+e.message); }
+    }
+
     function abrirModalResponsiva(id) {
+        responsivaSuperficiesPendiente = false;
         const item = db.find(r => r.id === id);
         if (!item) return;
         itemResponsivaActual = item;
@@ -1988,6 +2150,7 @@
     function cerrarResponsivaModal() {
         document.getElementById('modalResponsiva').style.display = 'none';
         itemResponsivaActual = null;
+        responsivaSuperficiesPendiente = false;
     }
 
     function imprimirResponsiva() {
@@ -2245,10 +2408,14 @@
 
     function mostrarPagina(pagina) {
         const esInicio = pagina === 'inicio';
+        const esInventario = pagina === 'inventario';
         document.getElementById('paginaInicio').hidden = !esInicio;
-        document.getElementById('paginaInventario').hidden = esInicio;
+        document.getElementById('paginaInventario').hidden = !esInventario;
+        document.getElementById('paginaSuperficies').hidden = pagina !== 'superficies';
         document.getElementById('navInicio').classList.toggle('active', esInicio);
-        document.getElementById('navInventario').classList.toggle('active', !esInicio);
+        document.getElementById('navInventario').classList.toggle('active', esInventario);
+        document.getElementById('navSuperficies').classList.toggle('active', pagina === 'superficies');
+        if (pagina === 'superficies') cargarSuperficiesNube().catch(e => alert('No se pudo cargar Superficies: '+e.message));
         toggleMenuMovil(false);
     }
 
