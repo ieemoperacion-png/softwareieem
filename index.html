@@ -367,10 +367,11 @@
         .ieem-excel-firmas {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 22px;
+            align-items: flex-start;
+            margin-top: 14px;
             padding: 0 18px;
             font-size: 9.5pt;
+            gap: 34px;
         }
 
         .ieem-firma-col {
@@ -381,18 +382,25 @@
 
         .ieem-firma-titulo {
             font-weight: bold;
-            margin-bottom: 30px;
+            margin-bottom: 9px;
         }
 
         .ieem-firma-img-auth {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            max-height: 52px;
-            max-width: 170px;
+            position: static;
+            display: block;
+            width: 170px;
+            height: 43px;
+            max-height: 43px;
+            max-width: 100%;
+            margin: 0 auto 3px;
+            transform: none;
             object-fit: contain;
+            object-position: center;
             pointer-events: none;
+        }
+
+        .ieem-firma-col-entrega .ieem-firma-nombre {
+            margin-top: 0;
         }
 
         .ieem-firma-nombre {
@@ -444,9 +452,9 @@
             .ieem-excel-mov-row { margin: 4px 0 5px !important; font-size: 8.5pt !important; }
             .ieem-excel-grid th { padding: 3px !important; font-size: 7.5pt !important; }
             .ieem-excel-grid td { height: 13px !important; padding: 1px 3px !important; font-size: 7.5pt !important; }
-            .ieem-excel-firmas { margin-top: 12px !important; padding: 0 12px !important; align-items: flex-end !important; break-inside: avoid !important; }
-            .ieem-firma-titulo { margin-bottom: 28px !important; }
-            .ieem-firma-img-auth { max-height: 42px !important; bottom: 22px !important; }
+            .ieem-excel-firmas { margin-top: 12px !important; padding: 0 12px !important; align-items: flex-start !important; gap: 28px !important; break-inside: avoid !important; }
+            .ieem-firma-titulo { margin-bottom: 8px !important; }
+            .ieem-firma-img-auth { position: static !important; display: block !important; width: 165px !important; height: 40px !important; max-height: 40px !important; margin: 0 auto 3px !important; transform: none !important; }
             .ieem-firma-nombre { min-height: 16px !important; font-size: 8.5pt !important; padding-bottom: 2px !important; }
             .ieem-firma-pie { font-size: 8.5pt !important; padding-top: 2px !important; }
         }
@@ -1167,13 +1175,13 @@
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
 
-            <div class="ieem-firma-col">
+            <div class="ieem-firma-col ieem-firma-col-entrega">
                 <div class="ieem-firma-titulo">Entrega / Recibe</div>
                 <img src="firmaautorizacion.jpg"
-                     alt="Firma Autorización"
+                     alt="Firma de quien entrega o recibe"
                      class="ieem-firma-img-auth"
                      onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg';}else{this.style.display='none';}">
-                <div class="ieem-firma-nombre">LAZARO SEGURA MUCIÑO</div>
+                <div id="lblEntregaRecibeNombre" class="ieem-firma-nombre">LAZARO SEGURA MUCIÑO</div>
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
         </div>
@@ -1261,8 +1269,8 @@
                         <small style="display:block;color:#68717d;margin:5px 0 0 26px;">Activa o desactiva ambos elementos con una sola casilla.</small>
                     </div>
                     <div id="editDatosFirmaGrupo" class="campo-edicion campo-completo">
-                        <label for="editNombreFirma">Nombre para firma (impresión)</label>
-                        <input type="text" id="editNombreFirma" placeholder="Nombre que aparecerá en la responsiva">
+                        <label for="editNombreFirma">Nombre de quien entrega / recibe (impresión)</label>
+                        <input type="text" id="editNombreFirma" placeholder="Nombre que aparecerá debajo de la firma">
                     </div>
                     <div id="editArchivoFirmaGrupo" class="campo-edicion campo-completo">
                         <label for="editFirmaArchivo">Firma para impresión (imagen)</label>
@@ -1921,8 +1929,10 @@
 
         // Nombre y firma configurados en Editar; solo se reflejan en la responsiva.
         const incluirFirmaNombre = datosImpresion.incluirFirmaNombre !== false;
-        document.getElementById('lblSolicitanteNombre').textContent = incluirFirmaNombre
-            ? (Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : (item.asignado || '')) : '';
+        // El nombre editable corresponde a quien Entrega / Recibe, no al Solicitante.
+        document.getElementById('lblSolicitanteNombre').textContent = '';
+        document.getElementById('lblEntregaRecibeNombre').textContent = incluirFirmaNombre
+            ? (Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : 'LAZARO SEGURA MUCIÑO') : '';
         const firmaGuardada = datosImpresion.firma || '';
         const firmaAuth = document.querySelector('.ieem-firma-img-auth');
         if (firmaAuth) {
