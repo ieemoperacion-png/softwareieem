@@ -1253,24 +1253,22 @@
                         <label for="editObservaciones">Observaciones</label>
                         <textarea id="editObservaciones" placeholder="Escribe aquí las observaciones del artículo..."></textarea>
                     </div>
-                    <div class="campo-edicion">
-                        <label for="editTipoMovimiento">Movimiento para impresión</label>
-                        <select id="editTipoMovimiento">
-                            <option value="ENTRADA">Entrada a Bodega</option>
-                            <option value="SALIDA">Salida por asignación</option>
-                        </select>
+                    <div class="campo-edicion campo-completo" style="padding:10px 12px;border:1px solid #d7e0eb;border-radius:8px;background:#f8fafc;">
+                        <label style="display:flex;align-items:center;gap:9px;font-weight:700;cursor:pointer;">
+                            <input type="checkbox" id="editIncluirFirmaNombre" style="width:17px;height:17px;">
+                            Incluir nombre y firma en la responsiva impresa
+                        </label>
+                        <small style="display:block;color:#68717d;margin:5px 0 0 26px;">Activa o desactiva ambos elementos con una sola casilla.</small>
                     </div>
-                    <div class="campo-edicion">
+                    <div id="editDatosFirmaGrupo" class="campo-edicion campo-completo">
                         <label for="editNombreFirma">Nombre para firma (impresión)</label>
                         <input type="text" id="editNombreFirma" placeholder="Nombre que aparecerá en la responsiva">
-                        <button type="button" class="btn-cancelar" style="margin-top:6px;" onclick="document.getElementById('editNombreFirma').value=''">Quitar nombre</button>
                     </div>
-                    <div class="campo-edicion campo-completo">
+                    <div id="editArchivoFirmaGrupo" class="campo-edicion campo-completo">
                         <label for="editFirmaArchivo">Firma para impresión (imagen)</label>
                         <input type="file" id="editFirmaArchivo" accept="image/png,image/jpeg,image/webp">
-                        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px;">
+                        <div style="margin-top:8px;">
                             <img id="editFirmaPreview" alt="Vista previa de firma" style="display:none;max-width:220px;max-height:75px;object-fit:contain;border:1px solid #ddd;padding:5px;background:#fff;">
-                            <button type="button" class="btn-cancelar" onclick="quitarFirmaRegistro()">Quitar firma</button>
                         </div>
                         <small style="color:#68717d;">La firma y el nombre se usan únicamente en la responsiva impresa.</small>
                     </div>
@@ -1681,11 +1679,12 @@
         document.getElementById('editFSalida').value = item.fSalida || '';
         document.getElementById('editObservaciones').value = item.observaciones || '';
         const datosImpresion = obtenerDatosImpresion(item.id);
-        document.getElementById('editTipoMovimiento').value = datosImpresion.tipo || ((['ENTRADA','ALMACEN'].includes(String(item.est || '').toUpperCase())) ? 'ENTRADA' : 'SALIDA');
-        document.getElementById('editNombreFirma').value = datosImpresion.nombre || item.asignado || '';
+        document.getElementById('editIncluirFirmaNombre').checked = datosImpresion.incluirFirmaNombre !== false;
+        document.getElementById('editNombreFirma').value = Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : (item.asignado || '');
         document.getElementById('editFirmaArchivo').value = '';
         mostrarVistaFirmaEdicion(datosImpresion.firma || '');
-        ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones','editTipoMovimiento','editNombreFirma','editFirmaArchivo']
+        actualizarControlesFirmaEdicion();
+        ['editEstatus','editTapizada','editArea','editDepartamento','editTarima','editAsignado','editPiston','editFechaPiston','editFEntrada','editFSalida','editObservaciones','editNombreFirma','editFirmaArchivo','editIncluirFirmaNombre']
             .forEach(idCampo => { document.getElementById(idCampo).disabled = soloLectura; });
         document.querySelector('.btn-guardar').style.display = esDirAdmin ? '' : 'none';
         document.getElementById('editEstatus').disabled = soloLectura;
@@ -1717,7 +1716,7 @@
         item.fSalida = document.getElementById('editFSalida').value;
         item.observaciones = document.getElementById('editObservaciones').value.trim();
         const datosImpresion = obtenerDatosImpresion(item.id);
-        datosImpresion.tipo = document.getElementById('editTipoMovimiento').value;
+        datosImpresion.incluirFirmaNombre = document.getElementById('editIncluirFirmaNombre').checked;
         datosImpresion.nombre = document.getElementById('editNombreFirma').value.trim();
         const archivoFirma = document.getElementById('editFirmaArchivo').files[0];
         if (archivoFirma) {
@@ -1819,6 +1818,14 @@
         try { localStorage.setItem('ieem_impresion_' + id, JSON.stringify(datos)); }
         catch (error) { console.error('No se pudieron guardar los datos de impresión:', error); }
     }
+    function actualizarControlesFirmaEdicion() {
+        const activo = document.getElementById('editIncluirFirmaNombre').checked;
+        document.getElementById('editDatosFirmaGrupo').style.display = activo ? '' : 'none';
+        document.getElementById('editArchivoFirmaGrupo').style.display = activo ? '' : 'none';
+    }
+    document.addEventListener('change', event => {
+        if (event.target && event.target.id === 'editIncluirFirmaNombre') actualizarControlesFirmaEdicion();
+    });
     function mostrarVistaFirmaEdicion(src) {
         const img = document.getElementById('editFirmaPreview');
         img.src = src || ''; img.style.display = src ? 'block' : 'none';
@@ -1867,11 +1874,19 @@
         document.getElementById('lblRespArea').textContent = item.area || 'DIRECCIÓN DE ADMINISTRACIÓN';
         document.getElementById('lblRespDepto').textContent = item.departamento || 'CONTROL PATRIMONIAL';
 
-        // Respeta el tipo de movimiento seleccionado en Editar.
-        const datosImpresion = obtenerDatosImpresion(item.id);
-        const estatusUpper = String(item.est || '').toUpperCase();
-        const tipoMovimiento = datosImpresion.tipo || ((estatusUpper === 'ENTRADA' || estatusUpper === 'ALMACEN') ? 'ENTRADA' : 'SALIDA');
+        // El movimiento se determina directamente con las fechas capturadas en Editar.
+        const entrada = item.fEntrada || '';
+        const salida = item.fSalida || '';
+        let tipoMovimiento;
+        if (entrada && salida) tipoMovimiento = (new Date(salida) >= new Date(entrada)) ? 'SALIDA' : 'ENTRADA';
+        else if (entrada) tipoMovimiento = 'ENTRADA';
+        else if (salida) tipoMovimiento = 'SALIDA';
+        else {
+            const estatusUpper = String(item.est || '').toUpperCase();
+            tipoMovimiento = (estatusUpper === 'ENTRADA' || estatusUpper === 'ALMACEN') ? 'ENTRADA' : 'SALIDA';
+        }
         seleccionarTipoMovimiento(tipoMovimiento);
+        const datosImpresion = obtenerDatosImpresion(item.id);
 
         // Construir 13 filas de la tabla igual que en formato de movimientosweb.xlsx
         const tbody = document.getElementById('tbodyFormatoExcel');
@@ -1905,11 +1920,15 @@
         tbody.innerHTML = filasHtml;
 
         // Nombre y firma configurados en Editar; solo se reflejan en la responsiva.
-        document.getElementById('lblSolicitanteNombre').textContent = Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : (item.asignado || '');
+        const incluirFirmaNombre = datosImpresion.incluirFirmaNombre !== false;
+        document.getElementById('lblSolicitanteNombre').textContent = incluirFirmaNombre
+            ? (Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : (item.asignado || '')) : '';
         const firmaGuardada = datosImpresion.firma || '';
         const firmaAuth = document.querySelector('.ieem-firma-img-auth');
         if (firmaAuth) {
-            if (firmaGuardada) {
+            if (!incluirFirmaNombre) {
+                firmaAuth.style.display = 'none';
+            } else if (firmaGuardada) {
                 firmaAuth.src = firmaGuardada;
                 firmaAuth.style.display = 'block';
             } else if (datosImpresion.firmaEliminada) {
