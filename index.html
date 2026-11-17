@@ -688,9 +688,24 @@
 
         .sidebar-link.active,.sidebar-page-link.active { background:#c3c8d0; font-weight:700; color:#002060; }
         .home-view { max-width:1200px; margin:0 auto; min-height:70vh; }
-        .home-view h1 { margin:8px 0; color:#002060; font-size:28px; }
+        .home-view h1 { margin:8px 0; color:#002060; font-size:30px; }
         .home-view p { color:#68717d; font-size:14px; }
-        .home-workspace { margin-top:28px; min-height:360px; border:1px dashed #cbd2dc; border-radius:12px; background:#fff; }
+        .home-intro { margin:22px 0 28px; padding:25px 28px; border-radius:14px; color:#fff; background:linear-gradient(120deg,#002060,#174b86); box-shadow:0 8px 24px rgba(0,32,96,.12); }
+        .home-intro h1 { margin:0 0 8px; color:#fff; font-size:28px; }
+        .home-intro p { max-width:720px; margin:0; color:rgba(255,255,255,.86); line-height:1.6; }
+        .home-section-title { margin:28px 0 14px; color:#26364b; font-size:17px; font-weight:800; }
+        .home-module-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; }
+        .home-module-card { display:flex; flex-direction:column; min-height:190px; padding:22px; border:1px solid #e0e6ee; border-radius:13px; background:#fff; box-shadow:0 4px 16px rgba(25,45,75,.06); text-align:left; cursor:pointer; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; color:#26364b; }
+        .home-module-card:hover { transform:translateY(-3px); border-color:#9eb5d3; box-shadow:0 10px 24px rgba(25,45,75,.11); }
+        .home-module-icon { display:flex; align-items:center; justify-content:center; width:48px; height:48px; margin-bottom:17px; border-radius:12px; background:#edf3fb; color:#002060; font-size:25px; }
+        .home-module-card strong { margin-bottom:7px; color:#002060; font-size:16px; }
+        .home-module-card span { color:#68717d; font-size:13px; line-height:1.5; }
+        .home-module-card .home-card-action { margin-top:auto; padding-top:17px; color:#174b86; font-size:12px; font-weight:800; }
+        .home-module-card.coming-soon { cursor:default; border-style:dashed; background:#fafbfd; }
+        .home-module-card.coming-soon:hover { transform:none; box-shadow:0 4px 16px rgba(25,45,75,.06); border-color:#e0e6ee; }
+        .home-module-card.coming-soon .home-module-icon { background:#f1f2f4; color:#737b86; }
+        .home-footer-note { margin-top:28px; padding:14px 16px; border-left:3px solid #b5c5d9; background:#f5f7fa; color:#66717e; font-size:12px; line-height:1.5; }
+        @media(max-width:600px) { .home-intro { padding:21px 19px; } .home-intro h1 { font-size:23px; } .home-module-grid { grid-template-columns:1fr; } .home-module-card { min-height:160px; } }
         .page-view[hidden] { display:none !important; }
 
         .sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
@@ -841,12 +856,38 @@
                 <p style="margin:5px 0 0;color:#666;font-size:13px;">Dirección de Administración</p>
             </div>
             <div class="session-actions">
-                <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+                    <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
             </div>
         </div>
-        <h1>Inicio</h1>
-        <p>Espacio principal de trabajo. Desde el menú lateral podrás abrir los módulos del sistema.</p>
-        <div class="home-workspace" aria-label="Área de trabajo vacía"></div>
+
+        <div class="home-intro">
+            <h1>Bienvenido al Control Patrimonial</h1>
+            <p>Plataforma institucional para consultar y administrar los módulos de control de bienes. Selecciona una tarjeta para comenzar a trabajar.</p>
+        </div>
+
+        <h3 class="home-section-title">Módulos disponibles</h3>
+        <div class="home-module-grid">
+            <button type="button" class="home-module-card" onclick="mostrarPagina('inventario')">
+                <span class="home-module-icon" aria-hidden="true">▤</span>
+                <strong>Inventario de sillas</strong>
+                <span>Consulta los registros, revisa existencias y accede a las herramientas de seguimiento del inventario institucional.</span>
+                <span class="home-card-action">ABRIR MÓDULO →</span>
+            </button>
+            <button type="button" class="home-module-card" onclick="irCatalogo()">
+                <span class="home-module-icon" aria-hidden="true">▦</span>
+                <strong>Catálogo patrimonial</strong>
+                <span>Accede al catálogo institucional de consulta de bienes y referencias patrimoniales.</span>
+                <span class="home-card-action">ABRIR CATÁLOGO ↗</span>
+            </button>
+            <div class="home-module-card coming-soon" aria-label="Espacio reservado para nuevos módulos">
+                <span class="home-module-icon" aria-hidden="true">＋</span>
+                <strong>Nuevos módulos</strong>
+                <span>Este espacio queda preparado para incorporar otros módulos institucionales conforme se vayan habilitando.</span>
+                <span class="home-card-action">ESPACIO DISPONIBLE</span>
+            </div>
+        </div>
+
+        <div class="home-footer-note">Dirección de Administración · Control Patrimonial</div>
     </section>
 
     <section id="paginaInventario" class="page-view" hidden>
