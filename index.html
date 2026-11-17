@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dirección de Administración | Inventario IEEM</title>
+    <title>Control Patrimonial | IEEM</title>
     <link rel="icon" type="image/png" sizes="32x32" href="https://ieemoperacion-png.github.io/softwareieem/favicon.png">
     
     <!-- Librería ExcelJS y html2pdf para generar PDF real desde la vista previa -->
@@ -685,6 +685,14 @@
 
         .sidebar-link,.sidebar-page-link,.sidebar-add { display:flex; width:100%; align-items:center; gap:10px; padding:12px; border:0; border-radius:6px; color:#343a40; background:transparent; text-align:left; text-decoration:none; font-size:14px; cursor:pointer; box-sizing:border-box; }
         .sidebar-link:hover,.sidebar-page-link:hover,.sidebar-add:hover { background:#c9ccd1; }
+
+        .sidebar-link.active,.sidebar-page-link.active { background:#c3c8d0; font-weight:700; color:#002060; }
+        .home-view { max-width:1200px; margin:0 auto; min-height:70vh; }
+        .home-view h1 { margin:8px 0; color:#002060; font-size:28px; }
+        .home-view p { color:#68717d; font-size:14px; }
+        .home-workspace { margin-top:28px; min-height:360px; border:1px dashed #cbd2dc; border-radius:12px; background:#fff; }
+        .page-view[hidden] { display:none !important; }
+
         .sidebar-pages-title { padding:20px 12px 7px; color:#747a81; font-size:10px; font-weight:800; letter-spacing:1px; }
         .sidebar-add { margin-top:12px; border:1px dashed #9da3aa; font-size:12px; }
         .app-main { min-width:0; flex:1; padding:18px; box-sizing:border-box; }
@@ -813,8 +821,10 @@
                  alt="Logotipo del IEEM">
             <span>CONTROL PATRIMONIAL</span>
         </div>
+        <button type="button" class="sidebar-link active" id="navInicio" onclick="mostrarPagina('inicio')">⌂ <span>Inicio</span></button>
+        <button type="button" class="sidebar-link" id="navInventario" onclick="mostrarPagina('inventario')">▤ <span>Inventario de sillas</span></button>
         <button type="button" class="sidebar-link" onclick="irCatalogo()">☷ <span>Catálogo</span></button>
-        <div class="sidebar-pages-title">Menu</div>
+        <div class="sidebar-pages-title">Otras páginas</div>
         <nav id="sidebarPages"></nav>
         <button type="button" id="addSidebarPage" class="sidebar-add" onclick="agregarSubpagina()" style="display:none;">＋ Agregar subpágina</button>
     </aside>
@@ -824,9 +834,25 @@
         <button type="button" class="hamburger" aria-label="Abrir menú" onclick="toggleMenuMovil()">☰</button>
         <span>CONTROL PATRIMONIAL</span>
     </div>
+    <section id="paginaInicio" class="page-view home-view">
+        <div class="header">
+            <div>
+                <h2>CONTROL PATRIMONIAL</h2>
+                <p style="margin:5px 0 0;color:#666;font-size:13px;">Dirección de Administración</p>
+            </div>
+            <div class="session-actions">
+                <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+            </div>
+        </div>
+        <h1>Inicio</h1>
+        <p>Espacio principal de trabajo. Desde el menú lateral podrás abrir los módulos del sistema.</p>
+        <div class="home-workspace" aria-label="Área de trabajo vacía"></div>
+    </section>
+
+    <section id="paginaInventario" class="page-view" hidden>
     <div class="header">
         <div>
-            <h2>Dashboard de Inventario</h2>
+            <h2>Inventario de sillas</h2>
             <p style="margin:5px 0 0 0; font-size:13px; color:#666;">Inventario institucional - Dirección de Administración</p>
         </div>
         <div class="session-actions">
@@ -910,6 +936,7 @@
             </table>
         </div>
     </div>
+    </section>
     </main>
 </div>
 
@@ -1395,6 +1422,7 @@
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('appShell').style.display = 'flex';
             renderizarSubpaginas();
+            mostrarPagina('inicio');
             await cargarInventarioNube();
         } catch (error) {
             document.getElementById('appShell').style.display = 'none';
@@ -2002,6 +2030,15 @@
         link.download = "Dashboard_Inventario.xlsx";
         link.click();
         URL.revokeObjectURL(url);
+    }
+
+    function mostrarPagina(pagina) {
+        const esInicio = pagina === 'inicio';
+        document.getElementById('paginaInicio').hidden = !esInicio;
+        document.getElementById('paginaInventario').hidden = esInicio;
+        document.getElementById('navInicio').classList.toggle('active', esInicio);
+        document.getElementById('navInventario').classList.toggle('active', !esInicio);
+        toggleMenuMovil(false);
     }
 
     const URL_CATALOGO_IEEM = 'https://sites.google.com/view/ieem-controlpatrimonial/p%C3%A1gina-principal?authuser=0';
