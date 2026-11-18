@@ -1262,7 +1262,7 @@
                      alt="Firma de quien entrega o recibe"
                      class="ieem-firma-img-auth"
                      onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://ieemoperacion-png.github.io/softwareieem/firmaautorizacion.jpg';}else{this.style.display='none';}">
-                <div id="lblEntregaRecibeNombre" class="ieem-firma-nombre">LAZARO SEGURA MUCIÑO</div>
+                <div id="lblEntregaRecibeNombre" class="ieem-firma-nombre">IGNACIO EMMANUEL ILAGORRE SALGADO</div>
                 <div class="ieem-firma-pie">Nombre y Firma</div>
             </div>
         </div>
@@ -2038,7 +2038,7 @@
         const incluirFirmaNombre = true;
         document.getElementById('lblSolicitanteNombre').textContent = '';
         const datos = obtenerDatosImpresion('superficies');
-        document.getElementById('lblEntregaRecibeNombre').textContent = Object.prototype.hasOwnProperty.call(datos,'nombre') ? datos.nombre : 'LAZARO SEGURA MUCIÑO';
+        document.getElementById('lblEntregaRecibeNombre').textContent = Object.prototype.hasOwnProperty.call(datos,'nombre') ? datos.nombre : 'IGNACIO EMMANUEL ILAGORRE SALGADO';
         const firma = document.querySelector('.ieem-firma-img-auth');
         if (firma) { firma.src = datos.firma || 'firmaautorizacion.jpg'; firma.style.display = 'block'; }
         document.getElementById('modalResponsiva').style.display='flex';
@@ -2126,7 +2126,7 @@
         // El nombre editable corresponde a quien Entrega / Recibe, no al Solicitante.
         document.getElementById('lblSolicitanteNombre').textContent = '';
         document.getElementById('lblEntregaRecibeNombre').textContent = incluirFirmaNombre
-            ? (Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : 'LAZARO SEGURA MUCIÑO') : '';
+            ? (Object.prototype.hasOwnProperty.call(datosImpresion, 'nombre') ? datosImpresion.nombre : 'IGNACIO EMMANUEL ILAGORRE SALGADO') : '';
         const firmaGuardada = datosImpresion.firma || '';
         const firmaAuth = document.querySelector('.ieem-firma-img-auth');
         if (firmaAuth) {
