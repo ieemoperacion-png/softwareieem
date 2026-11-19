@@ -914,7 +914,7 @@
         }
     @media print { #grupoAsignarResponsiva { display:none !important; } }
 </style>
-</head>
+<!-- IEEM: asignaciones por UUID con nombres visibles y permisos por rol -->\n</head>
 <body>
 
 <div class="container" id="appShell" style="display:none;">
@@ -972,7 +972,7 @@
     </div>
 
     <div id="desktop-permissions-note" style="background:#eef3fa;border-left:4px solid #002060;padding:9px 12px;margin-bottom:15px;font-size:12px;color:#344;">
-        <strong>Permisos:</strong> DIRADMIN puede editar los registros y eliminar archivos. Los demás usuarios autenticados pueden consultar, generar responsivas y cargar documentos.
+        <strong>Permisos:</strong> DIRADMIN puede editar y asignar sillas. SUPADMIN puede consultar todas las sillas. CONSULTA solamente puede consultar las sillas asignadas a su usuario.
     </div>
     <div class="kpi-row">
         <div class="kpi-card"><h6>Stock</h6><h3 id="kpi-total">0</h3></div>
@@ -1324,8 +1324,10 @@
                         <select id="editTarima"></select>
                     </div>
                     <div class="campo-edicion">
-                        <label for="editAsignado">Nombre de la persona asignada</label>
-                        <input type="text" id="editAsignado" placeholder="Escribe el nombre">
+                        <label for="editAsignado">Asignar a (usuario CONSULTA)</label>
+                        <select id="editAsignado">
+                            <option value="">Sin asignar</option>
+                        </select>
                     </div>
                     <div class="campo-edicion">
                         <label for="editPiston">Cambio de pistón / detalle</label>
@@ -1624,13 +1626,17 @@
     }
 
     function filaNubeARegistro(row) {
+        const asignadoId = String(row.asignado || '').trim();
+        const personaAsignada = obtenerUsuarioPorId(asignadoId);
         return {
             id: row.id, s: row.serie, m: row.modelo, g: row.grupo, t: row.tarima,
             tap: row.tapizada, est: row.estatus, imgId: row.imagen_url || '',
             area: row.area || '', departamento: row.departamento || '',
             piston: row.cambio_piston || '', fechaPiston: row.fecha_piston || '',
             fEntrada: row.fecha_entrada || '', fSalida: row.fecha_salida || '',
-            observaciones: row.observaciones || '', asignado: row.asignado || '',
+            observaciones: row.observaciones || '',
+            asignadoId,
+            asignado: personaAsignada ? personaAsignada.nombre : (asignadoId || ''),
             numInventario: row.numero_inventario || row.inventario || row.clave_inventario || ''
         };
     }
@@ -1639,7 +1645,7 @@
         return {
             estatus: item.est || 'ALMACEN', tapizada: item.tap || 'NO', tarima: item.t ?? null,
             area: item.area || null, departamento: item.departamento || null,
-            asignado: item.asignado || null, cambio_piston: item.piston || null,
+            asignado: item.asignadoId || null, cambio_piston: item.piston || null,
             fecha_piston: item.fechaPiston || null, fecha_entrada: item.fEntrada || null,
             fecha_salida: item.fSalida || null, observaciones: item.observaciones || null,
             updated_at: new Date().toISOString()
@@ -1649,7 +1655,11 @@
     async function cargarInventarioNube() {
         const { data: rows, error } = await sb.from('inventario').select('*').order('id');
         if (error) throw error;
-        db = (rows || []).map(filaNubeARegistro);
+        const filasVisibles = (rows || []).filter(row => {
+            if (String(rolActual || '').toUpperCase() !== 'CONSULTA') return true;
+            return String(row.asignado || '').trim().toLowerCase() === String(usuarioActual?.id || '').trim().toLowerCase();
+        });
+        db = filasVisibles.map(filaNubeARegistro);
         for (const item of db) {
             if (item.imgId && !/^https?:\/\//i.test(item.imgId) && !item.imgId.startsWith('data:')) {
                 const { data: fotoFirmada, error: fotoError } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(item.imgId, 60 * 60 * 24);
@@ -1790,7 +1800,7 @@
         document.getElementById('btnSubirFoto').style.display = esDirAdmin ? 'block' : 'none';
         const tarimas = [...new Set(db.map(r => r.t).filter(v => v !== null && v !== undefined && v !== ''))].sort((a,b) => Number(a)-Number(b));
         llenarOpcionesEdicion('editTarima', tarimas, item.t);
-        document.getElementById('editAsignado').value = item.asignado || '';
+        document.getElementById('editAsignado').value = item.asignadoId || '';
         document.getElementById('editPiston').value = item.piston || '';
         document.getElementById('editFechaPiston').value = item.fechaPiston || '';
         document.getElementById('editFEntrada').value = item.fEntrada || '';
@@ -1827,7 +1837,8 @@
         item.departamento = document.getElementById('editDepartamento').value.trim();
         const tarima = document.getElementById('editTarima').value;
         item.t = tarima === '' ? null : (Number.isNaN(Number(tarima)) ? tarima : Number(tarima));
-        item.asignado = document.getElementById('editAsignado').value.trim();
+        item.asignadoId = document.getElementById('editAsignado').value || '';
+        item.asignado = obtenerUsuarioPorId(item.asignadoId)?.nombre || '';
         item.piston = document.getElementById('editPiston').value.trim();
         item.fechaPiston = document.getElementById('editFechaPiston').value;
         item.fEntrada = document.getElementById('editFEntrada').value;
@@ -1994,14 +2005,21 @@
         return usuario ? usuario.nombre : 'Usuario no disponible';
     }
     function llenarSelectoresUsuariosSuperficies() {
-        const selectEdicion = document.getElementById('sup-edit-asignado');
-        const selectResponsiva = document.getElementById('responsiva-asignado-a');
         const opciones = '<option value="">Sin asignar</option>' + usuariosRoles
             .filter(u => u.user_id && u.role === 'CONSULTA')
             .map(u => `<option value="${escaparHTML(u.user_id)}">${escaparHTML(u.nombre)}</option>`)
             .join('');
+
+        const selectEdicion = document.getElementById('sup-edit-asignado');
+        const selectResponsiva = document.getElementById('responsiva-asignado-a');
+        const selectSillas = document.getElementById('editAsignado');
+
         if (selectEdicion) selectEdicion.innerHTML = opciones;
-        if (selectResponsiva) selectResponsiva.innerHTML = '<option value="">Selecciona una persona</option>' + opciones.replace('<option value="">Sin asignar</option>', '');
+        if (selectSillas) selectSillas.innerHTML = opciones;
+        if (selectResponsiva) {
+            selectResponsiva.innerHTML = '<option value="">Selecciona una persona</option>' +
+                opciones.replace('<option value="">Sin asignar</option>', '');
+        }
     }
     function superficieVisibleParaUsuario(row) {
         if (!esConsultaSuperficies()) return true;
