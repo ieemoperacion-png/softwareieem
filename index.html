@@ -913,6 +913,10 @@
           .ieem-excel-grid tr { page-break-inside:avoid !important;break-inside:avoid !important; }
         }
     @media print { #grupoAsignarResponsiva { display:none !important; } }
+@media (max-width: 700px) {
+  #modalDetalleSuperficie .modal-edicion-contenido { width:96vw !important; max-height:92vh; overflow:auto; }
+  #detalleSuperficieDatos { grid-template-columns:1fr !important; }
+}
 </style>
 <!-- IEEM: asignaciones por UUID con nombres visibles y permisos por rol -->\n</head>
 <body>
@@ -1059,7 +1063,7 @@
           <input id="buscar-superficies" type="search" placeholder="Buscar por inventario, descripción, material..." oninput="renderizarSuperficies()" style="max-width:360px;width:100%;padding:10px;border:1px solid #ccd2da;border-radius:6px;">
         </div>
         <div class="table-responsive" style="max-height:55vh;">
-          <table style="min-width:1120px;width:100%;"><thead><tr><th>FOTO</th><th>#</th><th>NÚMERO DE INVENTARIO</th><th>DESCRIPCIÓN DEL MUEBLE</th><th>MEDIDAS</th><th>MATERIAL</th><th>COLOR</th><th>ESTADO DE USO</th><th>OBSERVACIONES</th><th>ESTATUS</th><th>ASIGNADO A</th><th>EDITAR</th><th>AGREGAR AL CARRITO</th></tr></thead><tbody id="superficies-body"></tbody></table>
+          <table style="min-width:1120px;width:100%;"><thead><tr><th>FOTO</th><th>#</th><th>NÚMERO DE INVENTARIO</th><th>DESCRIPCIÓN DEL MUEBLE</th><th>MEDIDAS</th><th>MATERIAL</th><th>COLOR</th><th>ESTADO DE USO</th><th>OBSERVACIONES</th><th>ESTATUS</th><th>ASIGNADO A</th><th>ACCIONES</th><th>EDITAR</th><th>AGREGAR AL CARRITO</th></tr></thead><tbody id="superficies-body"></tbody></table>
         </div>
       </div>
       <div id="panelCarritoSuperficies" style="position:sticky;bottom:8px;margin-top:14px;padding:14px;background:#fff;border:1px solid #d9dee7;border-radius:9px;box-shadow:0 3px 14px #0002;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;z-index:5;">
@@ -1168,6 +1172,28 @@
 <div id="imagenModal" class="modal" onclick="cerrarModal()">
     <button class="modal-close" onclick="cerrarModal()">×</button>
     <img class="modal-content" id="imgAmpliada" onclick="event.stopPropagation();">
+</div>
+
+<!-- Modal de consulta de superficies y sus responsivas -->
+<div id="modalDetalleSuperficie" class="modal-edicion" onclick="if(event.target.id==='modalDetalleSuperficie') cerrarDetalleSuperficie()">
+  <div class="modal-edicion-contenido" style="max-width:850px;">
+    <div class="modal-edicion-header">
+      <h3>Consultar superficie</h3>
+      <button type="button" onclick="cerrarDetalleSuperficie()">×</button>
+    </div>
+    <div class="modal-edicion-body">
+      <div id="detalleSuperficieDatos" class="ficha-campos" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;"></div>
+      <div style="margin-top:18px;">
+        <strong>Responsivas y archivos</strong>
+        <div id="detalleSuperficieArchivos" style="margin-top:8px;"></div>
+      </div>
+    </div>
+    <div class="modal-edicion-footer" style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;">
+      <button type="button" class="superficie-accion" id="btnSubirResponsivaSuperficie" onclick="seleccionarArchivoSuperficie(superficieDetalleActual)">＋ Subir responsiva</button>
+      <button type="button" class="superficie-accion" onclick="imprimirResponsivaSuperficieIndividual(superficieDetalleActual)">🖨 Imprimir responsiva</button>
+      <button type="button" class="btn-salir" onclick="cerrarDetalleSuperficie()">Cerrar</button>
+    </div>
+  </div>
 </div>
 
 <!-- =========================================================================
@@ -1404,6 +1430,8 @@
     let carritoSuperficies = [];
     let superficieEdicionId = null;
     let responsivaSuperficiesPendiente = false;
+    let archivosPorSuperficie = {};
+    let superficieDetalleActual = null;
     let asignacionSuperficiesConfirmada = false;
     const esAdminSuperficies = () => String(rolActual || '').toUpperCase() === 'DIRADMIN';
     let registroEnEdicionId = null;
@@ -2038,6 +2066,7 @@
             } else if (/^https?:\/\//i.test(foto) || foto.startsWith('data:')) row._fotoUrl = foto;
         }
         carritoSuperficies = carritoSuperficies.filter(id => superficies.some(r => String(r.id) === String(id)));
+        await cargarArchivosSuperficiesNube();
         renderizarSuperficies();
     }
     function renderizarSuperficies() {
@@ -2049,13 +2078,131 @@
         tbody.innerHTML = lista.map(r => {
             const foto = r._fotoUrl ? `<img src="${escaparHTML(r._fotoUrl)}" alt="Foto" onclick="ampliarImagen('${escaparHTML(r._fotoUrl)}')" style="width:44px;height:44px;object-fit:cover;border-radius:5px;cursor:pointer;">` : '<span style="color:#888;">SIN FOTO</span>';
             const agregado = carritoSuperficies.some(id => String(id) === String(r.id));
+            const accionesConsulta = `<div style="display:flex;flex-direction:column;gap:4px;min-width:112px;">
+                <button class="superficie-accion" onclick="abrirDetalleSuperficie(${JSON.stringify(r.id)})">⌕ Ver detalles</button>
+                <button class="superficie-accion" onclick="seleccionarArchivoSuperficie(${JSON.stringify(r.id)})">↑ Subir responsiva</button>
+                <button class="superficie-accion" onclick="imprimirResponsivaSuperficieIndividual(${JSON.stringify(r.id)})">▣ Imprimir</button>
+                <span style="font-size:11px;color:${(archivosPorSuperficie[String(r.id)] || []).length ? '#16803c' : '#888'};">${(archivosPorSuperficie[String(r.id)] || []).length ? (archivosPorSuperficie[String(r.id)] || []).length + ' archivo(s)' : 'Sin archivos'}</span>
+              </div>`;
             const accionesEdicion = esAdminSuperficies() ? `<button class="superficie-accion" onclick="abrirEdicionSuperficie(${JSON.stringify(r.id)})">✎ Editar</button>` : '<span style="color:#888;">Solo consulta</span>';
             const accionCarrito = esAdminSuperficies() ? `<button class="superficie-accion" onclick="alternarCarritoSuperficie(${JSON.stringify(r.id)})">${agregado ? '✓ Agregado' : '＋ Agregar'}</button>` : '<span style="color:#888;">—</span>';
-            return `<tr><td>${foto}</td><td>${escaparHTML(r.id)}</td><td>${escaparHTML(r.numero_inventario)}</td><td style="text-align:left;">${escaparHTML(r.descripcion_del_mueble)}</td><td>${escaparHTML(r.medidas)}</td><td>${escaparHTML(r.material)}</td><td>${escaparHTML(r.color)}</td><td>${escaparHTML(r.estado_de_uso)}</td><td style="text-align:left;">${escaparHTML(r.observaciones)}</td><td>${escaparHTML(r.estatus)}</td><td>${escaparHTML(obtenerNombreAsignado(r.asignado_a))}</td><td>${accionesEdicion}</td><td>${accionCarrito}</td></tr>`;
-        }).join('') || '<tr><td colspan="13" style="padding:20px;color:#777;">No hay superficies que coincidan con la búsqueda.</td></tr>';
+            return `<tr><td>${foto}</td><td>${escaparHTML(r.id)}</td><td>${escaparHTML(r.numero_inventario)}</td><td style="text-align:left;">${escaparHTML(r.descripcion_del_mueble)}</td><td>${escaparHTML(r.medidas)}</td><td>${escaparHTML(r.material)}</td><td>${escaparHTML(r.color)}</td><td>${escaparHTML(r.estado_de_uso)}</td><td style="text-align:left;">${escaparHTML(r.observaciones)}</td><td>${escaparHTML(r.estatus)}</td><td>${escaparHTML(obtenerNombreAsignado(r.asignado_a))}</td><td>${accionesConsulta}</td><td>${accionesEdicion}</td><td>${accionCarrito}</td></tr>`;
+        }).join('') || '<tr><td colspan="14" style="padding:20px;color:#777;">No hay superficies que coincidan con la búsqueda.</td></tr>';
         document.getElementById('superficies-carrito-total').textContent = carritoSuperficies.length;
         document.getElementById('superficies-carrito-resumen').textContent = carritoSuperficies.length ? carritoSuperficies.map(id => superficies.find(r => String(r.id) === String(id))?.numero_inventario || id).join(' · ') : 'Agrega las superficies que deseas incluir.';
     }
+    async function cargarArchivosSuperficiesNube() {
+        const { data, error } = await sb.from('superficies_files').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        archivosPorSuperficie = {};
+        (data || []).forEach(file => {
+            const id = String(file.superficie_id);
+            if (!archivosPorSuperficie[id]) archivosPorSuperficie[id] = [];
+            archivosPorSuperficie[id].push(file);
+        });
+    }
+    function cerrarDetalleSuperficie() {
+        const modal = document.getElementById('modalDetalleSuperficie');
+        if (modal) modal.style.display = 'none';
+        superficieDetalleActual = null;
+    }
+    function abrirDetalleSuperficie(id) {
+        const r = superficies.find(x => String(x.id) === String(id));
+        if (!r) return;
+        superficieDetalleActual = r.id;
+        const campos = [
+            ['Número de inventario', r.numero_inventario], ['Descripción', r.descripcion_del_mueble],
+            ['Medidas', r.medidas], ['Material', r.material], ['Color', r.color],
+            ['Estado de uso', r.estado_de_uso], ['Estatus', r.estatus],
+            ['Asignado a', obtenerNombreAsignado(r.asignado_a)], ['Observaciones', r.observaciones]
+        ];
+        document.getElementById('detalleSuperficieDatos').innerHTML = campos.map(([k,v]) =>
+            `<div style="border-bottom:1px solid #e5e7eb;padding:8px;"><small style="color:#64748b;">${escaparHTML(k)}</small><div>${escaparHTML(v ?? '—')}</div></div>`
+        ).join('');
+        renderizarArchivosDetalleSuperficie();
+        document.getElementById('modalDetalleSuperficie').style.display = 'flex';
+    }
+    function renderizarArchivosDetalleSuperficie() {
+        const el = document.getElementById('detalleSuperficieArchivos');
+        const files = archivosPorSuperficie[String(superficieDetalleActual)] || [];
+        el.innerHTML = files.length ? files.map(f =>
+            `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #eee;">
+                <span>📄 ${escaparHTML(f.file_name || 'Responsiva')}</span>
+                <button type="button" class="superficie-accion" onclick="abrirArchivoSuperficie(${JSON.stringify(f.id)})">Abrir archivo</button>
+             </div>`
+        ).join('') : '<span style="color:#777;">No hay responsivas cargadas para esta superficie.</span>';
+    }
+    function seleccionarArchivoSuperficie(id) {
+        if (!usuarioActual || id == null) { alert('No se pudo identificar la superficie o la sesión.'); return; }
+        const selector = document.createElement('input');
+        selector.type = 'file'; selector.accept = '.pdf,.jpg,.jpeg,.png'; selector.style.display = 'none';
+        selector.onchange = async () => {
+            const archivo = selector.files && selector.files[0];
+            if (!archivo) { selector.remove(); return; }
+            if (!['application/pdf','image/jpeg','image/png'].includes(archivo.type)) {
+                alert('Selecciona un archivo PDF, JPG o PNG.'); selector.remove(); return;
+            }
+            if (archivo.size > MAX_ARCHIVO_BYTES) { alert('El archivo supera el límite de 10 MB.'); selector.remove(); return; }
+            try {
+                const seguro = archivo.name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]/g, '_').slice(-100) || 'responsiva';
+                const uuid = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                const ruta = `sup-${id}/${usuarioActual.id}/${uuid}-${seguro}`;
+                const { error: uploadError } = await sb.storage.from(BUCKET_DOCUMENTOS).upload(ruta, archivo, {
+                    cacheControl:'3600', upsert:false, contentType:archivo.type
+                });
+                if (uploadError) throw uploadError;
+                const { error: metaError } = await sb.from('superficies_files').insert({
+                    superficie_id:id, file_name:archivo.name, object_path:ruta,
+                    content_type:archivo.type, file_size:archivo.size, uploaded_by:usuarioActual.id
+                });
+                if (metaError) {
+                    await sb.storage.from(BUCKET_DOCUMENTOS).remove([ruta]);
+                    throw metaError;
+                }
+                await cargarArchivosSuperficiesNube();
+                renderizarSuperficies();
+                if (superficieDetalleActual != null) renderizarArchivosDetalleSuperficie();
+                alert('Responsiva cargada correctamente.');
+            } catch (e) {
+                console.error(e);
+                alert('No se pudo cargar la responsiva: ' + (e.message || e));
+            } finally { selector.remove(); }
+        };
+        document.body.appendChild(selector); selector.click();
+    }
+    async function abrirArchivoSuperficie(fileId) {
+        const archivo = Object.values(archivosPorSuperficie).flat().find(f => String(f.id) === String(fileId));
+        if (!archivo) { alert('No se encontró el archivo.'); return; }
+        const win = window.open('about:blank', '_blank');
+        try {
+            const { data, error } = await sb.storage.from(BUCKET_DOCUMENTOS).createSignedUrl(archivo.object_path, 3600);
+            if (error) throw error;
+            if (win) win.location.href = data.signedUrl; else window.location.href = data.signedUrl;
+        } catch (e) {
+            if (win) win.close();
+            alert('No se pudo abrir el archivo: ' + e.message);
+        }
+    }
+    function imprimirResponsivaSuperficieIndividual(id) {
+        const r = superficies.find(x => String(x.id) === String(id));
+        if (!r) return;
+        responsivaSuperficiesPendiente = false;
+        asignacionSuperficiesConfirmada = false;
+        document.getElementById('lblFechaActual').textContent = obtenerFechaFormatoExcel();
+        document.getElementById('lblRespArea').textContent = 'DIRECCIÓN DE ADMINISTRACIÓN';
+        document.getElementById('lblRespDepto').textContent = 'CONTROL PATRIMONIAL';
+        seleccionarTipoMovimiento('SALIDA');
+        document.getElementById('tbodyFormatoExcel').innerHTML =
+            `<tr><td style="text-align:center;">1</td><td style="text-align:left;">${escaparHTML([r.descripcion_del_mueble, r.medidas ? 'Medidas: '+r.medidas : '', r.material ? 'Material: '+r.material : '', r.color ? 'Color: '+r.color : '', r.estado_de_uso ? 'Estado: '+r.estado_de_uso : ''].filter(Boolean).join(' | '))}</td><td style="text-align:center;">${escaparHTML(r.numero_inventario || '')}</td><td style="text-align:center;">—</td><td style="text-align:left;">${escaparHTML(r.observaciones || '')}</td></tr>`;
+        document.getElementById('lblSolicitanteNombre').textContent = '';
+        document.getElementById('lblEntregaRecibeNombre').textContent = obtenerNombreAsignado(r.asignado_a) === '—' ? '' : obtenerNombreAsignado(r.asignado_a);
+        const datos = obtenerDatosImpresion('superficies');
+        const firma = document.querySelector('.ieem-firma-img-auth');
+        if (firma) { firma.src = datos.firma || 'firmaautorizacion.jpg'; firma.style.display = 'block'; }
+        document.getElementById('grupoAsignarResponsiva').style.display = 'none';
+        document.getElementById('modalResponsiva').style.display = 'flex';
+    }
+
     function alternarCarritoSuperficie(id) {
         if (!esAdminSuperficies()) { alert('Solo DIRADMIN puede gestionar el carrito de responsivas.'); return; }
         const registro = superficies.find(r => String(r.id) === String(id));
