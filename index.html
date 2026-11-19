@@ -917,8 +917,38 @@
   #modalDetalleSuperficie .modal-edicion-contenido { width:96vw !important; max-height:92vh; overflow:auto; }
   #detalleSuperficieDatos { grid-template-columns:1fr !important; }
 }
+
+        .hf-panel{background:#fff;border:1px solid #dce1e8;border-radius:12px;padding:18px;box-shadow:0 2px 10px #0000000b}
+        .hf-status{margin:12px 0 16px;padding:12px 14px;border-radius:8px;background:#eef3fa;border-left:4px solid #002060;color:#26364b;font-size:13px}
+        .hf-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+        .hf-panel-head h3{margin:0 0 5px;color:#002060}.hf-panel-head p{margin:0;color:#667085;font-size:13px}
+        .hf-week-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+        .hf-week-kpis>div{background:#f5f7fb;border:1px solid #e3e8f0;border-radius:9px;padding:13px;display:flex;flex-direction:column;gap:5px}
+        .hf-week-kpis span{font-size:12px;color:#667085}.hf-week-kpis strong{font-size:23px;color:#002060}
+        .hf-table-title{font-size:15px;color:#002060;margin:20px 0 9px}
+        .hf-table{width:100%;min-width:460px;border-collapse:collapse}.hf-table th{background:#002060;color:white;padding:10px;text-align:left}.hf-table td{padding:10px;border-bottom:1px solid #e5e7eb;font-size:13px}
+        .hf-modal{display:none;position:fixed;inset:0;z-index:5000;background:#101828a8;align-items:center;justify-content:center;padding:16px}
+        .hf-modal.open{display:flex}.hf-modal-card{width:min(760px,100%);background:#fff;border-radius:14px;padding:20px;box-shadow:0 18px 60px #0004}
+        .hf-modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.hf-modal-head h2{margin:0;color:#002060}.hf-modal-head p{margin:5px 0;color:#667085;font-size:13px}
+        .hf-modal-head button{border:0;background:transparent;font-size:28px;cursor:pointer;color:#667085}
+        .hf-question{text-align:center;font-size:18px;font-weight:700;margin:18px 0}
+        .hf-faces{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+        .hf-face{border:2px solid #e3e8ef;border-radius:12px;background:#fff;padding:15px 8px;display:flex;align-items:center;flex-direction:column;gap:6px;cursor:pointer;color:#26364b}
+        .hf-face:hover,.hf-face.selected{border-color:#002060;background:#f0f5ff;box-shadow:0 0 0 2px #00206018}
+        .hf-emoji{font-size:50px;line-height:1.2}.hf-face small{color:#667085}
+        .hf-modal-message{margin:16px 0;padding:10px 12px;border-radius:7px;background:#f5f7fb;color:#475467;font-size:13px}
+        .hf-modal-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+        @media(max-width:620px){.hf-week-kpis{grid-template-columns:1fr}.hf-faces{grid-template-columns:repeat(2,minmax(0,1fr))}.hf-emoji{font-size:42px}.hf-modal-card{padding:15px;max-height:90vh;overflow:auto}}
+
+        .hf-admin-control{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 14px;padding:14px 16px;border:1px solid #dce1e8;border-radius:10px;background:#f8fafc}
+        .hf-admin-control[hidden]{display:none!important}.hf-admin-control small{display:block;color:#667085;margin-top:4px;font-size:12px}
+        .hf-admin-control-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.hf-admin-state{font-size:13px;font-weight:700;color:#16803c}
+        .hf-admin-state.off{color:#c0392b}
+
+        #navHappyface[hidden]{display:none!important}
 </style>
-<!-- IEEM: asignaciones por UUID con nombres visibles y permisos por rol -->\n</head>
+<!-- IEEM: asignaciones por UUID con nombres visibles y permisos por rol -->
+</head>
 <body>
 
 <div class="container" id="appShell" style="display:none;">
@@ -932,6 +962,7 @@
         <button type="button" class="sidebar-link active" id="navInicio" onclick="mostrarPagina('inicio')">⌂ <span>Inicio</span></button>
         <button type="button" class="sidebar-link" id="navInventario" onclick="mostrarPagina('inventario')">▤ <span>Inventario de sillas</span></button>
         <button type="button" class="sidebar-link" id="navSuperficies" onclick="mostrarPagina('superficies')">▧ <span>Superficies</span></button>
+        <button type="button" class="sidebar-link" id="navHappyface" onclick="mostrarPagina('happyface')" hidden>😊 <span>Administrar Happy Face</span></button>
         <button type="button" class="sidebar-link" onclick="irCatalogo()">☷ <span>Catálogo</span></button>
         <div class="sidebar-pages-title">Otras páginas</div>
         <nav id="sidebarPages"></nav>
@@ -1071,9 +1102,60 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn-salir" onclick="vaciarCarritoSuperficies()">Vaciar carrito</button><button type="button" class="btn-excel" onclick="generarResponsivaSuperficies()">🖨️ Generar carta responsiva</button></div>
       </div>
     </section>
+
+    <section id="paginaHappyface" class="page-view" hidden>
+      <div class="header">
+        <div><h2>Happy Face</h2><p style="margin:5px 0 0;color:#666;font-size:13px;">Registro diario de experiencia institucional y resumen semanal</p></div>
+        <div class="session-actions"><div id="happyface-session" class="session-label"></div><button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button></div>
+      </div>
+      <div class="hf-admin-control" id="hf-admin-control" hidden>
+        <div><strong>Estado general del Happy Face</strong><small>El cambio se aplica a todos los usuarios de la institución.</small></div>
+        <div class="hf-admin-control-actions"><span id="hf-admin-state" class="hf-admin-state">Consultando...</span><button type="button" id="hf-toggle-button" class="btn-guardar" onclick="alternarHappyface()" hidden>Desactivar</button></div>
+      </div>
+      <div class="hf-status" id="happyface-status">Revisando tu registro de hoy...</div>
+      <div class="hf-panel">
+        <div class="hf-panel-head">
+          <div><h3>¿Cómo fue tu día?</h3><p>Selecciona una carita. Cada respuesta registra 1 punto.</p></div>
+          <button class="btn-excel" type="button" onclick="abrirHappyfaceModal()">Registrar respuesta</button>
+        </div>
+        <div class="hf-week-kpis">
+          <div><span>Registros esta semana</span><strong id="hf-total-semana">0</strong></div>
+          <div><span>Puntos acumulados</span><strong id="hf-puntos-semana">0</strong></div>
+          <div><span>Semana</span><strong id="hf-rango-semana">—</strong></div>
+        </div>
+        <h3 class="hf-table-title">Resumen semanal por carita</h3>
+        <div class="table-responsive">
+          <table class="hf-table">
+            <thead><tr><th>Carita seleccionada</th><th>Registros</th><th>Puntos</th></tr></thead>
+            <tbody id="hf-resumen-body"><tr><td colspan="3">Cargando registros...</td></tr></tbody>
+          </table>
+        </div>
+        <h3 class="hf-table-title">Registros de la semana</h3>
+        <div class="table-responsive">
+          <table class="hf-table">
+            <thead><tr><th>Fecha</th><th>Nombre</th><th>Rol</th><th>Respuesta</th><th>Puntos</th></tr></thead>
+            <tbody id="hf-registros-body"><tr><td colspan="5">Cargando registros...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
     </main>
 </div>
 
+<div id="happyfaceModal" class="hf-modal" role="dialog" aria-modal="true" aria-labelledby="hf-modal-title">
+  <div class="hf-modal-card">
+    <div class="hf-modal-head"><div><h2 id="hf-modal-title">Registro Happy Face</h2><p>Tu respuesta se registra una vez por día.</p></div><button type="button" onclick="cerrarHappyfaceModal()" aria-label="Cerrar">×</button></div>
+    <p class="hf-question">¿Cómo te sientes hoy?</p>
+    <div class="hf-faces">
+      <button type="button" class="hf-face" data-face="Muy mal" onclick="seleccionarHappyface('Muy mal',this)"><span class="hf-emoji">😠</span><b>Muy mal</b><small>1 punto</small></button>
+      <button type="button" class="hf-face" data-face="Mal" onclick="seleccionarHappyface('Mal',this)"><span class="hf-emoji">😐</span><b>Mal</b><small>1 punto</small></button>
+      <button type="button" class="hf-face" data-face="Bien" onclick="seleccionarHappyface('Bien',this)"><span class="hf-emoji">🙂</span><b>Bien</b><small>1 punto</small></button>
+      <button type="button" class="hf-face" data-face="Muy bien" onclick="seleccionarHappyface('Muy bien',this)"><span class="hf-emoji">😄</span><b>Muy bien</b><small>1 punto</small></button>
+    </div>
+    <div id="hf-modal-message" class="hf-modal-message">Cada respuesta suma 1 punto al total semanal.</div>
+    <div class="hf-modal-actions"><button type="button" class="btn-salir" onclick="cerrarHappyfaceModal()">Ahora no</button><button type="button" class="btn-guardar" id="hf-save-button" onclick="guardarHappyface()" disabled>Guardar respuesta</button></div>
+  </div>
+</div>
 
 <div id="modalEdicionSuperficie" class="modal-edicion" onclick="if(event.target.id==='modalEdicionSuperficie') cerrarEdicionSuperficie()">
  <div class="modal-edicion-contenido"><div class="modal-edicion-header"><h3 id="tituloEdicionSuperficie">Editar superficie</h3><button type="button" onclick="cerrarEdicionSuperficie()">×</button></div>
@@ -1439,6 +1521,13 @@
     let archivosPorItem = {};
     const BUCKET_DOCUMENTOS = 'inventario-documentos';
     const MAX_ARCHIVO_BYTES = 10 * 1024 * 1024;
+    let happyfaceSeleccionado = '';
+    let happyfaceRegistroHoy = null;
+    let happyfaceActivo = true;
+    const esAdminHappyface = () => ['DIRADMIN','SUPADMIN'].includes(String(rolActual || '').toUpperCase());
+    const HAPPYFACE_CARAS = ['Muy mal', 'Mal', 'Bien', 'Muy bien'];
+    const HAPPYFACE_ICONOS = {'Muy mal':'😠','Mal':'😐','Bien':'🙂','Muy bien':'😄'};
+
 
     function mostrarMensajeAcceso(mensaje, error = true) {
         const el = document.getElementById('auth-message');
@@ -1625,6 +1714,9 @@
             rolActual = String(roleRow.role || 'CONSULTA').trim().toUpperCase();
             usuarioNombreActual = String(roleRow.nombre || '').trim() || 'Usuario sin nombre';
             esDirAdmin = rolActual === 'DIRADMIN';
+            const navHappyface = document.getElementById('navHappyface');
+            if (navHappyface) navHappyface.hidden = !esAdminHappyface();
+            if (esAdminHappyface()) { const hfPanel = document.getElementById('hf-admin-control'); if (hfPanel) hfPanel.hidden = false; }
 
             const { data: usuarios, error: usuariosError } = await sb
                 .from('user_roles').select('user_id, role, nombre').order('nombre');
@@ -1646,6 +1738,13 @@
             mostrarPagina('inicio');
             await cargarInventarioNube();
             await cargarSuperficiesNube();
+            try {
+                await prepararHappyfaceSesion();
+            } catch (hfError) {
+                console.error('Error al iniciar Happy Face:', hfError);
+                const hfStatus = document.getElementById('happyface-status');
+                if (hfStatus) hfStatus.textContent = 'Happy Face aún no está configurado en Supabase. Ejecuta el SQL de configuración y vuelve a iniciar sesión.';
+            }
         } catch (error) {
             document.getElementById('appShell').style.display = 'none';
             document.getElementById('authOverlay').style.display = 'flex';
@@ -2629,15 +2728,197 @@
         URL.revokeObjectURL(url);
     }
 
+
+    function fechaLocalHappyface() {
+        const d = new Date();
+        const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+        return `${y}-${m}-${day}`;
+    }
+    function lunesSemanaHappyface(fecha = new Date()) {
+        const d = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+        const delta = (d.getDay() + 6) % 7;
+        d.setDate(d.getDate() - delta);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function formatoFechaHappyface(fecha) {
+        if (!fecha) return '—';
+        const [y,m,d] = String(fecha).slice(0,10).split('-');
+        return `${d}/${m}/${y}`;
+    }
+    async function prepararHappyfaceSesion() {
+        if (!usuarioActual || !sb) return;
+        const etiqueta = document.getElementById('happyface-session');
+        if (etiqueta) etiqueta.innerHTML = `${escaparHTML(usuarioNombreActual)} · <span class="etiqueta-rol">${escaparHTML(rolActual)}</span>`;
+        await cargarEstadoHappyface();
+        if (happyfaceActivo) await revisarHappyfaceHoy(true);
+        else {
+            const status = document.getElementById('happyface-status');
+            if (status) status.textContent = 'El registro Happy Face está temporalmente desactivado por administración.';
+        }
+        if (esAdminHappyface()) await cargarResumenHappyface();
+    }
+    async function cargarEstadoHappyface() {
+        const { data, error } = await sb.from('happyface_config').select('activo').eq('id', true).single();
+        if (error) throw error;
+        happyfaceActivo = data?.activo === true;
+        pintarControlHappyface();
+    }
+    function pintarControlHappyface() {
+        const panel = document.getElementById('hf-admin-control');
+        const state = document.getElementById('hf-admin-state');
+        const button = document.getElementById('hf-toggle-button');
+        if (!panel || !esAdminHappyface()) return;
+        panel.hidden = false;
+        if (state) {
+            state.textContent = happyfaceActivo ? 'ACTIVADO' : 'DESACTIVADO';
+            state.classList.toggle('off', !happyfaceActivo);
+        }
+        if (button) {
+            button.hidden = rolActual !== 'DIRADMIN';
+            button.textContent = happyfaceActivo ? 'Desactivar' : 'Activar';
+        }
+    }
+    async function alternarHappyface() {
+        if (rolActual !== 'DIRADMIN') return alert('Solo DIRADMIN puede cambiar el estado de Happy Face.');
+        const nuevoEstado = !happyfaceActivo;
+        const confirmar = confirm(nuevoEstado
+            ? '¿Deseas ACTIVAR Happy Face para todos los usuarios?'
+            : '¿Deseas DESACTIVAR Happy Face para todos los usuarios?');
+        if (!confirmar) return;
+        const button = document.getElementById('hf-toggle-button');
+        if (button) button.disabled = true;
+        try {
+            const { error } = await sb.from('happyface_config').update({ activo: nuevoEstado, actualizado_por: usuarioActual.id, actualizado_en: new Date().toISOString() }).eq('id', true);
+            if (error) throw error;
+            happyfaceActivo = nuevoEstado;
+            pintarControlHappyface();
+            const status = document.getElementById('happyface-status');
+            if (status) status.textContent = happyfaceActivo
+                ? 'Happy Face está activado. Los usuarios podrán registrar su respuesta al iniciar sesión.'
+                : 'Happy Face está desactivado. No se solicitarán nuevas respuestas.';
+            if (happyfaceActivo && rolActual === 'CONSULTA') await revisarHappyfaceHoy(true);
+            alert(happyfaceActivo ? 'Happy Face activado.' : 'Happy Face desactivado.');
+        } catch (error) {
+            alert('No se pudo cambiar el estado: ' + (error.message || error));
+        } finally { if (button) button.disabled = false; }
+    }
+    async function revisarHappyfaceHoy(abrirSiPendiente = false) {
+        if (!usuarioActual) return;
+        const { data, error } = await sb.from('happyface_registros')
+            .select('id, fecha, emocion, puntos')
+            .eq('user_id', usuarioActual.id)
+            .eq('fecha', fechaLocalHappyface())
+            .maybeSingle();
+        if (error) throw error;
+        happyfaceRegistroHoy = data || null;
+        const status = document.getElementById('happyface-status');
+        if (status) {
+            status.textContent = data
+                ? `✓ Ya registraste tu respuesta de hoy (${formatoFechaHappyface(data.fecha)}): ${HAPPYFACE_ICONOS[data.emocion] || ''} ${data.emocion}. Tu registro cuenta para el resumen semanal.`
+                : 'Aún no has registrado tu Happy Face de hoy. Al elegir una carita se guardará 1 punto.';
+        }
+        if (!data && abrirSiPendiente) abrirHappyfaceModal();
+    }
+    function abrirHappyfaceModal() {
+        if (!happyfaceActivo) return;
+        if (happyfaceRegistroHoy) {
+            alert('Tu respuesta de hoy ya está registrada. Podrás volver a participar mañana.');
+            return;
+        }
+        happyfaceSeleccionado = '';
+        document.querySelectorAll('.hf-face').forEach(b => b.classList.remove('selected'));
+        const save = document.getElementById('hf-save-button');
+        if (save) save.disabled = true;
+        const msg = document.getElementById('hf-modal-message');
+        if (msg) msg.textContent = 'Cada respuesta suma 1 punto al total semanal. Solo puedes registrar una respuesta al día.';
+        document.getElementById('happyfaceModal')?.classList.add('open');
+    }
+    function cerrarHappyfaceModal() {
+        document.getElementById('happyfaceModal')?.classList.remove('open');
+    }
+    function seleccionarHappyface(emocion, boton) {
+        if (!HAPPYFACE_CARAS.includes(emocion) || happyfaceRegistroHoy) return;
+        happyfaceSeleccionado = emocion;
+        document.querySelectorAll('.hf-face').forEach(b => b.classList.toggle('selected', b === boton));
+        const save = document.getElementById('hf-save-button');
+        if (save) save.disabled = false;
+    }
+    async function guardarHappyface() {
+        if (!usuarioActual || !happyfaceActivo || !happyfaceSeleccionado || happyfaceRegistroHoy) return;
+        const button = document.getElementById('hf-save-button');
+        button.disabled = true; button.textContent = 'Guardando...';
+        try {
+            const { data, error } = await sb.from('happyface_registros').insert({
+                user_id: usuarioActual.id,
+                nombre: usuarioNombreActual,
+                rol: rolActual,
+                fecha: fechaLocalHappyface(),
+                emocion: happyfaceSeleccionado,
+                puntos: 1
+            }).select('id, fecha, emocion, puntos').single();
+            if (error) {
+                if (error.code === '23505') throw new Error('Ya existe un registro tuyo para hoy. Actualiza la página para verlo.');
+                throw error;
+            }
+            happyfaceRegistroHoy = data;
+            cerrarHappyfaceModal();
+            await revisarHappyfaceHoy(false);
+            await cargarResumenHappyface();
+        } catch (error) {
+            const msg = document.getElementById('hf-modal-message');
+            if (msg) msg.textContent = 'No se pudo guardar: ' + (error.message || error);
+            button.disabled = false;
+        } finally {
+            button.textContent = 'Guardar respuesta';
+        }
+    }
+    async function cargarResumenHappyface() {
+        if (!usuarioActual) return;
+        const inicio = lunesSemanaHappyface();
+        const hoy = fechaLocalHappyface();
+        const { data, error } = await sb.from('happyface_registros')
+            .select('fecha, nombre, rol, emocion, puntos, user_id')
+            .gte('fecha', inicio).lte('fecha', hoy)
+            .order('fecha', { ascending: false });
+        if (error) throw error;
+        const registros = data || [];
+        const total = registros.length;
+        const puntos = registros.reduce((n,r) => n + Number(r.puntos || 0), 0);
+        document.getElementById('hf-total-semana').textContent = total;
+        document.getElementById('hf-puntos-semana').textContent = puntos;
+        document.getElementById('hf-rango-semana').textContent = `${formatoFechaHappyface(inicio)} – ${formatoFechaHappyface(hoy)}`;
+        const resumen = HAPPYFACE_CARAS.map(emocion => {
+            const subset = registros.filter(r => r.emocion === emocion);
+            return `<tr><td>${HAPPYFACE_ICONOS[emocion]} ${emocion}</td><td>${subset.length}</td><td>${subset.reduce((n,r)=>n+Number(r.puntos||0),0)}</td></tr>`;
+        }).join('');
+        document.getElementById('hf-resumen-body').innerHTML = resumen || '<tr><td colspan="3">Sin registros esta semana.</td></tr>';
+        document.getElementById('hf-registros-body').innerHTML = registros.length
+            ? registros.map(r => `<tr><td>${formatoFechaHappyface(r.fecha)}</td><td>${escaparHTML(r.nombre || 'Usuario')}</td><td>${escaparHTML(r.rol || '')}</td><td>${HAPPYFACE_ICONOS[r.emocion] || ''} ${escaparHTML(r.emocion)}</td><td>${Number(r.puntos || 0)}</td></tr>`).join('')
+            : '<tr><td colspan="5">Sin registros esta semana.</td></tr>';
+    }
+
     function mostrarPagina(pagina) {
+        if (pagina === 'happyface' && !esAdminHappyface()) {
+            alert('No tienes permiso para consultar esta subpágina.');
+            pagina = 'inicio';
+        }
         const esInicio = pagina === 'inicio';
         const esInventario = pagina === 'inventario';
+        const esHappyface = pagina === 'happyface';
         document.getElementById('paginaInicio').hidden = !esInicio;
         document.getElementById('paginaInventario').hidden = !esInventario;
         document.getElementById('paginaSuperficies').hidden = pagina !== 'superficies';
+        document.getElementById('paginaHappyface').hidden = !esHappyface;
         document.getElementById('navInicio').classList.toggle('active', esInicio);
         document.getElementById('navInventario').classList.toggle('active', esInventario);
         document.getElementById('navSuperficies').classList.toggle('active', pagina === 'superficies');
+        document.getElementById('navHappyface').classList.toggle('active', esHappyface);
+        if (esHappyface) {
+            cargarEstadoHappyface().then(() => {
+                pintarControlHappyface();
+                if (esAdminHappyface()) return cargarResumenHappyface();
+            }).catch(e => alert('No se pudo cargar Happy Face: ' + e.message));
+        }
         if (pagina === 'superficies') cargarSuperficiesNube().catch(e => alert('No se pudo cargar Superficies: '+e.message));
         toggleMenuMovil(false);
     }
