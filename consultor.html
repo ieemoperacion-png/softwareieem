@@ -8,17 +8,30 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #e6e6e6;
+            background-image: url('https://ieemoperacion-png.github.io/softwareieem/ieemfondo.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
         }
 
         .card {
-            background-color: #e6e6e6;
+            background-color: rgba(230, 230, 230, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            border-radius: 22px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
             text-align: center;
-            width: 480px;
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
         }
 
         .logo-container {
@@ -99,7 +112,7 @@
         }
 
         .content-container {
-            margin-top: 45px;
+            margin-top: 30px;
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -109,10 +122,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f2f2f2;
+            background-color: rgba(242, 242, 242, 0.95);
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
 
         .file-link {
@@ -182,8 +195,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // DIRECCIÓN DE LA API CORREGIDA: Apunta directamente a los commits del archivo específico en tu repositorio
-        const apiUrl = "https://github.com";
+        // Reemplaza USUARIO y REPOSITORIO por los de tu repositorio público en GitHub
+        const apiUrl = "https://api.github.com/repos/USUARIO/REPOSITORIO/commits?path=DISTRITALES%20TDV1.xlsx&page=1&per_page=1";
         
         fetch(apiUrl)
             .then(response => {
@@ -191,7 +204,6 @@
                 return response.json();
             })
             .then(data => {
-                // Validación del arreglo de confirmaciones (commits) que envía GitHub
                 if (data && data.length > 0 && data[0].commit && data[0].commit.committer) {
                     const commitDate = new Date(data[0].commit.committer.date);
                     const opciones = { year: 'numeric', month: '2-digit', day: '2-digit' };
