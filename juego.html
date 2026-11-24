@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Armador 3D IEEM - Conectado a Supabase</title>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: sans-serif; display: flex; }
+    #ui { width: 310px; background: #1e1e1e; color: #fff; padding: 15px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+    .item { background: #2d2d2d; padding: 10px; margin-bottom: 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .item:hover { background: #3d3d3d; }
+    .disabled { opacity: 0.4; pointer-events: none; }
+    #info { position: absolute; top: 10px; left: 330px; background: rgba(0,0,0,0.75); color: #fff; padding: 8px 12px; border-radius: 5px; font-size: 13px; }
+    #ficha { position: absolute; bottom: 15px; right: 15px; width: 220px; background: #1e1e1e; color: #fff; padding: 12px; border-radius: 8px; display: none; font-size: 12px; }
+    #ficha img { width: 100%; height: 120px; object-fit: cover; border-radius: 4px; margin-top: 8px; }
+    button { width: 100%; padding: 10px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 12px; }
+  </style>
+  <script src="https://cloudflare.com"></script>
+  <script src="https://jsdelivr.net"></script>
+  <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+  <div id="ui">
+    <h3>Inventario IEEM (En Vivo)</h3>
+    <button onclick="exportarLista()">Descargar Lista de Inventario</button>
+    <div id="estado">Cargando desde Supabase...</div>
+    <div id="catalogo"></div>
+  </div>
+  <div id="info">Clic y arrastra para mover | <b>R</b>: Rotar 90° | <b>Supr</b>: Quitar pieza</div>
+  <div id="ficha"></div>
+
+  <script>
+    // 1. CONFIGURACIÓN DE SUPABASE
+    const SUPABASE_URL = 'https://supabase.co';
+    const SUPABASE_ANON_KEY = 'TU_CLAVE_ANON_AQUI'; // <-- PEGA AQUÍ TU CLAVE PUBLIC ANON
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let inventarioAgrupado = [];
+    const coloresMap = { 'CAFÉ': 0x5C3A21, 'CAOBA': 0x6E2C1B, 'GRIS': 0x808080, 'ARENA': 0xD8CBB8 };
+
+    // Extrae medidas en metros desde el texto (ej. "1.53 X 76 CM" -> w: 1.53, d: 0.76)
+    function parsearMedidas(desc, obs) {
+      const texto = (desc + ' ' + (obs || '')).toUpperCase();
+      const nums = texto.match(/(\d+(?:\.\d+)?)/g);
+      let d1 = 1.00, d2 = 0.60;
+      if (nums && nums.length >= 2) {
+        d1 = parseFloat(nums);
+        d2 = parseFloat(nums);
+        if (d1 > 10) d1 /= 100; // Convertir cm a metros
+        if (d2 > 10) d2 /= 100;
+      }
+      const esCostado = texto.includes('COSTADO');
+      const esPuente = texto.includes('PUENTE');
+      return {
+        tipo: esCostado ? 'costado' : (esPuente ? 'puente' : 'cubierta'),
+        w: esCostado ? d2 : d1,
+        h: esCostado ? d1 : 0.03,
+        d: esCostado ? 0.03 : d2
+      };
+    }
+
+    async function cargarInventario() {
+      const { data, error } = await db.from('superficies').select('*');
+      if (error) {
+        document.getElementById('estado').innerText = 'Error: ' + error.message;
+        return;
+      }
+      document.getElementById('estado').innerText = `${data.length} registros conectados`;
+
+      const grupos = {};
+      data.forEach(row => {
+        const med = parsearMedidas(row.descripcion, row.observaciones);
+        const clave = `${med.tipo}-${row.material}-${row.color}-${med.w}x${med.d}x${med.h}`;
+        if (!grupos[clave]) {
+          grupos[clave] = {
+            nombre: `${med.tipo.toUpperCase()} ${row.color || ''} (${med.w.toFixed(2)}x${(med.tipo==='costado'?med.h:med.d).toFixed(2)}m)`,
+            ...med,
+            colorHex: coloresMap[(row.color || '').toUpperCase()] || 0xA0A0A0,
+            piezasReales: []
+          };
+        }
+        grupos[clave].piezasReales.push(row);
+      });
+
+      inventarioAgrupado = Object.values(grupos);
+      renderUI();
+    }
+
+    // 2. ESCENA 3D THREE.JS
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f2f5);
+    const camera = new THREE.PerspectiveCamera(50, (window.innerWidth - 310) / window.innerHeight, 0.1, 100);
+    camera.position.set(2.5, 2.5, 3.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth - 310, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    scene.add(new THREE.GridHelper(6, 60));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
+
+    const planoSuelo = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshBasicMaterial({ visible: false }));
+    planoSuelo.rotation.x = -Math.PI / 2;
+    scene.add(planoSuelo);
+
+    const piezasEnEscena = [];
+    let seleccionada = null, arrastrando = false;
+    const raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
+
+    function renderUI() {
+      const cont = document.getElementById('catalogo');
+      cont.innerHTML = '';
+      inventarioAgrupado.forEach(grupo => {
+        const div = document.createElement('div');
+        div.className = 'item' + (grupo.piezasReales.length <= 0 ? ' disabled' : '');
+        div.innerHTML = `<span>${grupo.nombre}</span><b>${grupo.piezasReales.length}</b>`;
+        div.onclick = () => agregarPieza(grupo);
+        cont.appendChild(div);
+      });
+    }
+
+    function agregarPieza(grupo) {
+      if (grupo.piezasReales.length <= 0) return;
+      const registroReal = grupo.piezasReales.pop(); // Toma un ID real de la BD
+      renderUI();
+
+      const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(grupo.w, grupo.h, grupo.d),
+        new THREE.MeshStandardMaterial({ color: grupo.colorHex, roughness: 0.6 })
+      );
+      mesh.position.y = grupo.tipo === 'costado' ? grupo.h / 2 : 0.71 + (grupo.h / 2);
+      mesh.userData = { grupoRef: grupo, registroReal };
+      scene.add(mesh);
+      piezasEnEscena.push(mesh);
+      seleccionarPieza(mesh);
+    }
+
+    function seleccionarPieza(mesh) {
+      seleccionada = mesh;
+      const ficha = document.getElementById('ficha');
+      if (!mesh) { ficha.style.display = 'none'; return; }
+      const reg = mesh.userData.registroReal;
+      ficha.style.display = 'block';
+      ficha.innerHTML = `
+        <b>Inv:</b> ${reg.numero_inventario || 'S/N'}<br>
+        <b>Estado:</b> ${reg.estado_de_uso}<br>
+        <b>Ubicación:</b> ${reg.ubicacion || 'N/A'}
+        ${reg.foto_url ? `<img src="${reg.foto_url}" alt="Foto pieza">` : ''}
+      `;
+    }
+
+    renderer.domElement.addEventListener('pointerdown', (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(piezasEnEscena);
+      if (hits.length > 0) {
+        seleccionarPieza(hits.object);
+        arrastrando = true;
+        controls.enabled = false;
+      } else {
+        seleccionarPieza(null);
+      }
+    });
+
+    renderer.domElement.addEventListener('pointermove', (e) => {
+      if (!arrastrando || !seleccionada) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObject(planoSuelo);
+      if (hits.length > 0) {
+        seleccionada.position.x = Math.round(hits.point.x / 0.05) * 0.05;
+        seleccionada.position.z = Math.round(hits.point.z / 0.05) * 0.05;
+      }
+    });
+
+    window.addEventListener('pointerup', () => { arrastrando = false; controls.enabled = true; });
+    window.addEventListener('keydown', (e) => {
+      if (!seleccionada) return;
+      if (e.key.toLowerCase() === 'r') seleccionada.rotation.y += Math.PI / 2;
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        seleccionada.userData.grupoRef.piezasReales.push(seleccionada.userData.registroReal);
+        scene.remove(seleccionada);
+        piezasEnEscena.splice(piezasEnEscena.indexOf(seleccionada), 1);
+        seleccionarPieza(null);
+        renderUI();
+      }
+    });
+
+    function exportarLista() {
+      if (piezasEnEscena.length === 0) return alert('Coloca piezas primero.');
+      const lista = piezasEnEscena.map(p => `${p.userData.registroReal.numero_inventario} | ${p.userData.registroReal.descripcion} | Estado: ${p.userData.registroReal.estado_de_uso}`).join('\n');
+      alert('Piezas utilizadas en esta mesa:\n\n' + lista);
+    }
+
+    cargarInventario();
+    function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+    animate();
+  </script>
+</body>
+</html>
